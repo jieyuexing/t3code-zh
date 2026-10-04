@@ -1132,9 +1132,8 @@ export interface DesktopBridge {
   onTrackpadScrollEnd?: (listener: () => void) => () => void;
   /**
    * The OS locale as a BCP-47 tag, which the renderer cannot read for itself:
-   * the packaged app ships only the `en-US` Chromium locale pak, so
-   * `navigator.language` and the default `Intl` locale are pinned to `en-US`
-   * regardless of OS settings.
+   * `navigator.language` and the default `Intl` locale follow the app's
+   * selected Chromium locale, which can differ from OS settings.
    */
   getSystemLocale?: () => string | null;
   // One bootstrap per pool instance currently registered with bootstrap
@@ -1208,6 +1207,8 @@ export interface DesktopBridge {
    */
   pickThemeFiles?: () => Promise<readonly PickedThemeFile[] | null>;
   setTheme: (theme: DesktopTheme) => Promise<void>;
+  /** Fork UI language; native desktop labels take effect after restarting the app. */
+  setLocale?: (locale: "en" | "zh-CN") => Promise<void>;
   showContextMenu: <T extends string>(
     items: readonly ContextMenuItem<T>[],
     position?: { x: number; y: number },

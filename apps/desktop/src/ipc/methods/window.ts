@@ -51,6 +51,17 @@ const ContextMenuPosition = Schema.Struct({
   y: Schema.Number,
 });
 
+export const setLocale = DesktopIpc.makeIpcMethod({
+  channel: IpcChannels.SET_LOCALE_CHANNEL,
+  payload: Schema.Literals(["en", "zh-CN"]),
+  result: Schema.Void,
+  handler: (locale) =>
+    Effect.tryPromise(async () => {
+      const { setDesktopLocale } = await import("../../../../../i18n/desktop-runtime.js");
+      setDesktopLocale(locale);
+    }),
+});
+
 const ContextMenuInput = Schema.Struct({
   items: Schema.Array(ContextMenuItemSchema),
   position: Schema.optionalKey(ContextMenuPosition),
