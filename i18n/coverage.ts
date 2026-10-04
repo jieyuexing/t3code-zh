@@ -2,7 +2,7 @@ import * as NodeFS from "node:fs";
 import * as NodePath from "node:path";
 import * as NodeURL from "node:url";
 import { babel } from "./babel.mjs";
-import { classify, inScope, repoRoot, sourceRoots } from "./rules.mjs";
+import { classifyAll, inScope, repoRoot, sourceRoots } from "./rules.mjs";
 import { readDictionary, readIgnore } from "./plugin.mjs";
 
 type Occurrence = {
@@ -44,36 +44,37 @@ export function extract(paths = sourceRoots.map((root) => NodePath.join(repoRoot
       parserOpts: { plugins: ["typescript", "jsx"] },
     });
     const collect = (path) => {
-      const candidate = classify(path, { filename: file });
-      if (!candidate || (!candidate.eligible && !candidate.review)) return;
-      const ledger = candidate.eligible ? candidates : review;
-      const category = relative.startsWith("apps/desktop/") ? "desktop" : candidate.category;
-      const item: Candidate = ledger.get(candidate.key) ?? {
-        key: candidate.key,
-        placeholders: candidate.placeholders,
-        categories: [],
-        locations: [],
-        occurrences: [],
-        occurrenceCount: 0,
-      };
-      const location = `${relative}:${path.node.loc?.start.line ?? 1}`;
-      item.occurrenceCount++;
-      if (!candidate.eligible) {
-        item.reasons ??= {};
-        item.reasons[candidate.reason] = (item.reasons[candidate.reason] ?? 0) + 1;
-      }
-      if (!item.categories.includes(category)) item.categories.push(category);
-      if (item.occurrences.length < 8)
-        item.occurrences.push({
-          location,
-          category,
-          context: candidate.context,
+      for (const candidate of classifyAll(path, { filename: file })) {
+        if (!candidate.eligible && !candidate.review) continue;
+        const ledger = candidate.eligible ? candidates : review;
+        const category = relative.startsWith("apps/desktop/") ? "desktop" : candidate.category;
+        const item: Candidate = ledger.get(candidate.key) ?? {
+          key: candidate.key,
           placeholders: candidate.placeholders,
-          ...(!candidate.eligible ? { reason: candidate.reason } : {}),
-        });
-      if (!item.locations.includes(location) && item.locations.length < 8)
-        item.locations.push(location);
-      ledger.set(candidate.key, item);
+          categories: [],
+          locations: [],
+          occurrences: [],
+          occurrenceCount: 0,
+        };
+        const location = `${relative}:${candidate.line ?? path.node.loc?.start.line ?? 1}`;
+        item.occurrenceCount++;
+        if (!candidate.eligible) {
+          item.reasons ??= {};
+          item.reasons[candidate.reason] = (item.reasons[candidate.reason] ?? 0) + 1;
+        }
+        if (!item.categories.includes(category)) item.categories.push(category);
+        if (item.occurrences.length < 8)
+          item.occurrences.push({
+            location,
+            category,
+            context: candidate.context,
+            placeholders: candidate.placeholders,
+            ...(!candidate.eligible ? { reason: candidate.reason } : {}),
+          });
+        if (!item.locations.includes(location) && item.locations.length < 8)
+          item.locations.push(location);
+        ledger.set(candidate.key, item);
+      }
     };
     babel.traverse(ast, { JSXText: collect, StringLiteral: collect, TemplateLiteral: collect });
   }

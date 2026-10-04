@@ -1,6 +1,6 @@
 import * as NodeFS from "node:fs";
 import * as NodeURL from "node:url";
-import { classify, inScope } from "./rules.mjs";
+import { classify, classifyAll, inScope } from "./rules.mjs";
 
 export function readDictionary() {
   return JSON.parse(NodeFS.readFileSync(new URL("./zh-CN.json", import.meta.url), "utf8"));
@@ -23,27 +23,40 @@ export default function i18nPlugin({ types: t }, options = {}) {
         const imports = new Map();
         const runtime =
           options.runtime ?? NodeURL.fileURLToPath(new URL("./runtime.js", import.meta.url));
+        // Classify the unmodified tree, just like extraction. Rewriting a local
+        // plural helper must not change how its later call sites are recognized.
+        const candidates = new WeakMap();
+        const context = { filename: state.filename, describePlaceholders: false };
+        program.traverse({
+          "JSXText|StringLiteral|TemplateLiteral"(path) {
+            candidates.set(path.node, {
+              outer: classify(path, context),
+              items: classifyAll(path, context),
+            });
+          },
+        });
         const translate = (path) => {
-          const candidate = classify(path, {
-            filename: state.filename,
-            describePlaceholders: false,
-          });
-          if (
-            !candidate?.eligible ||
-            !Object.hasOwn(dictionary, candidate.key) ||
-            Object.hasOwn(ignored, candidate.key)
-          )
-            return;
+          const original = candidates.get(path.node);
+          if (!original) return;
+          const matches = original.items.filter(
+            (candidate) =>
+              candidate.eligible &&
+              Object.hasOwn(dictionary, candidate.key) &&
+              !Object.hasOwn(ignored, candidate.key),
+          );
+          if (!matches.length) return;
+          const document = !!matches[0].segment;
+          const candidate = document ? original.outer : matches[0];
           const template = path.isTemplateLiteral();
-          const helper = template ? "__tf" : "__t";
+          const helper = document ? "__th" : template ? "__tf" : "__t";
           if (!imports.has(helper))
             imports.set(helper, program.scope.generateUidIdentifier(helper));
           const args = [t.stringLiteral(candidate.raw)];
-          if (template) {
+          if (template || document) {
             // Template interpolation coerces each expression before evaluating the next.
             args.push(
               t.arrayExpression(
-                path.node.expressions.map((expr) =>
+                (path.node.expressions ?? []).map((expr) =>
                   t.templateLiteral(
                     [
                       t.templateElement({ raw: "", cooked: "" }),
@@ -55,6 +68,7 @@ export default function i18nPlugin({ types: t }, options = {}) {
               ),
             );
           }
+          if (document) args.push(t.valueToNode(matches.map((match) => match.segment)));
           const call = t.callExpression(t.cloneNode(imports.get(helper)), args);
           path.replaceWith(
             path.isJSXText() || path.parentPath.isJSXAttribute()
@@ -67,7 +81,7 @@ export default function i18nPlugin({ types: t }, options = {}) {
         program.traverse({
           JSXText: translate,
           StringLiteral: translate,
-          TemplateLiteral: translate,
+          TemplateLiteral: { exit: translate },
         });
         if (imports.size)
           program.unshiftContainer(

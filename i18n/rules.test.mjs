@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test"
 import * as NodePath from "node:path";
 import { babel } from "./babel.mjs";
 import plugin from "./plugin.mjs";
-import { classify, inScope, jsxText, repoRoot, uiProperties } from "./rules.mjs";
+import { classify, classifyAll, inScope, jsxText, repoRoot, uiProperties } from "./rules.mjs";
 import { createTranslator } from "./core.js";
 
 const filename = NodePath.join(repoRoot, "apps/web/src/i18n-fixture.tsx");
@@ -33,8 +33,7 @@ const candidates = (code) => {
     }),
     {
       "StringLiteral|TemplateLiteral|JSXText"(path) {
-        const item = classify(path);
-        if (item?.eligible) result.push(item);
+        result.push(...classifyAll(path).filter((item) => item.eligible));
       },
     },
   );
@@ -231,14 +230,15 @@ describe("UI candidates and rewriting", () => {
     expect(candidates('Schema.Literal(`${enabled ? "Save" : "Close"}`)')).toEqual([]);
     expect(candidates('css`${enabled ? "New thread" : "Close"}`')).toEqual([]);
   });
-  it("keeps children of a translatable template out of extraction until the transformer can visit them", () => {
+  it("translates nested UI fragments before their enclosing template", () => {
     const code = '<p>{`New thread ${enabled ? "Save" : "Close"}`}</p>';
-    expect(candidates(code).map((item) => item.key)).toEqual(["New thread {0}"]);
+    expect(candidates(code).map((item) => item.key)).toEqual(["New thread {0}", "Save", "Close"]);
     const output = transform(code, {
       dictionary: { "New thread {0}": "测试 {0}", Save: "保存", Close: "关闭" },
     });
     expect(output).toContain('_tf("New thread {0}"');
-    expect(output).not.toContain('_t("Save")');
+    expect(output).toContain('_t("Save")');
+    expect(output).toContain('_t("Close")');
   });
   it.each([
     "<p>New thread</p>",

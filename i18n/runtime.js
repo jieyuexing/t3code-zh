@@ -10,7 +10,7 @@ try {
 }
 if (typeof document !== "undefined") document.documentElement.lang = locale;
 export const getLocale = () => locale;
-export const { __t, __tf } = createTranslator(dictionary, getLocale);
+export const { __t, __tf, __th } = createTranslator(dictionary, getLocale);
 
 /** Persist both clients before reloading; a failed write must stay visible to the user. */
 export async function changeLocale(next, bridge, reload = () => globalThis.location.reload()) {

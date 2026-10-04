@@ -1,6 +1,7 @@
 import * as NodePath from "node:path";
 import * as NodeURL from "node:url";
 import protectedLocations from "./protected-locations.json" with { type: "json" };
+import { htmlSegments, isHtmlDocument } from "./html.mjs";
 
 export const repoRoot = NodeURL.fileURLToPath(new URL("../", import.meta.url));
 export const sourceRoots = [
@@ -128,6 +129,13 @@ function textArgument(call, child) {
   if (child.listKey !== "arguments") return false;
   const names = memberNames(call.node.callee);
   const leaf = names.at(-1);
+  if (
+    call.node.callee.type === "Identifier" &&
+    leaf === "plural" &&
+    child.key === 1 &&
+    isPluralTemplate(call.scope.getBinding(leaf)?.path.node.init)
+  )
+    return true;
   if (child.key === 0) {
     if (["alert", "confirm", "prompt", "Notification"].includes(leaf)) return true;
     if (names[0] === "toast" && ["success", "error", "info", "warning", "message"].includes(leaf))
@@ -266,6 +274,7 @@ function protectedCall(path) {
       "executeJavaScriptInIsolatedWorld",
       "evaluate",
       "evaluateHandle",
+      "evaluateWithDebugger",
     ].includes(leaf)
   )
     return "injected-code";
@@ -277,7 +286,6 @@ function protectedCall(path) {
 export function protectionReason(path, filename) {
   let crossedJsxElement = false;
   const context = uiContext(path);
-  let templateExpression = false;
   for (
     let child = path, parent = path.parentPath;
     parent;
@@ -298,10 +306,10 @@ export function protectionReason(path, filename) {
     if (node.type === "TaggedTemplateExpression") return "tagged-template";
     if (node.type === "TemplateLiteral") {
       const outer = classify(parent, { filename, describePlaceholders: false });
-      // The transformer skips the children of a rewritten template. Children of
-      // interpolation-only wrappers are still visited and can be translated.
+      // Location overrides also protect nested fragments. HTML interpolations
+      // are data/code; only the separately extracted text spans are translated.
       if (outer?.reason?.startsWith("reviewed:")) return outer.reason;
-      if (outer?.eligible) templateExpression = true;
+      if (isHtmlDocument(outer?.raw)) return "inline-html-expression";
     }
     if (node.type === "BinaryExpression" && comparisonOperators.has(node.operator))
       return "comparison";
@@ -336,6 +344,7 @@ export function protectionReason(path, filename) {
     }
     if (node.type === "ObjectProperty" && child.key === "value" && !crossedJsxElement) {
       const name = propertyName(node.key);
+      if (isRelativeTimePart(parent)) continue;
       if (name === "name" && isDisplayName(parent)) continue;
       if (isLabelTableValue(parent) && !["className", "style", "id", "key"].includes(name))
         continue;
@@ -351,7 +360,7 @@ export function protectionReason(path, filename) {
       if (reason) return reason;
     }
   }
-  return templateExpression ? "template-expression" : null;
+  return null;
 }
 
 /** Babel/React JSX whitespace semantics; do not collapse significant same-line spaces. */
@@ -377,6 +386,12 @@ function uiContext(path) {
   while (parent) {
     const node = parent.node;
     if (
+      node.type === "TemplateLiteral" &&
+      (isMultiword(node.quasis.map((q) => q.value.cooked ?? q.value.raw).join(" ")) ||
+        isPluralTemplate(parent.parentPath?.node))
+    )
+      return "prop";
+    if (
       (expressionWrappers.has(node.type) && child.key === "expression") ||
       node.type === "TemplateLiteral" ||
       (node.type === "ConditionalExpression" && child.key !== "test") ||
@@ -399,6 +414,7 @@ function uiContext(path) {
       node.type === "ObjectProperty" &&
       child.key === "value" &&
       (uiProperties.has(propertyName(node.key)) ||
+        isRelativeTimePart(parent) ||
         isDisplayName(parent) ||
         isLabelTableValue(parent))
     )
@@ -447,6 +463,37 @@ function uiContext(path) {
     return null;
   }
   return null;
+}
+
+// Only the local, two-argument count/noun helper with an English plural suffix.
+// A same-named API or differently shaped function is not a presentation contract.
+function isPluralTemplate(fn) {
+  if (fn?.type !== "ArrowFunctionExpression" || fn.params.length !== 2) return false;
+  if (!fn.params.every((param) => param.type === "Identifier")) return false;
+  const body = fn.body;
+  if (body.type !== "TemplateLiteral" || body.expressions.length !== 3) return false;
+  const [count, noun, suffix] = body.expressions;
+  return (
+    count.name === fn.params[0].name &&
+    noun.name === fn.params[1].name &&
+    body.quasis.map((part) => part.value.cooked).join("|") === "| ||" &&
+    suffix.type === "ConditionalExpression" &&
+    suffix.test.type === "BinaryExpression" &&
+    suffix.test.operator === "===" &&
+    suffix.test.left.name === count.name &&
+    suffix.test.right.value === 1 &&
+    suffix.consequent.value === "" &&
+    suffix.alternate.value === "s"
+  );
+}
+
+function isRelativeTimePart(property) {
+  if (!["value", "suffix"].includes(propertyName(property.node.key))) return false;
+  const fn = property.getFunctionParent();
+  return (
+    /^formatRelativeTime(?:Until)?$/.test(propertyName(fn?.node.id) ?? "") &&
+    property.parentPath.node.properties.some((part) => propertyName(part.key) === "suffix")
+  );
 }
 
 function isLabelFallback(path) {
@@ -522,7 +569,8 @@ export function classify(
     (override ? `reviewed:${override.reason}` : null) ??
     (template && node.quasis.some((part) => /\{\d+\}/.test(part.value.cooked ?? part.value.raw))
       ? "literal-placeholder-collision"
-      : null);
+      : null) ??
+    (isHtmlDocument(raw) ? "inline-html-document" : null);
   const multiword = isMultiword(template ? raw.replace(/\{\d+\}/g, " ") : raw);
   const eligible = !reason && (context !== null || multiword);
   return {
@@ -548,4 +596,27 @@ export function classify(
           propertyName(path.parentPath?.node.key) ?? propertyName(path.parentPath?.node.id) ?? "",
         )),
   };
+}
+
+/** Documents share the same protection checks, but expose only visible spans. */
+export function classifyAll(path, options) {
+  const outer = classify(path, options);
+  if (outer?.reason !== "inline-html-document") return outer ? [outer] : [];
+  return htmlSegments(outer.raw).map((segment) => ({
+    ...outer,
+    raw: segment.text,
+    key: segment.text.trim(),
+    eligible: true,
+    review: false,
+    reason: null,
+    context: `html-${segment.kind}`,
+    line:
+      path.node.loc?.start.line +
+      (path.isTemplateLiteral() ? outer.raw.slice(0, segment.start).split("\n").length - 1 : 0),
+    placeholders: segment.indices.map((index, i) => ({
+      token: `{${i}}`,
+      expression: outer.placeholders[index]?.expression ?? `interpolation ${index}`,
+    })),
+    segment,
+  }));
 }

@@ -16,7 +16,7 @@ const preferencePath =
 const locale = readDesktopLocale(preferencePath);
 // Chromium role labels use startup locale. Persisted switches take effect on restart.
 if (!app.isReady()) app.commandLine.appendSwitch("lang", locale === "en" ? "en-US" : "zh-CN");
-export const { __t, __tf } = createTranslator(dictionary, () => locale);
+export const { __t, __tf, __th } = createTranslator(dictionary, () => locale);
 
 export function setDesktopLocale(next) {
   persistDesktopLocale(preferencePath, next);

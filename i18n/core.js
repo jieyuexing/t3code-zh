@@ -17,5 +17,41 @@ export function createTranslator(dictionary, getLocale) {
       Number(index) < args.length ? String(args[Number(index)]) : token,
     );
   }
-  return { __t, __tf };
+  function __th(raw, args, segments) {
+    const fill = (text) =>
+      text.replace(/\{(\d+)\}/g, (token, index) =>
+        Number(index) < args.length ? args[Number(index)] : token,
+      );
+    if (getLocale() === "en") return fill(raw);
+    let result = "";
+    let cursor = 0;
+    for (const segment of segments) {
+      result += fill(raw.slice(cursor, segment.start));
+      if (!translations.has(segment.text.trim())) {
+        result += fill(raw.slice(segment.start, segment.end));
+      } else {
+        const translated = __tf(
+          segment.text,
+          segment.indices.map((index) => args[index]),
+        );
+        result +=
+          segment.kind === "script-text"
+            ? JSON.stringify(translated).replaceAll("<", "\\u003c")
+            : translated.replace(
+                /[&<>"']/g,
+                (character) =>
+                  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+                    character
+                  ],
+              );
+      }
+      cursor = segment.end;
+    }
+    return (result + fill(raw.slice(cursor))).replace(/<html\b[^>]*>/i, (tag) =>
+      /\blang\s*=/i.test(tag)
+        ? tag.replace(/\blang\s*=\s*(["'])[^"']*\1/i, 'lang="zh-CN"')
+        : tag.replace(/<html\b/i, '<html lang="zh-CN"'),
+    );
+  }
+  return { __t, __tf, __th };
 }

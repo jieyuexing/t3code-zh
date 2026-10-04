@@ -19,6 +19,11 @@ const storage = (initial = null) => {
 };
 
 describe("runtime lookup", () => {
+  it("keeps leading punctuation and empty plural suffix translations", () => {
+    const { __t } = createTranslator({ ", expired": "，已过期", s: "" }, () => "zh-CN");
+    expect(__t(" , expired ")).toBe(" ，已过期 ");
+    expect(__t("s")).toBe("");
+  });
   it("preserves original whitespace, misses and English", () => {
     let locale = "zh-CN";
     const { __t, __tf } = createTranslator(
