@@ -45,6 +45,10 @@ const ITEMS: ReadonlyArray<SettingsSearchItem> = [
 ];
 
 describe("searchSettings", () => {
+  it.each(["language", "语言", "English", "简体中文"])("finds device language for %s", (query) => {
+    expect(searchSettings(query).map((item) => item.id)).toContain("language");
+    expect(searchableSetting("language").title).toBe("Language / 语言");
+  });
   it.each(["send shortcut", "multiline", "new line"])("finds Send shortcut for %s", (query) => {
     expect(searchSettings(query).map((item) => item.id)).toContain("send-shortcut");
   });

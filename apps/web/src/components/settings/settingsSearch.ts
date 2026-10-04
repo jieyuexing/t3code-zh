@@ -177,6 +177,12 @@ export const SETTINGS_SEARCH_ITEMS = [
     ],
   },
   {
+    id: "language",
+    title: "Language / 语言",
+    to: "/settings/appearance",
+    searchTerms: ["English", "简体中文", "中文", "language", "locale"],
+  },
+  {
     id: "color-scheme",
     title: "Color scheme",
     to: "/settings/appearance",

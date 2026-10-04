@@ -14,6 +14,7 @@ import { DEV_PROXIED_PATH_PREFIXES } from "@t3tools/shared/devProxy";
 import { loadRepoEnv } from "../../scripts/lib/public-config";
 import { thirdPartyLicensesPlugin } from "../../scripts/lib/third-party-licenses";
 import { tailwindPlugins } from "./vite/tailwind";
+import i18nPlugin from "../../i18n/plugin.mjs";
 
 const repoEnv = loadRepoEnv();
 Object.assign(process.env, repoEnv);
@@ -153,7 +154,7 @@ const configuredAllowedHosts = (process.env.T3CODE_DEV_ALLOWED_HOSTS ?? "")
   .filter((entry) => entry.length > 0);
 const allowedHosts = [".ts.net", ...configuredAllowedHosts];
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
   return {
     assetsInclude: ["**/*.wasm"],
     plugins: [
@@ -178,6 +179,7 @@ export default defineConfig(() => {
         // whereas the previous version of the plugin parsed all files with a .ts extension.
         // This is causing our packages/ directory to fail to parse, as they are not relative to the CWD.
         parserOpts: { plugins: ["typescript", "jsx"] },
+        plugins: [[i18nPlugin, { mode }]],
         presets: [reactCompilerPreset()],
       }),
       tailwindPlugins(bundledDev),
