@@ -128,7 +128,11 @@ export function DeviceControlsRail(props: {
         <RailDivider />
         <RailButton
           tooltipSide={popupSide}
-          label={`Switch device to ${nextAppearance} mode`}
+          label={
+            nextAppearance === "light"
+              ? "Switch device to light mode"
+              : "Switch device to dark mode"
+          }
           disabled={controls.disabled || !settings?.appearance}
           onClick={() => void controls.act({ type: "setAppearance", value: nextAppearance })}
         >

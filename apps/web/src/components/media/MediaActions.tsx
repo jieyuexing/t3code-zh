@@ -91,7 +91,7 @@ export function MediaActions({
     let failureTitle = "Could not open media menu";
     let progressToast: ReturnType<typeof toastManager.add> | undefined;
     try {
-      const noun = source.kind === "image" ? "image" : "video";
+      const nounLabel = source.kind === "image" ? "image" : "video";
       const unavailable = source.src === null && source.asset === undefined;
       const canCopyImage =
         typeof navigator !== "undefined" &&
@@ -106,7 +106,7 @@ export function MediaActions({
         items.push({ id: "copy-url", label: "Copy URL" });
       }
       if (source.onOpenFile) items.push({ id: "open-file", label: "Open in file viewer" });
-      items.push({ id: "save", label: `Save ${noun}`, disabled: unavailable });
+      items.push({ id: "save", label: `Save ${nounLabel}`, disabled: unavailable });
       if (source.kind === "image") {
         items.push({
           id: "copy-image",
@@ -137,7 +137,7 @@ export function MediaActions({
       } else if (action === "save" || action === "copy-image") {
         progressToast = toastManager.add({
           type: "loading",
-          title: action === "save" ? `Preparing ${noun} download…` : "Copying image…",
+          title: action === "save" ? `Preparing ${nounLabel} download…` : "Copying image…",
         });
         await (action === "save" ? save() : copyImage());
         toastManager.update(progressToast, {

@@ -2515,12 +2515,14 @@ export function ConnectionsSettings() {
         const message =
           error instanceof Error
             ? error.message
-            : `Failed to switch the backend ${enabled ? "on" : "off"}.`;
+            : enabled
+              ? "Failed to switch the backend on."
+              : "Failed to switch the backend off.";
         setSavedBackendError(message);
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: `Could not switch backend ${enabled ? "on" : "off"}`,
+            title: enabled ? "Could not switch backend on" : "Could not switch backend off",
             description: message,
           }),
         );
