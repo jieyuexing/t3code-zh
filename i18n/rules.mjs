@@ -117,7 +117,7 @@ function labelBinding(name) {
   return (
     name === "summary" ||
     /(?:Label|Title|Caption|Tooltip|Placeholder|Description|Message|Heading)s?$/.test(name ?? "") ||
-    /(?:^|_)(?:LABEL|TITLE|CAPTION|TOOLTIP|PLACEHOLDER|DESCRIPTION|MESSAGE|HEADING)S?(?:_|$)/.test(
+    /(?:^|_)(?:LABEL|TITLE|CAPTION|TOOLTIP|PLACEHOLDER|DESCRIPTION|MESSAGE|HEADING)S?(?:$|_BY_)/.test(
       name ?? "",
     )
   );

@@ -73,6 +73,8 @@ describe("reviewed UI shapes", () => {
     ['<Row steps={["Settings"]} />', 'const x = {steps: ["Settings"]}'],
     ['const x = {labels: ["Settings"]}', 'const x = {values: ["Settings"]}'],
     ['const STATE_LABELS = {ready: "Settings"}', 'const STATE_IDS = {ready: "Settings"}'],
+    ['const PICKER_TOOLTIP = "Settings"', 'const PICKER_TOOLTIP_SIDE = "Settings" as const'],
+    ['const STATUS_LABEL_BY_KIND = {ready: "Settings"}', 'const STATUS_LABEL_CLASS = "Settings"'],
     ['const LABEL_BY_KIND = {path: "Settings"}', 'const IDS_BY_KIND = {path: "New thread"}'],
     ['const SAVED_LABELS = {variant: "Settings"}', 'const x = {variant: "New thread"}'],
     ['const actionLabel = yes ? "Settings" : "Close"', 'const actionId = "Settings"'],
