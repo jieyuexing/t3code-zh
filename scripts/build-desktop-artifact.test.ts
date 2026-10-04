@@ -542,7 +542,7 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
   });
 
   it("limits Electron locales and excludes separately packaged resources", () => {
-    assert.deepStrictEqual(DESKTOP_ELECTRON_LANGUAGES, ["en-US", "zh-CN"]);
+    assert.deepStrictEqual(DESKTOP_ELECTRON_LANGUAGES, ["en-US", "zh-CN", "zh_CN"]);
     // Every platform staging input is emitted once at resources/, so adding one
     // without its exclusion silently packs a second copy into app.asar. The
     // snapshot below cannot catch that on its own: adding a resource and

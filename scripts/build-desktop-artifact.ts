@@ -940,7 +940,8 @@ interface StagePackageJson {
 }
 
 export const STAGE_INSTALL_ARGS = ["install", "--prod"] as const;
-export const DESKTOP_ELECTRON_LANGUAGES = ["en-US", "zh-CN"] as const;
+// macOS ships Electron locales as zh_CN.lproj, Windows/Linux as zh-CN.pak.
+export const DESKTOP_ELECTRON_LANGUAGES = ["en-US", "zh-CN", "zh_CN"] as const;
 export const DESKTOP_FILE_EXCLUSIONS = [
   // Cursor finds platform assets by walking up from argv[1]. Keep them outside
   // asar so spawning helpers and loading native addons both use real paths.
