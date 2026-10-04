@@ -1,3 +1,4 @@
+import { displayThreadTitle } from "../../../../../i18n/display.js";
 import { ThreadDetailsControl } from "./ThreadDetailsControl";
 import { ThreadHoverCardPopup } from "../ThreadHoverCard";
 import { ThreadDetailsSection } from "./ThreadDetailsSection";
@@ -381,7 +382,7 @@ export function ThreadRelationshipsPanel(props: {
               const RelationshipPopup = agent ? ThreadHoverCardPopup : TooltipPopup;
               const relationshipTooltip = agent ? (
                 <SubagentTooltipContent
-                  title={threadTitle}
+                  title={displayThreadTitle(threadTitle)}
                   model={agent.model}
                   provider={provider}
                   providers={providers}
@@ -408,7 +409,7 @@ export function ThreadRelationshipsPanel(props: {
                   />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-left text-sm font-medium leading-4 text-foreground/85">
-                      {threadTitle}
+                      {displayThreadTitle(threadTitle)}
                     </span>
                   </span>
                   {agent ? (
@@ -439,7 +440,7 @@ export function ThreadRelationshipsPanel(props: {
                               size="sm"
                               variant="ghost"
                               part="link-primary"
-                              aria-label={`${threadTitle} ${threadRelationshipStatusLabel(status)}`}
+                              aria-label={`${displayThreadTitle(threadTitle)} ${threadRelationshipStatusLabel(status)}`}
                               disabled={node?.missing === true}
                               onClick={() => openThread(threadId)}
                             />

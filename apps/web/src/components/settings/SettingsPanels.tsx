@@ -1,3 +1,4 @@
+import { displayThreadTitle } from "../../../../../i18n/display.js";
 import { SettingsGroup } from "./SettingsGroup";
 import { changeLocale, getLocale } from "../../../../../i18n/runtime.js";
 import { Spinner } from "~/components/ui/spinner";
@@ -3589,7 +3590,7 @@ export function ArchivedThreadsPanel() {
                     }
                   })();
                 }}
-                title={thread.title}
+                title={displayThreadTitle(thread.title)}
                 description={
                   <>
                     Archived {formatRelativeTimeLabel(thread.archivedAt ?? thread.createdAt)}

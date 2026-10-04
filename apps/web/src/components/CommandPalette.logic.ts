@@ -1,3 +1,4 @@
+import { displayThreadTitle } from "../../../../i18n/display.js";
 import { threadPullRequestSearchTerms } from "@t3tools/shared/threadPullRequests";
 import type { CommandPaletteLinkedThreads } from "../commandPaletteBus";
 import {
@@ -31,7 +32,7 @@ export function buildLinkedThreadActionItems(
   return input.threads.map((thread) => ({
     kind: "action",
     value: `thread:${input.environmentId}:${thread.id}`,
-    title: thread.title || "Untitled thread",
+    title: displayThreadTitle(thread.title) || "Untitled thread",
     description: thread.archivedAt === null ? "Linked thread" : "Archived thread",
     searchTerms: [input.query, thread.title],
     icon: input.icon,
@@ -370,7 +371,7 @@ export function buildThreadActionItems<TThread extends BuildThreadActionItemsThr
           // Last so pasted IDs never outrank title matches for shared substrings.
           thread.id,
         ],
-        title: thread.title,
+        title: displayThreadTitle(thread.title),
         description,
         timestamp: formatRelativeTimeLabel(
           thread.latestUserMessageAt ?? thread.updatedAt ?? thread.createdAt,

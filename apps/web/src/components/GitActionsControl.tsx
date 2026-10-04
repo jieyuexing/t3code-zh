@@ -1,3 +1,4 @@
+import { displayLabel } from "../../../../i18n/display.js";
 import { ThreadDetailsControl } from "./chat/ThreadDetailsControl";
 import { useAtomValue } from "@effect/atom-react";
 import { type ScopedThreadRef } from "@t3tools/contracts";
@@ -1546,7 +1547,7 @@ export default function GitActionsControl({
     if (quickAction.kind === "show_hint") {
       toastManager.add({
         type: "info",
-        title: quickAction.label,
+        title: displayLabel(quickAction.label),
         description: quickAction.hint,
         data: threadToastData,
       });
@@ -1649,7 +1650,7 @@ export default function GitActionsControl({
             <div key={`${item.id}-${item.label}`}>
               <MenuItem density={presentation === "menu" ? "touch" : "default"} disabled>
                 <GitActionItemIcon icon={item.icon} SourceControlIcon={SourceControlIcon} />
-                <MenuItemLabel>{item.label}</MenuItemLabel>
+                <MenuItemLabel>{displayLabel(item.label)}</MenuItemLabel>
               </MenuItem>
               <p className="max-w-64 px-2 pb-2 text-xs text-muted-foreground">{disabledReason}</p>
             </div>
@@ -1669,7 +1670,7 @@ export default function GitActionsControl({
                   disabled
                 >
                   <GitActionItemIcon icon={item.icon} SourceControlIcon={SourceControlIcon} />
-                  <MenuItemLabel>{item.label}</MenuItemLabel>
+                  <MenuItemLabel>{displayLabel(item.label)}</MenuItemLabel>
                 </MenuItem>
               </PopoverTrigger>
               <PopoverPopup tooltipStyle side="left" align="center">
@@ -1689,7 +1690,7 @@ export default function GitActionsControl({
             }}
           >
             <GitActionItemIcon icon={item.icon} SourceControlIcon={SourceControlIcon} />
-            <MenuItemLabel>{item.label}</MenuItemLabel>
+            <MenuItemLabel>{displayLabel(item.label)}</MenuItemLabel>
           </MenuItem>
         );
       })}
@@ -1751,7 +1752,7 @@ export default function GitActionsControl({
                 quickAction={quickAction}
                 SourceControlIcon={SourceControlIcon}
               />
-              <MenuItemLabel>{quickAction.label}</MenuItemLabel>
+              <MenuItemLabel>{displayLabel(quickAction.label)}</MenuItemLabel>
             </MenuItem>
             {quickActionDisabledReason && (
               <p className="max-w-64 px-2 py-1.5 text-xs text-warning">
@@ -1842,7 +1843,7 @@ export default function GitActionsControl({
                     isPanel && "not-sr-only ml-0 truncate",
                   )}
                 >
-                  {quickAction.label}
+                  {displayLabel(quickAction.label)}
                 </span>
               </PopoverTrigger>
               <PopoverPopup tooltipStyle side="bottom" align="start">
@@ -1869,7 +1870,7 @@ export default function GitActionsControl({
                   isPanel && "not-sr-only ml-0 truncate",
                 )}
               >
-                {quickAction.label}
+                {displayLabel(quickAction.label)}
               </span>
             </ThreadDetailsControl>
           )}

@@ -1,3 +1,4 @@
+import { joinRelativeTime } from "../../../i18n/display.js";
 import { type TimestampFormat } from "@t3tools/contracts/settings";
 
 function getTimestampFormatOptions(
@@ -250,7 +251,7 @@ export function formatRelativeTime(isoDate: string): RelativeTimeParts | null {
 export function formatRelativeTimeLabel(isoDate: string) {
   const relative = formatRelativeTime(isoDate);
   if (!relative) return "";
-  return relative.suffix ? `${relative.value} ${relative.suffix}` : relative.value;
+  return joinRelativeTime(relative);
 }
 
 export function getRelativeTimeState(isoDate: string | null): RelativeTimeState {
@@ -306,7 +307,7 @@ export function formatRelativeTimeUntil(isoDate: string): RelativeTimeParts | nu
 export function formatRelativeTimeUntilLabel(isoDate: string): string {
   const relative = formatRelativeTimeUntil(isoDate);
   if (!relative) return "";
-  return relative.suffix ? `${relative.value} ${relative.suffix}` : relative.value;
+  return joinRelativeTime(relative);
 }
 
 /**

@@ -1,3 +1,4 @@
+import { displayThreadTitle } from "../../../../i18n/display.js";
 import { scopeProjectRef } from "@t3tools/client-runtime/environment";
 import { requestCustomSnooze } from "../components/CustomSnoozeDialog";
 import {
@@ -274,7 +275,7 @@ export function useThreadActionMenu(input: {
           case "archive": {
             if (confirmThreadArchive) {
               const confirmed = await settlePromise(() =>
-                api.dialogs.confirm(`Archive thread "${thread.title}"?`),
+                api.dialogs.confirm(`Archive thread "${displayThreadTitle(thread.title)}"?`),
               );
               if (confirmed._tag === "Failure" || !confirmed.value) return;
             }
@@ -297,7 +298,7 @@ export function useThreadActionMenu(input: {
               const confirmed = await settlePromise(() =>
                 api.dialogs.confirm(
                   [
-                    `Delete thread "${thread.title}"?`,
+                    `Delete thread "${displayThreadTitle(thread.title)}"?`,
                     "This permanently clears conversation history for this thread.",
                   ].join("\n"),
                   { variant: "destructive" },

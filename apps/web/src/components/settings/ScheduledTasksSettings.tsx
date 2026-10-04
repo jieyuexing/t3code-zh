@@ -1,3 +1,4 @@
+import { joinRelativeTime } from "../../../../../i18n/display.js";
 import { useAtomValue } from "@effect/atom-react";
 import {
   Clock3Icon,
@@ -189,7 +190,7 @@ export function relativeLabel(value: string | null): string {
   if (diffMs <= 0) {
     const relative = formatRelativeTime(value);
     if (!relative) return "Not scheduled";
-    return relative.suffix ? `${relative.value} ${relative.suffix}` : relative.value;
+    return joinRelativeTime(relative);
   }
   const minutes = Math.ceil(diffMs / 60_000);
   if (minutes < 2) return "in under a minute";
