@@ -1,0 +1,39 @@
+[
+  {
+    "file": "apps/web/src/components/chat/TraitsPicker.tsx",
+    "source": "CodexProvider REASONING_EFFORT_LABELS; OpenCodeProvider titleCaseSlug; piThinkingCapabilities",
+    "keys": [
+      "Agent",
+      "Build",
+      "Even faster, more expensive",
+      "Extra High",
+      "Extra high",
+      "Fast",
+      "Fast Mode",
+      "Flex",
+      "High",
+      "Low",
+      "Max",
+      "Medium",
+      "Minimal",
+      "None",
+      "Normal",
+      "Off",
+      "On",
+      "Plan",
+      "Reasoning",
+      "Reasoning effort",
+      "Service Tier",
+      "Standard",
+      "Thinking",
+      "Ultra",
+      "Ultrafast",
+      "Ultrathink"
+    ]
+  },
+  {
+    "file": "apps/web/src/components/GitActionsControl.tsx",
+    "source": "GitQuickAction and menu display labels; source records deliberately remain ignored semantic values",
+    "keys": ["Commit", "Push"]
+  }
+]

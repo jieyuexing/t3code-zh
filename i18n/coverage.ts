@@ -4,6 +4,8 @@ import * as NodeURL from "node:url";
 import { babel } from "./babel.mjs";
 import { classifyAll, inScope, repoRoot, sourceRoots } from "./rules.mjs";
 import { readDictionary, readIgnore } from "./plugin.mjs";
+import { contextTranslation, readContextDictionary } from "./context.mjs";
+import displayLabels from "./display-labels.json" with { type: "json" };
 
 type Occurrence = {
   location: string;
@@ -20,6 +22,8 @@ type Candidate = {
   occurrences: Occurrence[];
   occurrenceCount: number;
   reasons?: Record<string, number>;
+  contextTranslatedOccurrences?: number;
+  displayOnlyOccurrences?: number;
 };
 
 function filesAt(path: string): string[] {
@@ -30,12 +34,14 @@ function filesAt(path: string): string[] {
     .flatMap((entry) => (entry.isSymbolicLink() ? [] : filesAt(NodePath.join(path, entry.name))));
 }
 
-export function extract(paths = sourceRoots.map((root) => NodePath.join(repoRoot, root))) {
+export function extract(
+  paths = sourceRoots.map((root) => NodePath.join(repoRoot, root)),
+  contexts = readContextDictionary(),
+) {
   const candidates = new Map<string, Candidate>();
   const review = new Map<string, Candidate>();
-  for (const file of [
-    ...new Set(paths.flatMap((path) => filesAt(NodePath.resolve(path)))),
-  ].sort()) {
+  const files = [...new Set(paths.flatMap((path) => filesAt(NodePath.resolve(path))))].sort();
+  for (const file of files) {
     const relative = NodePath.relative(repoRoot, file).replaceAll("\\", "/");
     const ast = babel.parseSync(NodeFS.readFileSync(file, "utf8"), {
       filename: file,
@@ -58,6 +64,17 @@ export function extract(paths = sourceRoots.map((root) => NodePath.join(repoRoot
         };
         const location = `${relative}:${candidate.line ?? path.node.loc?.start.line ?? 1}`;
         item.occurrenceCount++;
+        if (
+          candidate.eligible &&
+          contextTranslation(
+            contexts,
+            file,
+            candidate.key,
+            candidate.line ?? path.node.loc?.start.line,
+          ) !== undefined
+        ) {
+          item.contextTranslatedOccurrences = (item.contextTranslatedOccurrences ?? 0) + 1;
+        }
         if (!candidate.eligible) {
           item.reasons ??= {};
           item.reasons[candidate.reason] = (item.reasons[candidate.reason] ?? 0) + 1;
@@ -78,6 +95,35 @@ export function extract(paths = sourceRoots.map((root) => NodePath.join(repoRoot
     };
     babel.traverse(ast, { JSXText: collect, StringLiteral: collect, TemplateLiteral: collect });
   }
+  // Dynamic provider labels have no client-side literal. This bounded catalog
+  // records the labels explicitly looked up by display helpers, not wire values.
+  for (const entry of displayLabels) {
+    if (!files.includes(NodePath.join(repoRoot, entry.file))) continue;
+    for (const key of entry.keys) {
+      const item: Candidate = candidates.get(key) ?? {
+        key,
+        placeholders: [],
+        categories: [],
+        locations: [],
+        occurrences: [],
+        occurrenceCount: 0,
+      };
+      const location = `${entry.file}:display-label`;
+      item.occurrenceCount++;
+      item.displayOnlyOccurrences = (item.displayOnlyOccurrences ?? 0) + 1;
+      if (!item.categories.includes("prop")) item.categories.push("prop");
+      if (item.locations.length < 8 && !item.locations.includes(location))
+        item.locations.push(location);
+      if (item.occurrences.length < 8)
+        item.occurrences.push({
+          location,
+          category: "prop",
+          context: `display-only: ${entry.source}`,
+          placeholders: [],
+        });
+      candidates.set(key, item);
+    }
+  }
   const sorted = (ledger: Map<string, Candidate>) =>
     [...ledger.values()].sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
   return { candidates: sorted(candidates), review: sorted(review) };
@@ -88,13 +134,17 @@ export function coverage(
   dictionary = readDictionary(),
   ignored = readIgnore(),
 ) {
-  const translated = candidates.filter(
-    ({ key }) => Object.hasOwn(dictionary, key) && !Object.hasOwn(ignored, key),
-  );
-  const skipped = candidates.filter(({ key }) => Object.hasOwn(ignored, key));
-  const missing = candidates.filter(
-    ({ key }) => !Object.hasOwn(dictionary, key) && !Object.hasOwn(ignored, key),
-  );
+  const isTranslated = (item: Candidate) =>
+    (item.contextTranslatedOccurrences !== undefined &&
+      item.contextTranslatedOccurrences === item.occurrenceCount) ||
+    (Object.hasOwn(dictionary, item.key) && !Object.hasOwn(ignored, item.key));
+  const translated = candidates.filter(isTranslated);
+  const isSkipped = (item: Candidate) =>
+    !isTranslated(item) &&
+    Object.hasOwn(ignored, item.key) &&
+    (!item.displayOnlyOccurrences || Object.hasOwn(dictionary, item.key));
+  const skipped = candidates.filter(isSkipped);
+  const missing = candidates.filter((item) => !isTranslated(item) && !isSkipped(item));
   const categories: Record<string, number> = {};
   for (const item of candidates)
     for (const category of item.categories) categories[category] = (categories[category] ?? 0) + 1;

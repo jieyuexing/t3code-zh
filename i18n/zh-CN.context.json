@@ -1,0 +1,19 @@
+{
+  "apps/web/src/components/device/DeviceToolsPanel.tsx": {
+    "Clear::line=211": "清透",
+    "Motion": "运动"
+  },
+  "apps/web/src/components/pullRequest/PullRequestListFilters.tsx": {
+    "Host": "托管平台"
+  },
+  "apps/web/src/components/pullRequest/PullRequestMarkdownEditor.tsx": {
+    "Write": "编写"
+  },
+  "apps/web/src/components/settings/ThemeSettings.tsx": {
+    "added": "已添加",
+    "updated": "已更新"
+  },
+  "apps/web/src/components/usage/UsagePage.tsx": {
+    "Share": "占比"
+  }
+}

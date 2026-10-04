@@ -1,7 +1,7 @@
 export type Locale = "en" | "zh-CN";
 export function getLocale(): Locale;
-export function __t(key: string): string;
-export function __tf(key: string, args: readonly unknown[]): string;
+export function __t(key: string, override?: string): string;
+export function __tf(key: string, args: readonly unknown[], override?: string): string;
 export function __th(
   raw: string,
   args: readonly string[],
@@ -11,6 +11,7 @@ export function __th(
     text: string;
     kind: string;
     indices: readonly number[];
+    translation?: string;
   }[],
 ): string;
 export function changeLocale(

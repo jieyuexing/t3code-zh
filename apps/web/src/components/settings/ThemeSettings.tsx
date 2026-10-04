@@ -920,14 +920,14 @@ export function ThemeLibrary({
           // Re-apply after collection updates. The update may remove the
           // selected variant, in which case the theme hook falls back safely.
           if (updated) refreshTheme();
-          const verb = updated ? "updated" : "added";
+          const verbLabel = updated ? "updated" : "added";
           toastManager.add(
             stackedThreadToast({
               type: "success",
               title:
                 importedThemes.length === 1
-                  ? `${importedThemes[0]!.label} ${verb}`
-                  : `${importedThemes.length} themes ${verb}`,
+                  ? `${importedThemes[0]!.label} ${verbLabel}`
+                  : `${importedThemes.length} themes ${verbLabel}`,
               description: importedThemes.map((imported) => imported.label).join(", "),
             }),
           );

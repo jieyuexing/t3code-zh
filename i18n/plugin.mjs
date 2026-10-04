@@ -1,6 +1,7 @@
 import * as NodeFS from "node:fs";
 import * as NodeURL from "node:url";
 import { classify, classifyAll, inScope } from "./rules.mjs";
+import { contextTranslation, readContextDictionary } from "./context.mjs";
 
 export function readDictionary() {
   return JSON.parse(NodeFS.readFileSync(new URL("./zh-CN.json", import.meta.url), "utf8"));
@@ -11,10 +12,12 @@ export function readIgnore() {
 
 let defaultDictionary;
 let defaultIgnore;
+let defaultContexts;
 
 export default function i18nPlugin({ types: t }, options = {}) {
   const dictionary = options.dictionary ?? (defaultDictionary ??= readDictionary());
   const ignored = options.ignore ?? (defaultIgnore ??= readIgnore());
+  const contexts = options.contexts ?? (defaultContexts ??= readContextDictionary());
   return {
     name: "t3zh-dictionary",
     visitor: {
@@ -31,7 +34,15 @@ export default function i18nPlugin({ types: t }, options = {}) {
           "JSXText|StringLiteral|TemplateLiteral"(path) {
             candidates.set(path.node, {
               outer: classify(path, context),
-              items: classifyAll(path, context),
+              items: classifyAll(path, context).map((candidate) => ({
+                ...candidate,
+                translation: contextTranslation(
+                  contexts,
+                  state.filename,
+                  candidate.key,
+                  candidate.line ?? path.node.loc?.start.line,
+                ),
+              })),
             });
           },
         });
@@ -41,8 +52,9 @@ export default function i18nPlugin({ types: t }, options = {}) {
           const matches = original.items.filter(
             (candidate) =>
               candidate.eligible &&
-              Object.hasOwn(dictionary, candidate.key) &&
-              !Object.hasOwn(ignored, candidate.key),
+              (candidate.translation !== undefined ||
+                (Object.hasOwn(dictionary, candidate.key) &&
+                  !Object.hasOwn(ignored, candidate.key))),
           );
           if (!matches.length) return;
           const document = !!matches[0].segment;
@@ -68,7 +80,17 @@ export default function i18nPlugin({ types: t }, options = {}) {
               ),
             );
           }
-          if (document) args.push(t.valueToNode(matches.map((match) => match.segment)));
+          if (document)
+            args.push(
+              t.valueToNode(
+                matches.map((match) => ({
+                  ...match.segment,
+                  ...(match.translation !== undefined ? { translation: match.translation } : {}),
+                })),
+              ),
+            );
+          else if (candidate.translation !== undefined)
+            args.push(t.stringLiteral(candidate.translation));
           const call = t.callExpression(t.cloneNode(imports.get(helper)), args);
           path.replaceWith(
             path.isJSXText() || path.parentPath.isJSXAttribute()
