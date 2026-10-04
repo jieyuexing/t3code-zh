@@ -1,4 +1,5 @@
 import { isElectron } from "~/env";
+import { __t } from "../../../../../i18n/runtime.js";
 import { isMacPlatform, isWindowsPlatform, normalizeSearchText } from "~/lib/utils";
 import { STATIC_KEYBINDING_COMMANDS, type KeybindingCommand } from "@t3tools/contracts";
 import type { EnvironmentId } from "@t3tools/contracts";
@@ -1041,6 +1042,9 @@ export function searchSettings(
         title,
         normalizeSearchText(SETTINGS_SECTION_LABELS[item.to]),
         ...(item.searchTerms ?? []).map(normalizeSearchText),
+        ...[item.title, SETTINGS_SECTION_LABELS[item.to], ...(item.searchTerms ?? [])].map(
+          (field) => normalizeSearchText(__t(field)),
+        ),
       ];
       if (!queryTokens.every((token) => fields.some((field) => field.includes(token)))) return [];
 
