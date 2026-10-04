@@ -58,7 +58,100 @@ export const uiProperties = new Set([
   "aria-valuetext",
   "alt",
   "children",
+  "tooltipText",
+  "sendDisabledReason",
+  "disabledReason",
+  "pickDisabledReason",
+  "ariaLabel",
+  "accessibleLabel",
+  "openAriaLabel",
+  "triggerAriaLabel",
+  "pendingLabel",
+  "copiedLabel",
+  "copyLabel",
+  "noMatchLabel",
+  "footerActionLabel",
+  "kindLabel",
+  "searchLabel",
+  "errorLabel",
+  "truncatedLabel",
+  "hostLabel",
+  "rightPanelUnavailableLabel",
+  "expandLabel",
+  "hideTooltip",
+  "revealTooltip",
+  "buttonText",
+  "caption",
+  "eyebrow",
+  "displayName",
+  "seedName",
+  "accessibilityLabel",
+  "continueLabel",
+  "currentLabel",
+  "sectionTitle",
+  "triggerLabel",
 ]);
+// These props contain controls or presentation records. Only their independently
+// recognized text fields are UI; IDs, values and arbitrary strings still are not.
+const uiContainers = new Set(["inputProps", "permissions", "presentation", "size", "status"]);
+const textArrays = new Set(["buttons", "labels", "headers", "steps"]);
+const componentTextProps = new Map([
+  ["PullRequestCopyableCode", new Set(["target"])],
+  ["NetworkAccessDescription", new Set(["fallback"])],
+  ["SettingsRow", new Set(["status"])],
+  ["PullRequestsUnavailableState", new Set(["error"])],
+  ["SnapShotSetupDialog", new Set(["error"])],
+  ["ThreadErrorBanner", new Set(["error"])],
+]);
+
+function jsxName(attribute) {
+  return propertyName(attribute.parentPath?.node.name);
+}
+
+function isTextAttribute(attribute) {
+  const name = propertyName(attribute.node.name);
+  return uiProperties.has(name) || componentTextProps.get(jsxName(attribute))?.has(name);
+}
+
+function labelBinding(name) {
+  return (
+    name === "summary" ||
+    /(?:Label|Title|Caption|Tooltip|Placeholder|Description|Message|Heading)s?$/.test(name ?? "") ||
+    /(?:^|_)(?:LABEL|TITLE|CAPTION|TOOLTIP|PLACEHOLDER|DESCRIPTION|MESSAGE|HEADING)S?(?:_|$)/.test(
+      name ?? "",
+    )
+  );
+}
+
+// Known presentation APIs; argument positions matter (e.g. a copied URL is data).
+function textArgument(call, child) {
+  if (child.listKey !== "arguments") return false;
+  const names = memberNames(call.node.callee);
+  const leaf = names.at(-1);
+  if (child.key === 0) {
+    if (["alert", "confirm", "prompt", "Notification"].includes(leaf)) return true;
+    if (names[0] === "toast" && ["success", "error", "info", "warning", "message"].includes(leaf))
+      return true;
+    if (/^set(?:[A-Z]\w*)?(?:Error|Message)$/.test(leaf ?? "")) return true;
+    if (
+      leaf === "createProfile" &&
+      call.scope.getBinding(leaf)?.path.node.init?.params?.[0]?.name === "baseName"
+    )
+      return true;
+    if (["runThreadCommand", "runProjectCloneAction", "runCommand"].includes(leaf)) {
+      // Only local wrappers whose first parameter explicitly describes UI copy.
+      const binding = call.scope.getBinding(leaf);
+      const fn = binding?.path.isFunctionDeclaration()
+        ? binding.path.node
+        : binding?.path.node.init;
+      const wrapped = fn?.type === "CallExpression" ? fn.arguments[0] : fn;
+      return /(?:title|message|label)/i.test(propertyName(wrapped?.params?.[0]) ?? "");
+    }
+  }
+  return (
+    ["copyReference", "writeTextToClipboard", "booleanStateLabel"].includes(leaf) && child.key === 1
+  );
+}
 export const nonTextProperties = new Set([
   "className",
   "class",
@@ -95,6 +188,7 @@ export const nonTextProperties = new Set([
   "args",
   "cwd",
   "env",
+  "headers",
 ]);
 const stringMethods = new Set([
   "includes",
@@ -180,8 +274,10 @@ function protectedCall(path) {
 }
 
 /** Protection wins over the dictionary, including through nested expressions. */
-export function protectionReason(path) {
+export function protectionReason(path, filename) {
   let crossedJsxElement = false;
+  const context = uiContext(path);
+  let templateExpression = false;
   for (
     let child = path, parent = path.parentPath;
     parent;
@@ -200,7 +296,13 @@ export function protectionReason(path) {
     )
       return "module-source";
     if (node.type === "TaggedTemplateExpression") return "tagged-template";
-    if (node.type === "TemplateLiteral") return "template-expression";
+    if (node.type === "TemplateLiteral") {
+      const outer = classify(parent, { filename, describePlaceholders: false });
+      // The transformer skips the children of a rewritten template. Children of
+      // interpolation-only wrappers are still visited and can be translated.
+      if (outer?.reason?.startsWith("reviewed:")) return outer.reason;
+      if (outer?.eligible) templateExpression = true;
+    }
     if (node.type === "BinaryExpression" && comparisonOperators.has(node.operator))
       return "comparison";
     if (node.type === "SwitchCase" && child.key === "test") return "switch-case";
@@ -218,10 +320,26 @@ export function protectionReason(path) {
     // A control={<Button>Save</Button>} prop owns markup, not its descendants' text.
     if (node.type === "JSXAttribute" && !crossedJsxElement) {
       const name = propertyName(node.name);
-      if (!uiProperties.has(name)) return `jsx-non-text:${name}`;
+      const nestedText =
+        context &&
+        (textArrays.has(name) ||
+          uiContainers.has(name) ||
+          /^on[A-Z]/.test(name ?? "") ||
+          name === "testConnection" ||
+          (name === "value" &&
+            path.findParent(
+              (ancestor) =>
+                ancestor.isCallExpression() &&
+                memberNames(ancestor.node.callee).at(-1) === "booleanStateLabel",
+            )));
+      if (!isTextAttribute(parent) && !nestedText) return `jsx-non-text:${name}`;
     }
     if (node.type === "ObjectProperty" && child.key === "value" && !crossedJsxElement) {
       const name = propertyName(node.key);
+      if (name === "name" && isDisplayName(parent)) continue;
+      if (isLabelTableValue(parent) && !["className", "style", "id", "key"].includes(name))
+        continue;
+      if (name === "code" && isLabelFallback(path)) continue;
       if (nonTextProperties.has(name) || name?.startsWith("data-")) return `non-text:${name}`;
     }
     if (
@@ -233,7 +351,7 @@ export function protectionReason(path) {
       if (reason) return reason;
     }
   }
-  return null;
+  return templateExpression ? "template-expression" : null;
 }
 
 /** Babel/React JSX whitespace semantics; do not collapse significant same-line spaces. */
@@ -253,12 +371,14 @@ export function jsxText(value) {
 
 function uiContext(path) {
   if (path.isJSXText()) return "jsx-text";
+  if (isLabelFallback(path)) return "prop";
   let child = path;
   let parent = path.parentPath;
   while (parent) {
     const node = parent.node;
     if (
       (expressionWrappers.has(node.type) && child.key === "expression") ||
+      node.type === "TemplateLiteral" ||
       (node.type === "ConditionalExpression" && child.key !== "test") ||
       (node.type === "LogicalExpression" && ["??", "||", "&&"].includes(node.operator))
     ) {
@@ -269,29 +389,100 @@ function uiContext(path) {
     if (node.type === "JSXExpressionContainer") {
       const attribute = parent.parentPath;
       return attribute.isJSXAttribute()
-        ? uiProperties.has(propertyName(attribute.node.name))
+        ? isTextAttribute(attribute)
           ? "jsx-attr"
           : null
         : "jsx-text";
     }
-    if (node.type === "JSXAttribute" && uiProperties.has(propertyName(node.name)))
-      return "jsx-attr";
+    if (node.type === "JSXAttribute" && isTextAttribute(parent)) return "jsx-attr";
     if (
       node.type === "ObjectProperty" &&
       child.key === "value" &&
-      uiProperties.has(propertyName(node.key))
+      (uiProperties.has(propertyName(node.key)) ||
+        isDisplayName(parent) ||
+        isLabelTableValue(parent))
     )
       return "prop";
-    // Electron dialog button arrays contain UI labels, not protocol values.
     if (
-      node.type === "ArrayExpression" &&
-      parent.parentPath?.isObjectProperty() &&
-      propertyName(parent.parentPath.node.key) === "buttons"
+      ["CallExpression", "OptionalCallExpression", "NewExpression"].includes(node.type) &&
+      textArgument(parent, child)
     )
       return "prop";
+    if (
+      node.type === "VariableDeclarator" &&
+      child.key === "init" &&
+      labelBinding(propertyName(node.id))
+    )
+      return "prop";
+    if (
+      node.type === "ReturnStatement" ||
+      (parent.isArrowFunctionExpression() && child.key === "body")
+    ) {
+      const fn = parent.isFunction() ? parent : parent.getFunctionParent();
+      const name = propertyName(fn?.node.id) ?? propertyName(fn?.parentPath?.node.id);
+      if (labelBinding(name)) return "prop";
+    }
+    // Array elements and record values are text only in named label collections.
+    if (
+      node.type === "ArrayExpression" ||
+      (node.type === "ObjectProperty" && child.key === "value")
+    ) {
+      let owner =
+        node.type === "ArrayExpression" ? parent.parentPath : parent.parentPath?.parentPath;
+      while (owner && expressionWrappers.has(owner.node.type)) owner = owner.parentPath;
+      if (owner?.isJSXExpressionContainer()) owner = owner.parentPath;
+      if (owner?.isCallExpression() && textArgument(owner, parent.parentPath)) return "prop";
+      const name =
+        propertyName(owner?.node.key) ??
+        propertyName(owner?.node.name) ??
+        propertyName(owner?.node.id);
+      if (
+        (textArrays.has(name) &&
+          (node.type === "ArrayExpression" || name === "labels") &&
+          (owner?.isJSXAttribute() || name === "buttons" || name === "labels")) ||
+        labelBinding(name)
+      )
+        return "prop";
+    }
     return null;
   }
   return null;
+}
+
+function isLabelFallback(path) {
+  const node = path.parentPath?.node;
+  return (
+    path.key === "right" &&
+    node?.type === "LogicalExpression" &&
+    ["??", "||"].includes(node.operator) &&
+    node.left.type === "CallExpression" &&
+    (memberNames(node.left.callee).at(-1) ?? "").endsWith("Label")
+  );
+}
+
+function isDisplayName(property) {
+  if (propertyName(property.node.key) !== "name" || !property.parentPath?.isObjectExpression())
+    return false;
+  const siblings = property.parentPath.node.properties;
+  // Electron filters, media preview names and source-control host presentation.
+  if (siblings.some((entry) => ["extensions", "src", "baseUrl"].includes(propertyName(entry.key))))
+    return true;
+  const id = siblings.find((entry) => propertyName(entry.key) === "id")?.value;
+  const fallback = property.node.value;
+  return (
+    ["DEFAULT_BROWSER_PROFILE_ID", "INCOGNITO_BROWSER_PROFILE_ID"].includes(id?.name) ||
+    id?.value === "chat-code-block" ||
+    (fallback.type === "LogicalExpression" &&
+      ["??", "||"].includes(fallback.operator) &&
+      ["MemberExpression", "OptionalMemberExpression"].includes(fallback.left.type) &&
+      propertyName(fallback.left.property) === "title")
+  );
+}
+
+function isLabelTableValue(property) {
+  let owner = property.parentPath?.parentPath;
+  while (owner && expressionWrappers.has(owner.node.type)) owner = owner.parentPath;
+  return owner?.isVariableDeclarator() && labelBinding(propertyName(owner.node.id));
 }
 
 export const isMultiword = (value) => /[A-Za-z][A-Za-z'’-]*\s+[A-Za-z]/.test(value);
@@ -320,9 +511,14 @@ export function classify(
   const relative = filename
     ? NodePath.relative(repoRoot, filename.split("?")[0]).replaceAll("\\", "/")
     : "";
-  const override = protectedLocations.find((entry) => entry.file === relative && entry.key === key);
+  const override = protectedLocations.find(
+    (entry) =>
+      entry.file === relative &&
+      entry.key === key &&
+      (entry.line === undefined || entry.line === path.node.loc?.start.line),
+  );
   const reason =
-    protectionReason(path) ??
+    protectionReason(path, filename) ??
     (override ? `reviewed:${override.reason}` : null) ??
     (template && node.quasis.some((part) => /\{\d+\}/.test(part.value.cooked ?? part.value.raw))
       ? "literal-placeholder-collision"

@@ -19,6 +19,7 @@ type Candidate = {
   locations: string[];
   occurrences: Occurrence[];
   occurrenceCount: number;
+  reasons?: Record<string, number>;
 };
 
 function filesAt(path: string): string[] {
@@ -47,7 +48,7 @@ export function extract(paths = sourceRoots.map((root) => NodePath.join(repoRoot
       if (!candidate || (!candidate.eligible && !candidate.review)) return;
       const ledger = candidate.eligible ? candidates : review;
       const category = relative.startsWith("apps/desktop/") ? "desktop" : candidate.category;
-      const item = ledger.get(candidate.key) ?? {
+      const item: Candidate = ledger.get(candidate.key) ?? {
         key: candidate.key,
         placeholders: candidate.placeholders,
         categories: [],
@@ -57,6 +58,10 @@ export function extract(paths = sourceRoots.map((root) => NodePath.join(repoRoot
       };
       const location = `${relative}:${path.node.loc?.start.line ?? 1}`;
       item.occurrenceCount++;
+      if (!candidate.eligible) {
+        item.reasons ??= {};
+        item.reasons[candidate.reason] = (item.reasons[candidate.reason] ?? 0) + 1;
+      }
       if (!item.categories.includes(category)) item.categories.push(category);
       if (item.occurrences.length < 8)
         item.occurrences.push({
@@ -135,7 +140,15 @@ export function main(argv = process.argv.slice(2)) {
   emit("--review", review);
   emit("--missing", result.missingCandidates);
   const { missingCandidates, ...summary } = result;
-  console.error(JSON.stringify({ ...summary, review: review.length }, null, 2));
+  const reviewByReason: Record<string, { keys: number; occurrences: number }> = {};
+  for (const item of review) {
+    for (const [reason, count] of Object.entries(item.reasons ?? {})) {
+      const group = (reviewByReason[reason] ??= { keys: 0, occurrences: 0 });
+      group.keys++;
+      group.occurrences += count;
+    }
+  }
+  console.error(JSON.stringify({ ...summary, review: review.length, reviewByReason }, null, 2));
   if (!options.has("--missing")) console.log(JSON.stringify(missingCandidates, null, 2));
   if (!options.has("--review")) console.error(JSON.stringify({ review }, null, 2));
   return result.missing > 0 ? 1 : 0;

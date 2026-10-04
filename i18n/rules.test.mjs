@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test"
 import * as NodePath from "node:path";
 import { babel } from "./babel.mjs";
 import plugin from "./plugin.mjs";
-import { classify, inScope, jsxText, repoRoot } from "./rules.mjs";
+import { classify, inScope, jsxText, repoRoot, uiProperties } from "./rules.mjs";
 import { createTranslator } from "./core.js";
 
 const filename = NodePath.join(repoRoot, "apps/web/src/i18n-fixture.tsx");
@@ -42,6 +42,118 @@ const candidates = (code) => {
 };
 beforeEach(() => vi.stubEnv("VITEST", ""));
 afterEach(() => vi.unstubAllEnvs());
+
+describe("reviewed UI shapes", () => {
+  it.each([...uiProperties])("recognizes %s without bypassing comparisons or style", (prop) => {
+    expect(candidates(`<Row ${prop}={"Settings"} />`).map((x) => x.key)).toEqual(["Settings"]);
+    expect(transform(`<Row ${prop}={"Settings"} />`)).toContain('("Settings")');
+    expect(candidates(`<Row ${prop}={x === "Settings"} />`)).toEqual([]);
+    expect(candidates(`const x = {className: {${JSON.stringify(prop)}: "New thread"}}`)).toEqual(
+      [],
+    );
+  });
+
+  it.each([
+    [
+      '<Row inputProps={{placeholder: "Settings", id: "New thread"}} />',
+      'const x = {inputProps: {id: "New thread"}}',
+    ],
+    [
+      '<Row permissions={[{title: "Settings", id: "New thread"}]} />',
+      '<Row permissions={["Settings"]} />',
+    ],
+    ['<Row presentation={{label: "Settings"}} />', '<Row presentation="New thread" />'],
+    ['<Row size={{label: "Settings", value: "New thread"}} />', '<Row size="New thread" />'],
+    ['<Row labels={["Settings"]} />', '<Row labels={{id: "New thread"}} />'],
+    ['<Row headers={["Settings"]} />', 'fetch(url, {headers: {Authorization: "New thread"}})'],
+    [
+      '<DiagnosticsTable headers={["Settings"]} />',
+      '<Browser headers={{Authorization: "New thread"}} />',
+    ],
+    ['<Row steps={["Settings"]} />', 'const x = {steps: ["Settings"]}'],
+    ['const x = {labels: ["Settings"]}', 'const x = {values: ["Settings"]}'],
+    ['const STATE_LABELS = {ready: "Settings"}', 'const STATE_IDS = {ready: "Settings"}'],
+    ['const LABEL_BY_KIND = {path: "Settings"}', 'const IDS_BY_KIND = {path: "New thread"}'],
+    ['const SAVED_LABELS = {variant: "Settings"}', 'const x = {variant: "New thread"}'],
+    ['const actionLabel = yes ? "Settings" : "Close"', 'const actionId = "Settings"'],
+    ['function stateLabel() {return "Settings"}', 'function stateId() {return "Settings"}'],
+    ['const stateLabel = () => "Settings"', 'const stateId = () => "Settings"'],
+    [
+      'const filters = [{name: "Settings", extensions: ["json"]}]',
+      'const x = {name: "New thread"}',
+    ],
+    [
+      'const filters = [{name: "Settings", extensions: formats}]',
+      'const x = {extensions: ["Settings"]}',
+    ],
+    [
+      'const profiles = [{id: DEFAULT_BROWSER_PROFILE_ID, name: "Settings"}]',
+      'const profiles = [{id: profileId, name: "New thread"}]',
+    ],
+    [
+      'const source = {name: window?.title || "Settings"}',
+      'const source = {name: file?.name || "New thread"}',
+    ],
+    [
+      '<Row onExpand={() => expandMedia({images: [{src: url, name: "Settings"}]})} />',
+      'const x = {name: "New thread", type: "string"}',
+    ],
+    ['<PullRequestCopyableCode target="Settings" />', '<a target="New thread" />'],
+    ['<NetworkAccessDescription fallback="Settings" />', '<Row fallback="New thread" />'],
+    ['<SettingsRow status="Settings" />', '<Row status="New thread" />'],
+    ['<PullRequestsUnavailableState error="Settings" />', '<Row error="New thread" />'],
+    [
+      '<Row onClick={() => toastManager.add({title: "Settings"})} />',
+      '<Row onClick={() => socket.send("New thread")} />',
+    ],
+    [
+      '<Row onClick={() => toast.error("Settings")} />',
+      '<Row onClick={() => logger.error("New thread")} />',
+    ],
+    [
+      '<Row onClick={() => confirm("Settings")} />',
+      '<Row onClick={() => confirm(x === "New thread")} />',
+    ],
+    ['<Row onError={() => setError("Settings")} />', '<Row onClick={() => setId("New thread")} />'],
+    [
+      '<Row onClick={() => setLanguageError("Settings")} />',
+      '<Row onClick={() => setError(Schema.Literal("New thread"))} />',
+    ],
+    [
+      '<Row onClick={() => new Notification("Settings")} />',
+      '<Row onClick={() => new URL("New thread")} />',
+    ],
+    [
+      '<Row onClick={() => copyReference(url, "Settings")} />',
+      '<Row onClick={() => copyReference("New thread", id)} />',
+    ],
+    [
+      '<Row onClick={() => writeTextToClipboard(url, "Settings")} />',
+      '<Row onClick={() => writeTextToClipboard("New thread", id)} />',
+    ],
+    ['<Row value={booleanStateLabel(state, {true: "Settings"})} />', '<Row value="New thread" />'],
+    [
+      'const x = {code: resolveFamilyLabel(font) ?? "Settings"}',
+      'const x = {code: resolveFamilyId(font) ?? "New thread"}',
+    ],
+    [
+      'const createProfile = (baseName) => {}; <Row onClick={() => createProfile("Settings")} />',
+      'const createProfile = (id) => {}; <Row onClick={() => createProfile("New thread")} />',
+    ],
+    [
+      'function runCommand(label, action) {};<Row onClick={() => runCommand("Settings", action)} />',
+      'function runCommand(command, action) {};<Row onClick={() => runCommand("New thread", action)} />',
+    ],
+  ])(
+    "extracts the reviewed positive shape and protects its counterexample: %s",
+    (positive, negative) => {
+      expect(candidates(positive).some((x) => x.key === "Settings")).toBe(true);
+      expect(transform(positive)).toContain('("Settings")');
+      expect(candidates(negative)).toEqual([]);
+      expect(transform(negative)).not.toContain("import {");
+    },
+  );
+});
 
 describe("protected positions, using the production plugin entry", () => {
   it.each([
@@ -107,6 +219,25 @@ describe("protected positions, using the production plugin entry", () => {
 });
 
 describe("UI candidates and rewriting", () => {
+  it("translates children of an interpolation-only template, which cannot itself be rewritten", () => {
+    const code = '<p>{`${enabled ? "Save" : "Close"}`}</p>';
+    expect(candidates(code).map((item) => item.key)).toEqual(["Save", "Close"]);
+    const output = transform(code);
+    expect(output).toContain('_t("Save")');
+    expect(output).toContain('_t("Close")');
+    expect(candidates('<p className={`${enabled ? "Save" : "Close"}`} />')).toEqual([]);
+    expect(candidates('Schema.Literal(`${enabled ? "Save" : "Close"}`)')).toEqual([]);
+    expect(candidates('css`${enabled ? "New thread" : "Close"}`')).toEqual([]);
+  });
+  it("keeps children of a translatable template out of extraction until the transformer can visit them", () => {
+    const code = '<p>{`New thread ${enabled ? "Save" : "Close"}`}</p>';
+    expect(candidates(code).map((item) => item.key)).toEqual(["New thread {0}"]);
+    const output = transform(code, {
+      dictionary: { "New thread {0}": "测试 {0}", Save: "保存", Close: "关闭" },
+    });
+    expect(output).toContain('_tf("New thread {0}"');
+    expect(output).not.toContain('_t("Save")');
+  });
   it.each([
     "<p>New thread</p>",
     "<Row control={<button>Save</button>} />",

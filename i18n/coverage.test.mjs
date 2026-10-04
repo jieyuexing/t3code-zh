@@ -47,6 +47,16 @@ describe("coverage CLI", () => {
       expect(JSON.parse(passed.stdout)).toEqual([]);
       expect(JSON.parse(passed.stderr).missing).toBe(0);
       expect(Array.isArray(JSON.parse(NodeFS.readFileSync(review, "utf8")))).toBe(true);
+      const excluded = JSON.parse(NodeFS.readFileSync(review, "utf8"));
+      for (const item of excluded) {
+        expect(Object.values(item.reasons).reduce((sum, count) => sum + count, 0)).toBe(
+          item.occurrenceCount,
+        );
+      }
+      const reasonCounts = Object.values(JSON.parse(passed.stderr).reviewByReason);
+      expect(reasonCounts.reduce((sum, entry) => sum + entry.occurrences, 0)).toBe(
+        excluded.reduce((sum, item) => sum + item.occurrenceCount, 0),
+      );
     } finally {
       NodeFS.rmSync(directory, { recursive: true });
     }
