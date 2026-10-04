@@ -1,0 +1,26 @@
+{
+  "Claude": { "category": "provider", "reason": "Provider brand" },
+  "Codex": { "category": "provider", "reason": "Provider brand" },
+  "Commit": {
+    "category": "semantic-value",
+    "reason": "GitQuickActionIcon compares quickAction.label to this English value."
+  },
+  "English": { "category": "language-name", "reason": "Native language label" },
+  "Push": {
+    "category": "semantic-value",
+    "reason": "GitQuickActionIcon compares quickAction.label to this English value."
+  },
+  "Requested visual changes:": {
+    "category": "protocol",
+    "reason": "Legacy composer context writer and reader share this delimiter."
+  },
+  "Running source control action": {
+    "category": "semantic-value",
+    "reason": "Progress state producers and GitActionsControl.logic compare this sentinel."
+  },
+  "T3 Code": { "category": "brand", "reason": "Product name" },
+  "just now": {
+    "category": "semantic-value",
+    "reason": "Sidebar compares the timestamp formatter result with this English value."
+  }
+}

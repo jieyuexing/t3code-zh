@@ -1,0 +1,17 @@
+[
+  {
+    "file": "apps/web/src/components/ChatView.logic.ts",
+    "key": "New thread",
+    "reason": "Draft thread data uses the same English title seed as the server."
+  },
+  {
+    "file": "apps/web/src/components/ChatView.tsx",
+    "key": "New thread",
+    "reason": "Outgoing thread title seed; retain server data semantics, independently of the visible New thread action."
+  },
+  {
+    "file": "packages/client-runtime/src/operations/threadTitle.ts",
+    "key": "New thread",
+    "reason": "Shared thread title seed crosses the wire; the server also recognizes the English fallback."
+  }
+]
