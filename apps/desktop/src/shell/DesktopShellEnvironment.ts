@@ -67,7 +67,20 @@ export class DesktopShellEnvironment extends Context.Service<
   }
 >()("@t3tools/desktop/shell/DesktopShellEnvironment") {}
 
+// Provider CLIs reach their APIs through the user's shell proxy; apps launched from
+// the Dock never see it otherwise.
+const PROXY_ENV_NAMES = [
+  "HTTPS_PROXY",
+  "https_proxy",
+  "HTTP_PROXY",
+  "http_proxy",
+  "ALL_PROXY",
+  "all_proxy",
+  "NO_PROXY",
+  "no_proxy",
+] as const;
 const LOGIN_SHELL_ENV_NAMES = [
+  ...PROXY_ENV_NAMES,
   "PATH",
   "DBUS_SESSION_BUS_ADDRESS",
   "DISPLAY",
@@ -453,6 +466,14 @@ const installPosixEnvironment = Effect.fn("desktop.shellEnvironment.installPosix
     ] as const) {
       if (!config.env[name] && shellEnvironment[name]) {
         config.env[name] = shellEnvironment[name];
+      }
+    }
+
+    // Proxy variables form one group too: an inherited proxy keeps its own NO_PROXY.
+    if (PROXY_ENV_NAMES.every((name) => Option.isNone(trimNonEmpty(config.env[name])))) {
+      for (const name of PROXY_ENV_NAMES) {
+        const value = trimNonEmpty(shellEnvironment[name]);
+        if (Option.isSome(value)) config.env[name] = value.value;
       }
     }
 
