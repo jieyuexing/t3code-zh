@@ -120,12 +120,12 @@ describe("display-only translation", () => {
     expect(displayLabel("High")).toBe("High");
   });
   it.each([
-    ["default", null],
-    ["priority", "fast"],
-    ["ultrafast", "ultrafast"],
+    ["default", "高"],
+    ["priority", "高 快速"],
+    ["ultrafast", "高 超快"],
   ])(
-    "retains semantic selection and speed icon for %s while translating the trigger",
-    async (id, icon) => {
+    "retains semantic selection for %s while translating the combined reasoning and speed label",
+    async (id, label) => {
       const { buildTraitsTriggerDisplay } =
         await import("../apps/web/src/components/chat/TraitsPicker.tsx");
       const descriptors = [
@@ -155,7 +155,7 @@ describe("display-only translation", () => {
         primarySelectDescriptorId: "reasoningEffort",
         ultrathinkPromptControlled: false,
       });
-      expect(result).toEqual({ label: "高", speedIcon: icon });
+      expect(result).toEqual({ label });
       expect(descriptors).toEqual(original);
       const { buildProviderOptionSelectionsFromDescriptors } =
         await import("../packages/shared/src/model.ts");
