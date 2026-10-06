@@ -2730,7 +2730,10 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
           schemes: ["t3code", "t3code-dev"],
         },
       ],
-      ...(signed ? { sign: path.join(repoRoot, "scripts/sign-macos.ts") } : {}),
+      sign: path.join(repoRoot, "scripts/sign-macos.ts"),
+      // Re-seal Electron's bundles so their signature identifiers follow Info.plist.
+      // Keep the default hardened runtime and entitlements, even without a certificate.
+      ...(!signed ? { identity: "-", timestamp: "none", notarize: false } : {}),
       ...(macPasskeySigning
         ? {
             entitlements: macPasskeySigning.entitlementsPath,
