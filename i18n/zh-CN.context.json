@@ -1,13 +1,36 @@
 {
+  "apps/web/src/browser/ServerBrowserSurface.tsx": {
+    "file": "文件",
+    "files": "文件"
+  },
+  "apps/web/src/components/auth/ConnectAgentSurface.tsx": {
+    "on this machine.": "命令。"
+  },
+  "apps/web/src/components/chat/ComposerPrimaryActions.tsx": {
+    "Summarize": "将"
+  },
+  "apps/web/src/components/chat/McpAppFrame.tsx": {
+    "The": "",
+    "Unable to load the": "无法加载"
+  },
   "apps/web/src/components/device/DeviceToolsPanel.tsx": {
     "Clear::line=211": "清透",
     "Motion": "运动"
+  },
+  "apps/web/src/components/onboarding/WelcomeWizard.tsx": {
+    ". You can set": "。之后可在“设置”中配置。",
+    "it": "",
+    "them": "",
+    "up later from Settings.": ""
   },
   "apps/web/src/components/pullRequest/PullRequestListFilters.tsx": {
     "Host": "托管平台"
   },
   "apps/web/src/components/pullRequest/PullRequestMarkdownEditor.tsx": {
     "Write": "编写"
+  },
+  "apps/web/src/components/settings/GitHubAccountSettings.tsx": {
+    "Sign in with": "请在服务器主机上使用"
   },
   "apps/web/src/components/settings/ThemeSettings.tsx": {
     "added": "已添加",

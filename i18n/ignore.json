@@ -87,6 +87,10 @@
     "category": "protocol",
     "reason": "拼进评审上下文记录的 label，该记录会持久化并发送给 Agent"
   },
+  "(function(){var s=document.getElementById(\"t3-theme\"),n=0;if(!s)return;var b={0};function a(t){if(!t||typeof t!==\"object\"||!t.variables||typeof t.variables!==\"object\")return;var c=\":root{color-scheme:\"+(t.appearance===\"light\"?\"light\":\"dark\")+\";\";for(var k in t.variables){if(/^--[a-z0-9-]+$/.test(k))c+=k+\":\"+String(t.variables[k]).replace(/[;{}<>]/g,\"\")+\";\";}s.textContent=c+\"}\"+b;}try{var m=/[#&]{1}=([^&]*)/.exec(location.hash);if(m){a(JSON.parse(decodeURIComponent(m[1])));history.replaceState(history.state,\"\",location.pathname+location.search);}}catch(e){}window.addEventListener(\"message\",function(e){var d=e.data,p=d&&d.params;if(d&&d.jsonrpc===\"2.0\"&&d.method==={2}&&p&&p.styles)a({appearance:p.theme,variables:p.styles.variables});});document.addEventListener(\"click\",function(e){var l=e.isTrusted?e.composedPath().find(function(t){return t&&t.matches&&t.matches(\"a[href]\");}):null,u;if(!l)return;try{u=new URL(l.getAttribute(\"href\"),document.baseURI);}catch(x){return;}if(!/^https?:$/.test(u.protocol)||u.href.split(\"#\")[0]===location.href.split(\"#\")[0])return;if(window.parent!==window){e.preventDefault();window.parent.postMessage({jsonrpc:\"2.0\",id:\"t3-link-\"+(++n),method:{3},params:{url:u.href}},\"*\");}else{l.setAttribute(\"target\",\"_blank\");l.setAttribute(\"rel\",\"noopener\");}},true);if(window.parent!==window){var h,o,z=function(){var r=document.documentElement,v=Math.ceil(r.scrollHeight>r.clientHeight?r.scrollHeight:r.getBoundingClientRect().height);if(v===h)return;h=v;window.parent.postMessage({jsonrpc:\"2.0\",method:{4},params:{height:v}},\"*\");};if(window.ResizeObserver){o=new ResizeObserver(z);o.observe(document.documentElement);}document.addEventListener(\"DOMContentLoaded\",function(){if(o&&document.body)o.observe(document.body);z();});window.addEventListener(\"load\",z);}})();": {
+    "category": "code",
+    "reason": "htmlRender 注入 iframe 的 bootstrap 脚本，属于执行代码而非界面文案。"
+  },
   "(function(){var s=document.getElementById(\"t3-theme\"),n=0;if(!s)return;var b={0};function a(t){if(!t||typeof t!==\"object\"||!t.variables||typeof t.variables!==\"object\")return;var c=\":root{color-scheme:\"+(t.appearance===\"light\"?\"light\":\"dark\")+\";\";for(var k in t.variables){if(/^--[a-z0-9-]+$/.test(k))c+=k+\":\"+String(t.variables[k]).replace(/[;{}<>]/g,\"\")+\";\";}s.textContent=c+\"}\"+b;}try{var m=/[#&]{1}=([^&]*)/.exec(location.hash);if(m){a(JSON.parse(decodeURIComponent(m[1])));history.replaceState(history.state,\"\",location.pathname+location.search);}}catch(e){}window.addEventListener(\"message\",function(e){var d=e.data,p=d&&d.params;if(d&&d.jsonrpc===\"2.0\"&&d.method==={2}&&p&&p.styles)a({appearance:p.theme,variables:p.styles.variables});});document.addEventListener(\"click\",function(e){var l=e.isTrusted?e.composedPath().find(function(t){return t&&t.matches&&t.matches(\"a[href]\");}):null,u;if(!l)return;try{u=new URL(l.getAttribute(\"href\"),document.baseURI);}catch(x){return;}if(!/^https?:$/.test(u.protocol)||u.href.split(\"#\")[0]===location.href.split(\"#\")[0])return;if(window.parent!==window){e.preventDefault();window.parent.postMessage({jsonrpc:\"2.0\",id:\"t3-link-\"+(++n),method:{3},params:{url:u.href}},\"*\");}else{l.setAttribute(\"target\",\"_blank\");l.setAttribute(\"rel\",\"noopener\");}},true);})();": {
     "category": "code",
     "reason": "HTML bootstrap 的字体、标记或注入脚本，属于执行代码而非界面文案。"
@@ -218,6 +222,10 @@
   "<meta charset=\"utf-8\">{0}": {
     "category": "code",
     "reason": "clipboard HTML payload"
+  },
+  "<meta http-equiv=\"Content-Security-Policy\" content=\"{0}\">": {
+    "category": "code",
+    "reason": "MCP 应用文档的 CSP meta 标记，属于 HTML 代码。"
   },
   "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">": {
     "category": "code",
@@ -443,6 +451,10 @@
     "category": "protocol",
     "reason": "已是中英双语并列的固定提示，无需再翻译"
   },
+  "Could not send the app's message.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
+  },
   "Could not write the update restart marker.": {
     "category": "dev-only",
     "reason": "log warning"
@@ -538,6 +550,10 @@
   "DataSpell": {
     "category": "brand",
     "reason": "editor/IDE product name"
+  },
+  "Declined by the user.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
   },
   "Degree out of range": {
     "category": "dev-only",
@@ -699,6 +715,10 @@
     "category": "code",
     "reason": "Relay HTTP API 的 endpoint 描述，属于协议参考资料，不是客户端界面文案。"
   },
+  "GH_TOKEN": {
+    "category": "code",
+    "reason": "环境变量名，按术语表保留。"
+  },
   "Galaxy Z Fold 5": {
     "category": "model",
     "reason": "设备型号名"
@@ -766,6 +786,10 @@
   "INT": {
     "category": "code",
     "reason": "signal name INT"
+  },
+  "If a box needs its own background (a mock of a specific screen, a panel that must stand apart), give it at least 16px of padding on every side and var(--radius) corners, so content never touches its edge.": {
+    "category": "code",
+    "reason": "HTML_RENDER_THEME_GUIDE / LAYOUT_GUIDE 为 Agent 工具描述中的英文生成指令，含 CSS 合同；不改写模型输入。"
   },
   "IntelliJ IDEA": {
     "category": "brand",
@@ -883,6 +907,10 @@
     "category": "protocol",
     "reason": "MCP tool schema description read by the model"
   },
+  "Let content set the page's height. Avoid viewport-based heights such as 100vh or height:100% on html or body; the frame grows to fit the page, so they can make it grow again and again.": {
+    "category": "code",
+    "reason": "HTML_RENDER_THEME_GUIDE / LAYOUT_GUIDE 为 Agent 工具描述中的英文生成指令，含 CSS 合同；不改写模型输入。"
+  },
   "Liberation Mono": {
     "category": "code",
     "reason": "font family name"
@@ -898,6 +926,10 @@
   "Link an environment": {
     "category": "protocol",
     "reason": "OpenAPI spec summary/description for relay API"
+  },
+  "Links open only from a click in the app.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
   },
   "Linux": {
     "category": "semantic-value",
@@ -943,6 +975,10 @@
     "category": "code",
     "reason": "SVG path 数据"
   },
+  "MCP URL": {
+    "category": "brand",
+    "reason": "useCopyToClipboard 的 target 技术名称 MCP URL，中英文同形，保持原文。"
+  },
   "MCP credential does not grant the {0} capability.": {
     "category": "protocol",
     "reason": "MCP error text returned to the agent model, with instructions"
@@ -962,6 +998,22 @@
   "Message text.": {
     "category": "dev-only",
     "reason": "性能基准测试标签/夹具"
+  },
+  "Message too large.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
+  },
+  "Messages are not available here.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
+  },
+  "Messages from apps need a started thread.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
+  },
+  "Method not found: {0}": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
   },
   "Microsoft Edge": {
     "category": "semantic-value",
@@ -1003,6 +1055,10 @@
     "category": "protocol",
     "reason": "OpenAPI spec summary/description for relay API"
   },
+  "Model context needs content blocks or an object of structured content.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
+  },
   "M{0} {1}h{2}v1H{3}z": {
     "category": "code",
     "reason": "SVG path data"
@@ -1030,6 +1086,10 @@
   "No unresolved review findings were returned; inspect the pull request and its failing checks before changing code.": {
     "category": "protocol",
     "reason": "发送给 Agent 的提示词，不是界面文案"
+  },
+  "Not supported for a desktop preview tab: {0}": {
+    "category": "protocol",
+    "reason": "CdpRelay 返回给 CDP 客户端（Agent 的自动化工具）的协议错误，不是界面文案。"
   },
   "Noto Sans": {
     "category": "code",
@@ -1062,6 +1122,22 @@
   "Ocean": {
     "category": "brand",
     "reason": "主题名称（专有名称）"
+  },
+  "Only http(s) links can be opened.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
+  },
+  "Only text and structured content are supported.": {
+    "category": "protocol",
+    "reason": "McpAppRequestError 的消息经 McpAppFrame 的 commandFailure 转成返回给第三方应用的 JSON-RPC 错误，不在 T3 界面显示；保持原文。"
+  },
+  "Only text messages from the user role are supported.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
+  },
+  "Only this preview tab's page can be attached.": {
+    "category": "protocol",
+    "reason": "CdpRelay 返回给 CDP 客户端（Agent 的自动化工具）的协议错误，不是界面文案。"
   },
   "OpenCode": {
     "category": "brand",
@@ -1174,6 +1250,10 @@
   "Reloads this page. Restart the desktop app to update native menus. / 刷新当前页面；原生菜单需重启桌面应用。": {
     "category": "protocol",
     "reason": "already bilingual literal"
+  },
+  "Request failed.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
   },
   "Requested visual changes:": {
     "category": "semantic-value",
@@ -1323,6 +1403,10 @@
     "category": "brand",
     "reason": "product name"
   },
+  "T3 could not ask for approval here.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
+  },
   "T3 injects its active theme as CSS custom properties on :root, and they follow the user's theme and light/dark mode live:": {
     "category": "code",
     "reason": "HTML_RENDER_THEME_GUIDE / LAYOUT_GUIDE 为 Agent 工具描述中的英文生成指令，含 CSS 合同；不改写模型输入。"
@@ -1347,6 +1431,14 @@
     "category": "protocol",
     "reason": "发送给 Agent 的提示词，不是界面文案"
   },
+  "The app's MCP server request failed.": {
+    "category": "protocol",
+    "reason": "McpAppRequestError 的消息经 McpAppFrame 的 commandFailure 转成返回给第三方应用的 JSON-RPC 错误，不在 T3 界面显示；保持原文。"
+  },
+  "The app's thread is not running. Send a message in the thread that created it to use the app again.": {
+    "category": "protocol",
+    "reason": "McpAppRequestError 的消息经 McpAppFrame 的 commandFailure 转成返回给第三方应用的 JSON-RPC 错误，不在 T3 界面显示；保持原文。"
+  },
   "The base stylesheet sets html background/color/font from these, body margin to 0, and hides the page's scrollbar; your own CSS overrides it.": {
     "category": "code",
     "reason": "HTML_RENDER_THEME_GUIDE / LAYOUT_GUIDE 为 Agent 工具描述中的英文生成指令，含 CSS 合同；不改写模型输入。"
@@ -1367,6 +1459,10 @@
     "category": "code",
     "reason": "HTML_RENDER_THEME_GUIDE / LAYOUT_GUIDE 为 Agent 工具描述中的英文生成指令，含 CSS 合同；不改写模型输入。"
   },
+  "The page sits on the thread's own background, so by default leave html, body, and the outermost element with no background color. This overrides general style preferences such as a fixed black page background.": {
+    "category": "code",
+    "reason": "HTML_RENDER_THEME_GUIDE / LAYOUT_GUIDE 为 Agent 工具描述中的英文生成指令，含 CSS 合同；不改写模型输入。"
+  },
   "The pull request is #{0}, titled `{1}`, at `{2}`.": {
     "category": "protocol",
     "reason": "发送给 Agent 的提示词，不是界面文案"
@@ -1379,9 +1475,21 @@
     "category": "protocol",
     "reason": "发送给模型的提示词"
   },
+  "This app cannot call that tool.": {
+    "category": "protocol",
+    "reason": "McpAppRequestError 的消息经 McpAppFrame 的 commandFailure 转成返回给第三方应用的 JSON-RPC 错误，不在 T3 界面显示；保持原文。"
+  },
   "This session is {0} old and uses {1} tokens. Compact it before continuing?": {
     "category": "protocol",
     "reason": "问题文本被源码中的英文正则匹配识别（isClaudeResumeCompactionQuestion），翻译会破坏识别，需协调者连同正则一并处理"
+  },
+  "This thread's provider cannot run MCP app requests.": {
+    "category": "protocol",
+    "reason": "McpAppRequestError 的消息经 McpAppFrame 的 commandFailure 转成返回给第三方应用的 JSON-RPC 错误，不在 T3 界面显示；保持原文。"
+  },
+  "This tool call has no MCP app.": {
+    "category": "protocol",
+    "reason": "McpAppRequestError 的消息经 McpAppFrame 的 commandFailure 转成返回给第三方应用的 JSON-RPC 错误，不在 T3 界面显示；保持原文。"
   },
   "Thread": {
     "category": "dev-only",
@@ -1390,6 +1498,10 @@
   "Tokyo Night": {
     "category": "brand",
     "reason": "community theme name used as search suggestion"
+  },
+  "Too many requests in flight.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
   },
   "Trae": {
     "category": "brand",
@@ -1434,6 +1546,10 @@
   "Use a fluid width with no horizontal padding on the outermost element, and no outer card, border, or banner title: the page is part of your reply.": {
     "category": "code",
     "reason": "HTML_RENDER_THEME_GUIDE / LAYOUT_GUIDE 为 Agent 工具描述中的英文生成指令，含 CSS 合同；不改写模型输入。"
+  },
+  "Use locator='aria-ref=<ref>' with a ref from the latest server snapshot (including iframe elements), or a unique Playwright role/text selector. Refs expire on navigation, a new snapshot, or control handoff; refresh the snapshot after a stale-ref error.": {
+    "category": "protocol",
+    "reason": "MCP tool schema description read by the model"
   },
   "User Data": {
     "category": "code",
@@ -1586,6 +1702,10 @@
   "absolute z-20 -top-1.5 -right-1.5": {
     "category": "code",
     "reason": "CSS class / style string"
+  },
+  "active gh account": {
+    "category": "semantic-value",
+    "reason": "GitHub 账号 Select 的哨兵值，参与选择比较与回传，不是显示文字（显示用 Active gh account）。"
   },
   "after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:border after:border-(--chat-composer-outline) dark:after:inset-shadow-2xs dark:after:inset-shadow-(color:--chat-composer-highlight)": {
     "category": "code",
@@ -1863,6 +1983,10 @@
     "category": "dev-only",
     "reason": "Effect 结构化日志消息，仅写入日志"
   },
+  "desktop browser command stream stopped": {
+    "category": "code",
+    "reason": "桌面主进程 logBackendProcessWarning 的日志消息，供故障定位，保留原文。"
+  },
   "desktop relaunch requested": {
     "category": "dev-only",
     "reason": "Effect 结构化日志消息，仅写入日志"
@@ -1958,6 +2082,22 @@
   "environment-command:attachments:delete": {
     "category": "code",
     "reason": "internal atom/command identifier"
+  },
+  "environment-command:mcp-apps:call-tool": {
+    "category": "code",
+    "reason": "Atom 操作标识，用于状态/诊断，不是用户界面文案。"
+  },
+  "environment-command:mcp-apps:read-resource": {
+    "category": "code",
+    "reason": "Atom 操作标识，用于状态/诊断，不是用户界面文案。"
+  },
+  "environment-command:mcp-apps:tool-info": {
+    "category": "code",
+    "reason": "Atom 操作标识，用于状态/诊断，不是用户界面文案。"
+  },
+  "environment-command:mcp-apps:update-model-context": {
+    "category": "code",
+    "reason": "Atom 操作标识，用于状态/诊断，不是用户界面文案。"
   },
   "environment-data:agent-sessions:import": {
     "category": "code",
@@ -2239,6 +2379,10 @@
     "category": "code",
     "reason": "internal atom/command identifier"
   },
+  "environment-data:preview:adjust": {
+    "category": "code",
+    "reason": "Atom 操作标识，用于状态/诊断，不是用户界面文案。"
+  },
   "environment-data:preview:automation-focus-host": {
     "category": "code",
     "reason": "internal atom/command identifier"
@@ -2250,6 +2394,10 @@
   "environment-data:preview:automation-respond": {
     "category": "code",
     "reason": "internal atom/command identifier"
+  },
+  "environment-data:preview:clear-profile": {
+    "category": "code",
+    "reason": "Atom 操作标识，用于状态/诊断，不是用户界面文案。"
   },
   "environment-data:preview:close": {
     "category": "code",
@@ -2695,6 +2843,10 @@
     "category": "code",
     "reason": "internal atom/command identifier"
   },
+  "environment-data:terminal:observe": {
+    "category": "code",
+    "reason": "Atom 操作标识，用于状态/诊断，不是用户界面文案。"
+  },
   "environment-data:terminal:open": {
     "category": "code",
     "reason": "internal atom/command identifier"
@@ -2863,6 +3015,10 @@
     "category": "code",
     "reason": "Tailwind/CSS class 字符串，属于样式代码。"
   },
+  "font-src data: {0}": {
+    "category": "code",
+    "reason": "CSP 指令字符串，属于协议值。"
+  },
   "for candidate in \"$runtime_parent\"/sha256-*; do": {
     "category": "protocol",
     "reason": "shell script text run in WSL"
@@ -2890,6 +3046,14 @@
   "gap-6 p-6 md:p-12 [&_[data-slot=empty-title]]:text-2xl sm:[&_[data-slot=empty-title]]:text-3xl": {
     "category": "code",
     "reason": "CSS class / style string"
+  },
+  "gh": {
+    "category": "code",
+    "reason": "GitHub CLI 可执行文件名，按术语表保留。"
+  },
+  "gh auth login": {
+    "category": "code",
+    "reason": "可执行命令，按术语表保留。"
   },
   "gh pr checkout 123": {
     "category": "code",
@@ -2990,6 +3154,10 @@
   "h-4 w-px shrink-0 bg-border/65": {
     "category": "code",
     "reason": "CSS/Tailwind class string"
+  },
+  "h-6 gap-1 rounded-md border-transparent px-1.5 text-xs font-medium text-muted-foreground {0}": {
+    "category": "code",
+    "reason": "Tailwind/CSS class 字符串，属于样式代码。"
   },
   "h-7 gap-1 px-1.75 font-normal text-muted-foreground/70 text-sm hover:text-foreground/80 sm:h-6 sm:text-xs [&_svg:not([class*='size-'])]:size-4 sm:[&_svg:not([class*='size-'])]:size-3.5 [&_svg[data-composer-control-chevron]]:ms-0 [&_svg[data-composer-control-chevron]]:-me-1": {
     "category": "code",
@@ -3123,6 +3291,10 @@
     "category": "dev-only",
     "reason": "log message"
   },
+  "img-src data: blob: {0}": {
+    "category": "code",
+    "reason": "CSP 指令字符串，属于协议值。"
+  },
   "import fcntl,os,sys": {
     "category": "code",
     "reason": "Python 脚本"
@@ -3254,6 +3426,10 @@
   "max-sm:max-w-none max-sm:rounded-none max-sm:border-x-0 max-sm:border-t max-sm:border-b-0 max-sm:opacity-[calc(1-min(var(--nested-dialogs),1))] max-sm:data-ending-style:translate-y-4 max-sm:data-starting-style:translate-y-4": {
     "category": "code",
     "reason": "CSS class / style string"
+  },
+  "media-src data: blob: {0}": {
+    "category": "code",
+    "reason": "CSP 指令字符串，属于协议值。"
   },
   "messageSurface": {
     "category": "code",
@@ -3415,6 +3591,10 @@
     "category": "code",
     "reason": "可执行命令或可执行文件示例，按术语表保留。"
   },
+  "pointer-events-auto flex shrink-0 flex-col items-center gap-1 rounded-full border border-border/50 bg-background/80 p-1 shadow-sm": {
+    "category": "code",
+    "reason": "Tailwind/CSS class 字符串，属于样式代码。"
+  },
   "pointer-events-none absolute -right-0.5 top-0.5 z-10 flex size-3.5 items-center justify-center rounded-full bg-transparent shadow-sm": {
     "category": "code",
     "reason": "Tailwind class list"
@@ -3442,6 +3622,10 @@
   "prepareRuntime stub not configured": {
     "category": "dev-only",
     "reason": "test stub"
+  },
+  "preview appearance or zoom": {
+    "category": "code",
+    "reason": "atom command label, only used in console logs"
   },
   "preview automation host focus": {
     "category": "dev-only",
@@ -3595,6 +3779,10 @@
     "category": "protocol",
     "reason": "写入发送给模型的上下文块"
   },
+  "resources/read needs a uri.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
+  },
   "restart array out of range": {
     "category": "code",
     "reason": "Chromium LevelDB/Snappy 解析器的底层诊断标记，供故障定位，保留原文。"
@@ -3622,6 +3810,14 @@
   "safe storage ready": {
     "category": "dev-only",
     "reason": "Effect 结构化日志消息，仅写入日志"
+  },
+  "save GitHub account settings": {
+    "category": "code",
+    "reason": "useAtomCommand 的内部诊断 label，保持操作名稳定。"
+  },
+  "save GitHub token": {
+    "category": "code",
+    "reason": "useAtomCommand 的内部诊断 label，保持操作名稳定。"
   },
   "saved main window bounds could not be restored; using defaults": {
     "category": "dev-only",
@@ -3690,6 +3886,10 @@
   "snappy output length mismatch": {
     "category": "code",
     "reason": "Chromium LevelDB/Snappy 解析器的底层诊断标记，供故障定位，保留原文。"
+  },
+  "t3 auth pairing create": {
+    "category": "code",
+    "reason": "可执行命令，按术语表保留。"
   },
   "t3.json": {
     "category": "semantic-value",
@@ -3799,6 +3999,10 @@
     "category": "protocol",
     "reason": "拼进评审上下文记录的 label，该记录会持久化并发送给 Agent"
   },
+  "tools/call needs a tool name and object arguments.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
+  },
   "transform 150ms ease-out": {
     "category": "code",
     "reason": "CSS value"
@@ -3818,6 +4022,14 @@
   "trap cleanup_runtime_install EXIT": {
     "category": "protocol",
     "reason": "shell script text run in WSL"
+  },
+  "ui/download-file needs embedded resources or resource links.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
+  },
+  "ui/message needs non-empty text.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
   },
   "unexpected BrowserWindow creation": {
     "category": "dev-only",
@@ -3982,6 +4194,18 @@
   "{0} further findings were omitted.": {
     "category": "protocol",
     "reason": "发送给 Agent 的提示词，不是界面文案"
+  },
+  "{0} has no contents.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
+  },
+  "{0} hover:!bg-transparent dark:hover:!bg-transparent": {
+    "category": "code",
+    "reason": "Tailwind/CSS class 字符串，属于样式代码。"
+  },
+  "{0} is too large to save.": {
+    "category": "protocol",
+    "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
   },
   "{0} justify-center gap-1.5 rounded-none {1}": {
     "category": "code",
