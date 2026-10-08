@@ -51,9 +51,9 @@ export function grokUsageResponseToLimits(
     Option.isSome(start) &&
     Option.isSome(reset) &&
     DateTime.toEpochMillis(start.value) < DateTime.toEpochMillis(reset.value);
-  // The billing response uses proto3-style omission for a zero percentage.
-  // Only infer zero when the response still identifies a complete known
-  // subscription period; an incomplete or unknown response remains unreported.
+  // Observed billing responses omit a zero percentage while retaining a
+  // complete subscription period; the Grok CLI shows that same period as 0%.
+  // An incomplete or unknown response remains unreported.
   const usedPercent = response.config?.creditUsagePercent ?? (completeKnownPeriod ? 0 : undefined);
   if (usedPercent === undefined || !Number.isFinite(usedPercent)) {
     // Keep an incomplete successful response visible and retryable. Marking it
