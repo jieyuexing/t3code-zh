@@ -79,6 +79,15 @@ const PROXY_ENV_NAMES = [
   "NO_PROXY",
   "no_proxy",
 ] as const;
+const PROXY_ENDPOINT_ENV_NAMES = [
+  "HTTPS_PROXY",
+  "https_proxy",
+  "HTTP_PROXY",
+  "http_proxy",
+  "ALL_PROXY",
+  "all_proxy",
+] as const;
+const PROXY_BYPASS_ENV_NAMES = ["NO_PROXY", "no_proxy"] as const;
 const LOGIN_SHELL_ENV_NAMES = [
   ...PROXY_ENV_NAMES,
   "PATH",
@@ -472,11 +481,20 @@ const installPosixEnvironment = Effect.fn("desktop.shellEnvironment.installPosix
       }
     }
 
-    // Proxy variables form one group too: an inherited proxy keeps its own NO_PROXY.
-    if (PROXY_ENV_NAMES.every((name) => Option.isNone(trimNonEmpty(config.env[name])))) {
-      for (const name of PROXY_ENV_NAMES) {
+    // A bypass list by itself is not a proxy configuration. Keep an inherited
+    // NO_PROXY, but still hydrate the endpoint variables from the login shell.
+    // Once a real endpoint is inherited, leave its endpoint and bypass values
+    // together instead of mixing a second shell configuration into it.
+    if (PROXY_ENDPOINT_ENV_NAMES.every((name) => Option.isNone(trimNonEmpty(config.env[name])))) {
+      for (const name of PROXY_ENDPOINT_ENV_NAMES) {
         const value = trimNonEmpty(shellEnvironment[name]);
         if (Option.isSome(value)) config.env[name] = value.value;
+      }
+      if (PROXY_BYPASS_ENV_NAMES.every((name) => Option.isNone(trimNonEmpty(config.env[name])))) {
+        for (const name of PROXY_BYPASS_ENV_NAMES) {
+          const value = trimNonEmpty(shellEnvironment[name]);
+          if (Option.isSome(value)) config.env[name] = value.value;
+        }
       }
     }
 
