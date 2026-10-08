@@ -6362,7 +6362,7 @@
   "on \"{0}\". You can continue on this branch or create a feature branch and run the same action there.": "（分支 \"{0}\"）。你可以继续在此分支上操作，或创建功能分支后在其上执行相同操作。",
   "on \"{0}\". You can continue on this ref or create a feature ref and run the same action there.": "到“{0}”。你可以继续在该分支上操作，或创建功能分支并在其中执行相同操作。",
   "on channel {0}": "，通道 {0}",
-  "on settle": "处理时",
+  "on settle": "已处理时",
   "on the computer that opened this page. Only approve a sign-in you just started.": "（位于打开此页面的电脑上）。只批准你刚刚发起的登录。",
   "on the server host, then rescan to choose accounts here.": "登录，然后重新扫描，以便在此选择账号。",
   "on {0}": "，在 {0} 上",
