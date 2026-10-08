@@ -582,6 +582,52 @@ describe("Grok usage limits", () => {
       ).windows,
     ).toEqual([{ id: "subscription", kind: "monthly", label: "Monthly", usedPercent: 100 }]);
   });
+
+  it("treats an omitted percentage as zero only for a complete known billing period", () => {
+    expect(
+      grokUsageResponseToLimits(
+        {
+          config: {
+            currentPeriod: {
+              type: "USAGE_PERIOD_TYPE_WEEKLY",
+              start: "2026-09-11T03:10:30.159171+00:00",
+              end: "2026-09-18T03:10:30.159171+00:00",
+            },
+          },
+        },
+        checkedAt,
+      ).windows,
+    ).toEqual([
+      {
+        id: "subscription",
+        kind: "weekly",
+        label: "Weekly",
+        usedPercent: 0,
+        resetsAt: "2026-09-18T03:10:30.159Z",
+      },
+    ]);
+
+    for (const currentPeriod of [
+      { type: "USAGE_PERIOD_TYPE_WEEKLY", end: "2026-09-18T03:10:30.159171+00:00" },
+      {
+        type: "USAGE_PERIOD_TYPE_WEEKLY",
+        start: "invalid",
+        end: "2026-09-18T03:10:30.159171+00:00",
+      },
+      {
+        type: "USAGE_PERIOD_TYPE_WEEKLY",
+        start: "2026-09-18T03:10:30.159171+00:00",
+        end: "2026-09-11T03:10:30.159171+00:00",
+      },
+      {
+        type: "USAGE_PERIOD_TYPE_DAILY",
+        start: "2026-09-11T03:10:30.159171+00:00",
+        end: "2026-09-18T03:10:30.159171+00:00",
+      },
+    ]) {
+      expect(grokUsageResponseToLimits({ config: { currentPeriod } }, checkedAt).windows).toEqual([]);
+    }
+  });
 });
 
 it.layer(NodeServices.layer)("readGrokAccount", (it) => {
