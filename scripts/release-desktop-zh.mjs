@@ -73,48 +73,76 @@ console.log(`[zh-release] ${tag} ← ${head.slice(0, 9)}，${dmg}（sha256 ${sha
 if (dryRun) {
   console.log(notes);
 } else {
-  // Create a draft first, upload with curl, then publish: `gh release create <file>` uploads
-  // at ~80 KB/s through the local proxy, while curl through the same proxy runs at ~3 MB/s.
-  gh(
-    "release",
-    "create",
-    tag,
-    "-R",
-    REPO,
-    "--draft",
-    "--target",
-    head,
-    "--title",
-    `T3 Code 中文版 ${version}`,
-    "--notes-file",
-    notesFile,
-  );
-  const releaseId = gh(
-    "api",
-    `repos/${REPO}/releases`,
-    "--jq",
-    `.[] | select(.tag_name == "${tag}") | .id`,
-  );
-  const name = dmg.split("/").pop();
-  const curlArgs = [
-    "--fail",
-    "--silent",
-    "--show-error",
-    "-H",
-    `Authorization: Bearer ${gh("auth", "token")}`,
-    "-H",
-    "Content-Type: application/x-apple-diskimage",
-    "--data-binary",
-    `@${dmg}`,
-    `https://uploads.github.com/repos/${REPO}/releases/${releaseId}/assets?name=${encodeURIComponent(name)}`,
-  ];
-  const proxy = process.env.https_proxy ?? process.env.HTTPS_PROXY;
-  if (proxy) curlArgs.unshift("-x", proxy);
-  const asset = JSON.parse(NodeChildProcess.execFileSync("curl", curlArgs, { encoding: "utf8" }));
-  if (asset.size !== NodeFS.statSync(dmg).size || asset.digest !== `sha256:${sha256}`)
-    throw new Error(
-      `草稿 ${tag} 已建，但上传的安装包与本地不一致（${asset.size}、${asset.digest}），请检查后重传。`,
+  // Create a draft first (or reuse the one a failed run left), upload with curl, then publish:
+  // `gh release create <file>` uploads at ~80 KB/s through the local proxy, while curl through
+  // the same proxy runs at ~3 MB/s.
+  const findRelease = () => {
+    const found = gh(
+      "api",
+      `repos/${REPO}/releases`,
+      "--jq",
+      `[.[] | select(.tag_name == "${tag}")][0]`,
     );
+    return found && found !== "null" ? JSON.parse(found) : undefined;
+  };
+  let release = findRelease();
+  if (release && !release.draft) throw new Error(`${tag} 已经发布过，不再重复发布。`);
+  if (!release) {
+    gh(
+      "release",
+      "create",
+      tag,
+      "-R",
+      REPO,
+      "--draft",
+      "--target",
+      head,
+      "--title",
+      `T3 Code 中文版 ${version}`,
+      "--notes-file",
+      notesFile,
+    );
+    // A new draft can take a moment to show up in the release list.
+    for (let attempt = 0; !release && attempt < 5; attempt += 1) {
+      if (attempt) await new Promise((resolve) => setTimeout(resolve, 2000));
+      release = findRelease();
+    }
+    if (!release) throw new Error(`草稿 ${tag} 已建，但查不到它的 id，请检查后重跑。`);
+  }
+  const name = dmg.split("/").pop();
+  const findAsset = () => findRelease()?.assets.find((asset) => asset.name === name);
+  const matches = (asset) =>
+    asset.size === NodeFS.statSync(dmg).size && asset.digest === `sha256:${sha256}`;
+  const existing = findAsset();
+  if (existing && !matches(existing))
+    throw new Error(
+      `草稿 ${tag} 里已有不一致的 ${name}（${existing.size}、${existing.digest}），删掉该附件后重跑。`,
+    );
+  if (!existing) {
+    const curlArgs = [
+      "--fail",
+      "--silent",
+      "--show-error",
+      "--output",
+      "/dev/null",
+      "-H",
+      `Authorization: Bearer ${gh("auth", "token")}`,
+      "-H",
+      "Content-Type: application/x-apple-diskimage",
+      "--data-binary",
+      `@${dmg}`,
+      `https://uploads.github.com/repos/${REPO}/releases/${release.id}/assets?name=${encodeURIComponent(name)}`,
+    ];
+    const proxy = process.env.https_proxy ?? process.env.HTTPS_PROXY;
+    if (proxy) curlArgs.unshift("-x", proxy);
+    NodeChildProcess.execFileSync("curl", curlArgs);
+    // Check what GitHub stored rather than the upload response, which a proxy can cut short.
+    const asset = findAsset();
+    if (!asset || !matches(asset))
+      throw new Error(
+        `草稿 ${tag} 已建，但上传的安装包与本地不一致（${asset ? `${asset.size}、${asset.digest}` : "没有附件"}），请检查后重跑。`,
+      );
+  }
   gh("release", "edit", tag, "-R", REPO, "--draft=false", "--latest");
   console.log(`[zh-release] 已发布：https://github.com/${REPO}/releases/tag/${tag}`);
 }
