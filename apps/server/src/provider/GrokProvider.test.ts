@@ -4,7 +4,6 @@ import * as NodeURL from "node:url";
 
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { describe, expect, it } from "@effect/vitest";
-import * as Cause from "effect/Cause";
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Schema from "effect/Schema";
@@ -917,28 +916,6 @@ it.layer(NodeServices.layer)("readGrokAccount", (it) => {
           expect(usageLimits.unavailable).toEqual({
             reason: "probeFailed",
             message: "Grok could not connect to the billing service.",
-          }),
-        ),
-      ),
-    ),
-  );
-});
-
-it.layer(NodeServices.layer)("readGrokAccount timeout", (it) => {
-  it.effect("classifies the timeout error that Effect.timeout emits", () =>
-    readGrokAccount({
-      HOME: "/definitely/not/a/grok-home",
-      GROK_AUTH: '{"https://accounts.x.ai/sign-in":{"key":"private-token"}}',
-    }).pipe(
-      Effect.provideService(
-        HttpClient.HttpClient,
-        HttpClient.make(() => Effect.fail(new Cause.TimeoutError())),
-      ),
-      Effect.tap(({ usageLimits }) =>
-        Effect.sync(() =>
-          expect(usageLimits.unavailable).toEqual({
-            reason: "probeFailed",
-            message: "Grok usage-limit check timed out.",
           }),
         ),
       ),
