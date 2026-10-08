@@ -6,7 +6,7 @@ import * as FileSystem from "effect/FileSystem";
 import * as Option from "effect/Option";
 import * as Path from "effect/Path";
 import * as Schema from "effect/Schema";
-import { HttpClient, HttpClientRequest, HttpClientResponse } from "effect/http";
+import { HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "effect/http";
 import {
   clampPercent,
   makeUnavailableUsageLimits,
@@ -42,10 +42,16 @@ function unavailableGrokUsageLimits(checkedAt: string, message: string) {
 
 function grokUsageProbeFailureMessage(error: unknown): string {
   if (typeof error === "object" && error !== null && "_tag" in error) {
-    if (error._tag === "TimeoutException") return "Grok usage-limit check timed out.";
+    if (error._tag === "TimeoutError") return "Grok usage-limit check timed out.";
     if (error._tag === "ParseError" || error._tag === "SchemaError") {
       return "Grok returned an invalid usage-limits response.";
     }
+  }
+  if (
+    HttpClientError.isHttpClientError(error) &&
+    (error.reason._tag === "DecodeError" || error.reason._tag === "EmptyBodyError")
+  ) {
+    return "Grok returned an invalid usage-limits response.";
   }
   return "Grok could not connect to the billing service.";
 }
@@ -189,9 +195,7 @@ export const readGrokAccount = Effect.fn("readGrokAccount")(function* (
     if (response.status < 200 || response.status >= 300) {
       return unavailableGrokUsageLimits(checkedAt, grokUsageHttpFailureMessage(response.status));
     }
-    const body = yield* HttpClientResponse.schemaBodyJson(GrokUsageResponse)(
-      response,
-    );
+    const body = yield* HttpClientResponse.schemaBodyJson(GrokUsageResponse)(response);
     return grokUsageResponseToLimits(body, checkedAt);
   }).pipe(
     Effect.timeout("10 seconds"),
