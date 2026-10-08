@@ -1,3 +1,4 @@
+import { displayUsageNotice } from "../../../../../i18n/display.js";
 import type { EnvironmentId, UsageLimitsReport } from "@t3tools/contracts";
 import { limitsNotice } from "@t3tools/shared/usageLimits";
 import { GaugeIcon } from "lucide-react";
@@ -96,7 +97,7 @@ function UsageLimitsBannerBody({
                 </span>
               ) : null}
               {notice ? (
-                <span className="text-xs text-muted-foreground">{notice}</span>
+                <span className="text-xs text-muted-foreground">{displayUsageNotice(notice)}</span>
               ) : (
                 <LimitWindows
                   compact
@@ -128,7 +129,7 @@ function UsageLimitsBannerBody({
         })}
         {report.notices.map((notice) => (
           <span key={notice} className="text-xs text-muted-foreground">
-            {notice}
+            {displayUsageNotice(notice)}
           </span>
         ))}
       </ComposerBanner.Body>

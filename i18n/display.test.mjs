@@ -19,6 +19,56 @@ afterEach(() => {
 });
 
 describe("display-only translation", () => {
+  it("translates usage notice messages without translating environment or account labels", async () => {
+    const { displayUsageNotice } = await import("./display.js");
+    expect(
+      displayUsageNotice("Jieyue的MacBook Pro · Grok: Grok could not read usage limits."),
+    ).toBe("Jieyue的MacBook Pro · Grok: Grok 无法读取用量限额。");
+    expect(
+      displayUsageNotice(
+        "omarchy · Codex: Codex CLI is not authenticated. Run `codex login` and try again.",
+      ),
+    ).toBe("omarchy · Codex: Codex CLI 未登录。请运行 `codex login` 后重试。");
+    expect(displayUsageNotice("High · Codex: Codex could not read usage (JSON-RPC -32000).")).toBe(
+      "High · Codex: Codex 无法读取用量（JSON-RPC -32000）。",
+    );
+    expect(displayUsageNotice("Grok could not read usage limits.")).toBe("Grok 无法读取用量限额。");
+    expect(displayUsageNotice("Local · Grok: Grok usage-limit check timed out.")).toBe(
+      "Local · Grok: Grok 读取用量限额超时。",
+    );
+    expect(displayUsageNotice("Local · Grok: Grok billing returned HTTP 418.")).toBe(
+      "Local · Grok: Grok 计费服务返回 HTTP 418。",
+    );
+    expect(displayUsageNotice("Custom: unknown provider response")).toBe(
+      "Custom: unknown provider response",
+    );
+    expect(displayUsageNotice("High")).toBe("High");
+    expect(displayUsageNotice("Prefix Grok could not read usage limits.")).toBe(
+      "Prefix Grok could not read usage limits.",
+    );
+  });
+  it("translates quota window names while preserving model suffixes and unknown labels", async () => {
+    const { displayUsageWindowLabel } = await import("./display.js");
+    expect(displayUsageWindowLabel("Session")).toBe("会话");
+    expect(displayUsageWindowLabel("Weekly")).toBe("每周");
+    expect(displayUsageWindowLabel("Weekly · Fable")).toBe("每周 · Fable");
+    expect(displayUsageWindowLabel("Monthly")).toBe("每月");
+    expect(displayUsageWindowLabel("Subscription")).toBe("订阅");
+    expect(displayUsageWindowLabel("Weekly budget")).toBe("Weekly budget");
+  });
+  it("keeps usage messages and windows in English for English locale and upstream tests", async () => {
+    vi.stubGlobal("localStorage", { getItem: () => "en" });
+    const { displayUsageNotice, displayUsageWindowLabel } = await import("./display.js");
+    const notice = "Local · Grok: Grok could not read usage limits.";
+    expect(displayUsageNotice(notice)).toBe(notice);
+    expect(displayUsageNotice("Local · Grok: Grok billing returned HTTP 418.")).toBe(
+      "Local · Grok: Grok billing returned HTTP 418.",
+    );
+    expect(displayUsageWindowLabel("Weekly · Fable")).toBe("Weekly · Fable");
+    vi.stubEnv("MODE", "test");
+    expect(displayUsageNotice(notice)).toBe(notice);
+    expect(displayUsageWindowLabel("Weekly")).toBe("Weekly");
+  });
   it("translates known provider labels and leaves unknown custom text untouched", async () => {
     const { displayLabel } = await import("./display.js");
     expect(displayLabel("High")).toBe("高");

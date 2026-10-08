@@ -23,7 +23,7 @@ desktop 通过现有 bridge / IPC 保存同一选项。主进程在启动求值�
 
 `zh-CN.context.json` 按仓库相对文件路径组织：`{"apps/web/src/Example.tsx": {"Share": "占比"}}`。同文件有歧义时可用 `"Clear::line=211": "清透"`；精确行优先于文件覆盖，再回退全局词典。插件把译文作为 `__t(raw, override)` / `__tf(raw, args, override)` 的额外参数内联，HTML 片段同理；英文模式仍返回原文，不新增运行时词典加载。覆盖只作用于规则已允许的 UI 位置，不能绕过比较、协议值等保护。测试检查全部覆盖仍能命中生产源码，并分别验证 DeviceToolsPanel 的清透外观与清除位置按钮；上游 merge 移动行号后须重新核对。
 
-`display.js` 用于少量动态显示边界：TraitsPicker 与 provider 设置表单的标签/描述、Git 操作菜单、线程标题和相对时间。先完成原始值的比较、选择与图标判断，再调用 `displayLabel`；不映射 descriptor、option ID、持久化数据或回传值。`displayThreadTitle` 只翻译完全等于 `New thread` 的服务端种子，重命名输入和提交继续使用原始标题。`relativeTimeSuffix` / `joinRelativeTime` 在中文去掉 value 与后缀间的空格，英文保留。上述 helper 与 Babel 一样在测试模式保持英文；i18n 专项测试显式启用 production 模式。
+`display.js` 用于少量动态显示边界：TraitsPicker 与 provider 设置表单的标签/描述、Git 操作菜单、线程标题、相对时间和用量限额。先完成原始值的比较、选择与图标判断，再调用 `displayLabel`；不映射 descriptor、option ID、持久化数据或回传值。`displayThreadTitle` 只翻译完全等于 `New thread` 的服务端种子，重命名输入和提交继续使用原始标题。`relativeTimeSuffix` / `joinRelativeTime` 在中文去掉 value 与后缀间的空格，英文保留。用量 helper 只翻译已知提示后缀和周期标签，保留环境名、账号名、模型后缀及未知错误原文；服务端数据与归并键仍用原值。上述 helper 与 Babel 一样在测试模式保持英文；i18n 专项测试显式启用 production 模式。
 
 `display-labels.json` 是从 provider 源码核对的动态标签清单，附显示文件与来源；提取器将这些运行时查表入口也纳入覆盖率。新 provider 增加已知标签时需同步清单，未知/自定义标签仍回退原文。Commit/Push 等同时是语义值和显示文字：可以同时存在于 ignore 与全局词典，ignore 保持自动改写和图标比较所需的英文，显式显示 helper 从词典取中文；不要仅为显示翻译移除 ignore。
 
