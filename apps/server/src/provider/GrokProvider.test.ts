@@ -607,8 +607,32 @@ describe("Grok usage limits", () => {
       },
     ]);
 
+    expect(
+      grokUsageResponseToLimits(
+        {
+          config: {
+            currentPeriod: {
+              type: "USAGE_PERIOD_TYPE_MONTHLY",
+              start: "2026-09-01T00:00:00.000Z",
+              end: "2026-10-01T00:00:00.000Z",
+            },
+          },
+        },
+        checkedAt,
+      ).windows,
+    ).toEqual([
+      {
+        id: "subscription",
+        kind: "monthly",
+        label: "Monthly",
+        usedPercent: 0,
+        resetsAt: "2026-10-01T00:00:00.000Z",
+      },
+    ]);
+
     for (const currentPeriod of [
       { type: "USAGE_PERIOD_TYPE_WEEKLY", end: "2026-09-18T03:10:30.159171+00:00" },
+      { type: "USAGE_PERIOD_TYPE_WEEKLY", start: "2026-09-11T03:10:30.159171+00:00" },
       {
         type: "USAGE_PERIOD_TYPE_WEEKLY",
         start: "invalid",
@@ -620,12 +644,24 @@ describe("Grok usage limits", () => {
         end: "2026-09-11T03:10:30.159171+00:00",
       },
       {
+        type: "USAGE_PERIOD_TYPE_WEEKLY",
+        start: "2026-09-11T03:10:30.159171+00:00",
+        end: "invalid",
+      },
+      {
+        type: "USAGE_PERIOD_TYPE_WEEKLY",
+        start: "2026-09-11T03:10:30.159171+00:00",
+        end: "2026-09-11T03:10:30.159171+00:00",
+      },
+      {
         type: "USAGE_PERIOD_TYPE_DAILY",
         start: "2026-09-11T03:10:30.159171+00:00",
         end: "2026-09-18T03:10:30.159171+00:00",
       },
     ]) {
-      expect(grokUsageResponseToLimits({ config: { currentPeriod } }, checkedAt).windows).toEqual([]);
+      expect(grokUsageResponseToLimits({ config: { currentPeriod } }, checkedAt).windows).toEqual(
+        [],
+      );
     }
   });
 });
