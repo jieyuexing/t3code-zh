@@ -1810,6 +1810,11 @@ function isClaudeNonSubagentTask(message: SDKMessage): boolean {
   return isClaudeOpaqueBackgroundTaskType(claudeTaskTypeFromSdkMessage(message));
 }
 
+/** The subagent status a `task_notification` ends it with. */
+function claudeSubagentEndStatus(status: "completed" | "failed" | "stopped") {
+  return status === "completed" ? "completed" : status === "stopped" ? "cancelled" : "failed";
+}
+
 function isClaudeBackgroundTasksChangedMessage(message: SDKMessage): boolean {
   return (
     message.type === "system" &&
@@ -3302,6 +3307,9 @@ export function makeClaudeAdapterV2(
           }
         });
         const requestedContinuations = yield* Ref.make(new Set<string>());
+        // Counts continuation offers per native thread, so a request the
+        // worker drops late cannot clear a newer offer's buffer.
+        const continuationGenerations = new Map<string, number>();
         // ExitPlanMode plans whose permission callback fired while the tool's
         // root frames were held for a prompt echo. Each projects when its
         // tool_use frame is handled, in whichever run that frame is routed
@@ -5305,6 +5313,51 @@ export function makeClaudeAdapterV2(
           }
         });
 
+        // The worker drops a continuation it will not start: the thread was
+        // archived, it now runs another provider, or the dispatch failed. No
+        // Claude turn will drain the buffer, so the subagents it reports end
+        // here, through the turn that settled last, and the next wake can
+        // request a continuation again. Claude's own session keeps the wake.
+        const dropBufferedWake = Effect.fnUntraced(function* (
+          nativeThreadId: string,
+          generation: number,
+        ) {
+          if (continuationGenerations.get(nativeThreadId) !== generation) return;
+          const requested = yield* Ref.modify(requestedContinuations, (current) => {
+            if (!current.has(nativeThreadId)) return [false, current] as const;
+            const updated = new Set(current);
+            updated.delete(nativeThreadId);
+            return [true, updated] as const;
+          });
+          if (!requested) return;
+          const buffered = yield* Ref.modify(wakeBuffers, (current) => {
+            const entry = current.get(nativeThreadId);
+            if (entry === undefined) return [[] as ReadonlyArray<SDKMessage>, current] as const;
+            const updated = new Map(current);
+            updated.delete(nativeThreadId);
+            return [entry.messages, updated] as const;
+          });
+          const settled = settledTurnByNativeThread.get(nativeThreadId);
+          if (settled === undefined) return;
+          const subagents = yield* Ref.get(sessionSubagentsByTaskId);
+          for (const message of buffered) {
+            if (
+              message.type !== "system" ||
+              message.subtype !== "task_notification" ||
+              !subagents.has(message.task_id)
+            ) {
+              continue;
+            }
+            yield* updateClaudeSubagentNode({
+              context: settled,
+              taskId: message.task_id,
+              ...(message.tool_use_id === undefined ? {} : { toolUseId: message.tool_use_id }),
+              result: message.summary,
+              status: claudeSubagentEndStatus(message.status),
+            });
+          }
+        });
+
         const bufferWakeMessage = Effect.fnUntraced(function* (wakeInput: {
           readonly nativeThreadId: string;
           readonly message: SDKMessage;
@@ -5511,12 +5564,21 @@ export function makeClaudeAdapterV2(
             threadId: route.threadId,
             providerThreadId: route.providerThreadId,
           });
+          const generation = (continuationGenerations.get(wakeInput.nativeThreadId) ?? 0) + 1;
+          continuationGenerations.set(wakeInput.nativeThreadId, generation);
+          const drop = dropBufferedWake(wakeInput.nativeThreadId, generation);
           yield* continuationRequests.offer({
             threadId: route.threadId,
             providerThreadId: route.providerThreadId,
             driver: CLAUDE_PROVIDER,
             detail,
             ...(notification === null ? {} : { notification }),
+            clearIfCurrent: () => drop,
+            dispatchIfCurrent: (dispatch) =>
+              dispatch.pipe(
+                Effect.map(Option.some),
+                Effect.tapCause(() => drop),
+              ),
           });
         });
 
@@ -6304,12 +6366,7 @@ export function makeClaudeAdapterV2(
                 taskId: message.task_id,
                 ...(message.tool_use_id === undefined ? {} : { toolUseId: message.tool_use_id }),
                 result: message.summary,
-                status:
-                  message.status === "completed"
-                    ? "completed"
-                    : message.status === "stopped"
-                      ? "cancelled"
-                      : "failed",
+                status: claudeSubagentEndStatus(message.status),
               });
             }
             // Replay tombstone only needs to outlive buffering until this
