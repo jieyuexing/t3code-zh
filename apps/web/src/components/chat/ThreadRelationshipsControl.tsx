@@ -60,7 +60,7 @@ import { Menu, MenuItem, MenuPopup, MenuTrigger } from "../ui/menu";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { toastManager } from "../ui/toast";
 import {
-  THREAD_DETAILS_PANEL_LINK_SPLIT_GROUP_CLASS,
+  THREAD_DETAILS_PANEL_SPLIT_GROUP_CLASS,
   THREAD_DETAILS_PANEL_ROW_CONTENT_CLASS,
   THREAD_DETAILS_PANEL_SPLIT_SEPARATOR_CLASS,
 } from "./threadDetailsPanelStyles";
@@ -213,6 +213,7 @@ export function ThreadRelationshipsPanel(props: {
               driver: subagent.driver,
               providerInstanceId: subagent.providerInstanceId,
               origin: subagent.origin,
+              modelSelection: subagent.modelSelection,
             },
           ]),
       ),
@@ -413,6 +414,7 @@ export function ThreadRelationshipsPanel(props: {
                   model={agent.model}
                   providerInstanceId={agent.providerInstanceId}
                   origin={agent.origin}
+                  modelSelection={agent.modelSelection}
                   provider={provider}
                   providers={providers}
                   driver={providerDriver}
@@ -462,12 +464,9 @@ export function ThreadRelationshipsPanel(props: {
                 </>
               );
               return (
-                <li
-                  key={threadId}
-                  className={`group relative flex h-8 items-center rounded-lg ${canStop ? THREAD_DETAILS_PANEL_LINK_SPLIT_GROUP_CLASS : ""}`}
-                >
+                <li key={threadId} className="group relative flex h-8 items-center rounded-lg">
                   {isMergeTarget ? (
-                    <div className={THREAD_DETAILS_PANEL_LINK_SPLIT_GROUP_CLASS}>
+                    <div className={THREAD_DETAILS_PANEL_SPLIT_GROUP_CLASS}>
                       <Tooltip>
                         <TooltipTrigger
                           delay={200}
@@ -475,7 +474,7 @@ export function ThreadRelationshipsPanel(props: {
                             <ThreadDetailsControl
                               size="sm"
                               variant="ghost"
-                              part="link-primary"
+                              part="primary"
                               aria-label={`${displayThreadTitle(threadTitle)} ${threadRelationshipStatusLabel(status)}`}
                               disabled={node?.missing === true}
                               onClick={() => openThread(threadId)}
@@ -535,7 +534,7 @@ export function ThreadRelationshipsPanel(props: {
                             variant="ghost"
                             disabled={node?.missing === true}
                             onClick={() => openThread(threadId)}
-                            part={canStop ? "group-row" : "row"}
+                            part="row"
                           />
                         }
                       >
