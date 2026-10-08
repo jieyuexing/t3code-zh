@@ -66,34 +66,55 @@ const notes = [
 const tag = `zh-v${version}`;
 const notesFile = `${process.env.TMPDIR ?? "/tmp"}/release-notes-${version}.md`;
 NodeFS.writeFileSync(notesFile, notes);
-const command = [
-  "release",
-  "create",
-  tag,
-  dmg,
-  "-R",
-  REPO,
-  "--target",
-  head,
-  "--title",
-  `T3 Code 中文版 ${version}`,
-  "--notes-file",
-  notesFile,
-  "--latest",
-];
+const gh = (...ghArgs) =>
+  NodeChildProcess.execFileSync("gh", ghArgs, { cwd: root, encoding: "utf8" }).trim();
 
 console.log(`[zh-release] ${tag} ← ${head.slice(0, 9)}，${dmg}（sha256 ${sha256.slice(0, 16)}…）`);
 if (dryRun) {
   console.log(notes);
-  console.log(`gh ${command.join(" ")}`);
 } else {
-  NodeChildProcess.execFileSync("gh", command, { cwd: root, stdio: "inherit" });
-  const asset = JSON.parse(
-    NodeChildProcess.execFileSync("gh", ["release", "view", tag, "-R", REPO, "--json", "assets"], {
-      encoding: "utf8",
-    }),
-  ).assets.find((entry) => entry.name.endsWith(".dmg"));
-  if (!asset || asset.size !== NodeFS.statSync(dmg).size)
-    throw new Error("Release 已建，但安装包大小与本地不一致，请检查上传。");
+  // Create a draft first, upload with curl, then publish: `gh release create <file>` uploads
+  // at ~80 KB/s through the local proxy, while curl through the same proxy runs at ~3 MB/s.
+  gh(
+    "release",
+    "create",
+    tag,
+    "-R",
+    REPO,
+    "--draft",
+    "--target",
+    head,
+    "--title",
+    `T3 Code 中文版 ${version}`,
+    "--notes-file",
+    notesFile,
+  );
+  const releaseId = gh(
+    "api",
+    `repos/${REPO}/releases`,
+    "--jq",
+    `.[] | select(.tag_name == "${tag}") | .id`,
+  );
+  const name = dmg.split("/").pop();
+  const curlArgs = [
+    "--fail",
+    "--silent",
+    "--show-error",
+    "-H",
+    `Authorization: Bearer ${gh("auth", "token")}`,
+    "-H",
+    "Content-Type: application/x-apple-diskimage",
+    "--data-binary",
+    `@${dmg}`,
+    `https://uploads.github.com/repos/${REPO}/releases/${releaseId}/assets?name=${encodeURIComponent(name)}`,
+  ];
+  const proxy = process.env.https_proxy ?? process.env.HTTPS_PROXY;
+  if (proxy) curlArgs.unshift("-x", proxy);
+  const asset = JSON.parse(NodeChildProcess.execFileSync("curl", curlArgs, { encoding: "utf8" }));
+  if (asset.size !== NodeFS.statSync(dmg).size || asset.digest !== `sha256:${sha256}`)
+    throw new Error(
+      `草稿 ${tag} 已建，但上传的安装包与本地不一致（${asset.size}、${asset.digest}），请检查后重传。`,
+    );
+  gh("release", "edit", tag, "-R", REPO, "--draft=false", "--latest");
   console.log(`[zh-release] 已发布：https://github.com/${REPO}/releases/tag/${tag}`);
 }
