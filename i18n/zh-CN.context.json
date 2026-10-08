@@ -6,9 +6,6 @@
   "apps/web/src/components/auth/ConnectAgentSurface.tsx": {
     "on this machine.": "命令。"
   },
-  "apps/web/src/components/chat/ComposerPrimaryActions.tsx": {
-    "Summarize": "将"
-  },
   "apps/web/src/components/chat/McpAppFrame.tsx": {
     "The": "",
     "Unable to load the": "无法加载"
