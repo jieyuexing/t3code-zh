@@ -3,6 +3,9 @@
     "file": "文件",
     "files": "文件"
   },
+  "apps/web/src/components/Sidebar.tsx": {
+    "Active": "收件箱"
+  },
   "apps/web/src/components/auth/ConnectAgentSurface.tsx": {
     "on this machine.": "命令。"
   },
