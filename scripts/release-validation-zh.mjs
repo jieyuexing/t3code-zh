@@ -152,14 +152,18 @@ export async function prepareWindows({ artifact, candidateFile, output, sevenZip
     if (
       /\.exe$|\.node$|fff_c\.dll$/.test(entry.path) &&
       !entry.path.includes("ia32") &&
-      !entry.path.includes("arm64")
+      !entry.path.includes("arm64") &&
+      // node-pty ships prebuilds for every OS; only the win32 ones load on Windows.
+      !/\/prebuilds\/(?:darwin|linux)-/.test(entry.path)
     ) {
       const data = NodeFS.readFileSync(NodePath.join(payload, entry.path));
       const offset = data.readUInt32LE(60);
+      // electron-builder ships its NSIS elevation helper as x86 for every target arch.
+      const expectedMachine = entry.path === "resources/elevate.exe" ? 0x014c : 0x8664;
       if (
         data.toString("ascii", 0, 2) !== "MZ" ||
         data.toString("ascii", offset, offset + 4) !== "PE\0\0" ||
-        data.readUInt16LE(offset + 4) !== 0x8664
+        data.readUInt16LE(offset + 4) !== expectedMachine
       )
         throw new Error(`Wrong PE architecture: ${entry.path}`);
     }
