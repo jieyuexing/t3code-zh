@@ -1,4 +1,4 @@
-# 仅在获准的 Windows 隔离根内运行。材料由最终 NSIS 提取；不运行安装器或 GUI。
+# Run only inside an approved isolated Windows root. Materials come from the final NSIS; never runs the installer or GUI.
 param([Parameter(Mandatory=$true)][string]$Materials,[Parameter(Mandatory=$true)][string]$Output,[Parameter(Mandatory=$true)][string]$ExpectedMaterialsSha256)
 $ErrorActionPreference='Stop'
 $ProgressPreference='SilentlyContinue'
@@ -104,7 +104,7 @@ foreach($stage in @('electron','node','bad','good','ffi','fff','keyring','pty'))
  if($stage -eq 'bad' -and ($err -notmatch 'ERR_MODULE_NOT_FOUND' -or $err -notmatch 'ffi-rs')){throw 'Wrong bad-sample failure'}
 }
 VerifyMaterials
-# 坏样本也必须只缺那一个实际依赖，不能在运行期间补包或改内容。
+# The bad sample must lack exactly that one real dependency; nothing may be restored or edited during the run.
 foreach($entry in @($manifest.files | Where-Object {$_.path.StartsWith('sidecar/') -and -not $_.path.StartsWith('sidecar/node_modules/ffi-rs/')})){
  $file=Join-Path $bad $entry.path.Substring(8)
  if((Hash $file) -ne $entry.sha256){throw 'Bad sample changed unexpectedly'}

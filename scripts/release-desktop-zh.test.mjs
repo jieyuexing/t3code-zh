@@ -552,3 +552,12 @@ NodeTest.test(
     NodeAssert.ok(!("GH_TOKEN" in env));
   },
 );
+
+NodeTest.test(
+  "Windows validation script is ASCII so PowerShell 5.1 parses it under any code page",
+  () => {
+    const script = NodeFS.readFileSync(new URL("./validate-windows-zh.ps1", import.meta.url));
+    const offending = [...script.entries()].find(([, byte]) => byte > 0x7f);
+    NodeAssert.equal(offending, undefined, "validate-windows-zh.ps1 must contain only ASCII bytes");
+  },
+);
