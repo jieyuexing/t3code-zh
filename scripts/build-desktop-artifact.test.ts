@@ -1,5 +1,6 @@
 // @effect-diagnostics nodeBuiltinImport:off - Tests use Node's glob matcher to verify electron-builder exclusions.
 import * as NodeCrypto from "node:crypto";
+import { listPackage } from "@electron/asar";
 import * as NodePath from "node:path";
 
 import * as NodeServices from "@effect/platform-node/NodeServices";
@@ -658,6 +659,10 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
       assert.deepStrictEqual(win.nsis, { differentialPackage: true });
       // The Claude SDK platform packages and .bin shims never ship.
       assert.deepStrictEqual(WINDOWS_SERVER_ASAR_IGNORE_GLOBS, [
+        "**/node_modules/.modules.yaml",
+        "**/node_modules/.pnpm-workspace-state-v1.json",
+        "**/node_modules/.pnpm",
+        "**/node_modules/.pnpm/**",
         "**/node_modules/@cursor/sdk-*",
         "**/node_modules/@cursor/sdk-*/**",
         "**/node_modules/@anthropic-ai/claude-agent-sdk-*",
@@ -869,7 +874,7 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
         const tempDir = yield* fs.makeTempDirectoryScoped({
           prefix: "t3-windows-architecture-test-",
         });
-        const sourceDir = path.join(tempDir, "server");
+        const sourceDir = path.join(tempDir, ".hidden", "server");
         const nativeFiles = [
           "node_modules/node-pty/prebuilds/win32-x64/conpty/OpenConsole.exe",
           "node_modules/node-pty/prebuilds/win32-arm64/conpty/OpenConsole.exe",
@@ -883,8 +888,18 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
           yield* fs.writeFileString(nativePath, "native");
         }
 
+        for (const metadata of [".modules.yaml", ".pnpm-workspace-state-v1.json"]) {
+          yield* fs.writeFileString(
+            path.join(sourceDir, "node_modules", metadata),
+            "private build path",
+          );
+        }
         const asarPath = path.join(tempDir, "server.asar");
         yield* packWindowsServerAsar({ sourceDir, asarPath, arch: "x64" });
+        const packedFiles = listPackage(asarPath, { isPack: false });
+        assert.isFalse(
+          packedFiles.some((name) => /\.(modules\.yaml|pnpm-workspace-state-v1\.json)$/.test(name)),
+        );
         const unpackedRoot = `${asarPath}.unpacked`;
 
         assert.isTrue(
@@ -1222,6 +1237,59 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
         }
       }),
     ),
+  );
+
+  it.effect("cross Windows candidate still rejects missing native payload", () =>
+    Effect.scoped(
+      Effect.gen(function* () {
+        const fixture = yield* makeWindowsPayloadFixture({ copyUnpackedNatives: false });
+        const error = yield* validateWindowsPackagedPayload({
+          stageDistDir: fixture.stageDistDir,
+          appExecutableName: fixture.appExecutableName,
+          targetArch: "x64",
+          appVersion: WINDOWS_PAYLOAD_FIXTURE_VERSION,
+          windowsCrossCandidate: true,
+        }).pipe(Effect.flip);
+        assert.instanceOf(error, WindowsPackagedPayloadValidationError);
+        assert.equal(error.reason, "unpacked-native-missing");
+      }),
+    ).pipe(Effect.provideService(HostProcessPlatform, "linux")),
+  );
+  it.effect(
+    "cross Windows candidate transfers only native execution after structural validation",
+    () =>
+      Effect.scoped(
+        Effect.gen(function* () {
+          const fixture = yield* makeWindowsPayloadFixture({
+            copyUnpackedNatives: true,
+            wslRuntime: "valid",
+          });
+          const result = yield* validateWindowsPackagedPayload({
+            stageDistDir: fixture.stageDistDir,
+            appExecutableName: fixture.appExecutableName,
+            targetArch: "x64",
+            appVersion: WINDOWS_PAYLOAD_FIXTURE_VERSION,
+            expectWslRuntime: true,
+            windowsCrossCandidate: true,
+          });
+          assert.equal(result.packagedAppDir, fixture.packagedAppDir);
+        }),
+      ).pipe(Effect.provideService(HostProcessPlatform, "linux")),
+  );
+  it.effect("cross Windows candidate cannot skip native validation on Windows", () =>
+    Effect.scoped(
+      Effect.gen(function* () {
+        const fixture = yield* makeWindowsPayloadFixture({ copyUnpackedNatives: true });
+        const error = yield* validateWindowsPackagedPayload({
+          stageDistDir: fixture.stageDistDir,
+          appExecutableName: fixture.appExecutableName,
+          targetArch: "x64",
+          appVersion: WINDOWS_PAYLOAD_FIXTURE_VERSION,
+          windowsCrossCandidate: true,
+        }).pipe(Effect.flip);
+        assert.instanceOf(error, WindowsPackagedPayloadValidationError);
+      }),
+    ).pipe(Effect.provideService(HostProcessPlatform, "win32")),
   );
 
   // The fixture's t3code.exe is a text placeholder, not an executable. These

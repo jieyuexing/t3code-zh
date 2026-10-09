@@ -162,6 +162,7 @@ interface BuildCliInput {
   readonly mockUpdates: Option.Option<boolean>;
   readonly mockUpdateServerPort: Option.Option<number>;
   readonly wslRuntime: Option.Option<string>;
+  readonly windowsCrossCandidate?: Option.Option<boolean>;
 }
 
 function detectHostBuildPlatform(hostPlatform: string): typeof BuildPlatform.Type | undefined {
@@ -907,6 +908,7 @@ const resolvePythonForNodeGyp = Effect.fn("resolvePythonForNodeGyp")(function* (
 });
 
 interface ResolvedBuildOptions {
+  readonly windowsCrossCandidate?: boolean;
   readonly platform: typeof BuildPlatform.Type;
   readonly target: string;
   readonly arch: typeof BuildArch.Type;
@@ -1013,6 +1015,11 @@ export const WINDOWS_NATIVE_ASAR_UNPACK_GLOB =
 // are never spawned at runtime (and are symlinks on POSIX build hosts, which
 // the asar extraction path deliberately does not support).
 export const WINDOWS_SERVER_ASAR_IGNORE_GLOBS = [
+  // Package-manager metadata contains the builder's absolute home/store paths.
+  "**/node_modules/.modules.yaml",
+  "**/node_modules/.pnpm-workspace-state-v1.json",
+  "**/node_modules/.pnpm",
+  "**/node_modules/.pnpm/**",
   "**/node_modules/@cursor/sdk-*",
   "**/node_modules/@cursor/sdk-*/**",
   "**/node_modules/@anthropic-ai/claude-agent-sdk-*",
@@ -1676,6 +1683,19 @@ export const resolveBuildOptions = Effect.fn("resolveBuildOptions")(function* (
           ),
         ));
 
+  const windowsCrossCandidate =
+    input.windowsCrossCandidate === undefined
+      ? false
+      : Option.getOrElse(input.windowsCrossCandidate, () => false);
+  if (
+    windowsCrossCandidate &&
+    (platform !== "win" || target !== "nsis" || arch !== "x64" || hostPlatform === "win32")
+  ) {
+    return yield* new BuildCommandFailedError({
+      command: "--windows-cross-candidate requires a non-Windows host and win/nsis/x64",
+      exitCode: 1,
+    });
+  }
   const wslRuntime =
     Option.getOrUndefined(input.wslRuntime) ?? Option.getOrUndefined(env.wslRuntime);
 
@@ -1692,6 +1712,7 @@ export const resolveBuildOptions = Effect.fn("resolveBuildOptions")(function* (
     mockUpdates,
     mockUpdateServerPort,
     wslRuntime,
+    windowsCrossCandidate,
   } satisfies ResolvedBuildOptions;
 });
 
@@ -2059,7 +2080,11 @@ export const copyDirectoryPreservingSymlinks = Effect.fn("copyDirectoryPreservin
 );
 
 const verifyPackagedBundleIsSelfContained = Effect.fn("verifyPackagedBundleIsSelfContained")(
-  function* (input: { readonly asarPath: string; readonly verbose: boolean }) {
+  function* (input: {
+    readonly asarPath: string;
+    readonly verbose: boolean;
+    readonly windowsCrossCandidate?: boolean;
+  }) {
     const fs = yield* FileSystem.FileSystem;
     const path = yield* Path.Path;
 
@@ -2080,6 +2105,17 @@ const verifyPackagedBundleIsSelfContained = Effect.fn("verifyPackagedBundleIsSel
     // is hoisted and should be physical. A future package-manager layout change
     // must not let the probe resolve through the build tree.
     yield* copyDirectoryPreservingSymlinks(extractedApp, probeApp);
+
+    // 跨 Windows 候选只完成抽取与链接闭包检查；祖先隔离和原生运行必须在目标根完成。
+    if (input.windowsCrossCandidate) {
+      if (!(yield* fs.exists(path.join(probeApp, "apps/server/dist/bin.mjs")))) {
+        return yield* new BundleNotSelfContainedError({
+          exitCode: -1,
+          output: "Missing sidecar entry",
+        });
+      }
+      return;
+    }
 
     // Guard the guard: if anything above the probe provides a node_modules, a
     // missing dependency would resolve there and the check would pass while the
@@ -2926,7 +2962,9 @@ export const packWindowsServerAsar = Effect.fn("packWindowsServerAsar")(function
     try: () =>
       createPackageWithOptions(input.sourceDir, input.asarPath, {
         dot: true,
-        unpack: WINDOWS_NATIVE_ASAR_UNPACK_GLOB,
+        // asar matches absolute paths without dot:true. Basename matching keeps
+        // native files unpacked even when the build lives below .local/.worktrees.
+        unpack: WINDOWS_NATIVE_ASAR_UNPACK_GLOB.replaceAll("**/", ""),
         // glob 13 (via @electron/asar 4) matches `ignore` relative to `cwd`,
         // not against the absolute paths it crawls, so anchor it at the source.
         globOptions: {
@@ -3164,11 +3202,22 @@ export const validateWindowsPackagedPayload = Effect.fn(
   // directory is named t3-<version>-linux-<arch>.
   readonly appVersion: string;
   readonly expectWslRuntime?: boolean;
+  readonly windowsCrossCandidate?: boolean;
   readonly fileLimit?: number;
   readonly verbose?: boolean;
 }) {
   const fs = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
+  if (
+    input.windowsCrossCandidate &&
+    ((yield* HostProcessPlatform) === "win32" || input.targetArch !== "x64")
+  ) {
+    return yield* new WindowsPackagedPayloadValidationError({
+      reason: "sidecar-invalid",
+      packagedAppDir: input.stageDistDir,
+      cause: new Error("Cross candidate requires non-Windows host and x64"),
+    });
+  }
   const fileLimit = input.fileLimit ?? WINDOWS_PACKAGED_PAYLOAD_FILE_LIMIT;
   const isFile = (filePath: string) =>
     fs.stat(filePath).pipe(
@@ -3385,11 +3434,16 @@ export const validateWindowsPackagedPayload = Effect.fn(
   yield* verifyPackagedBundleIsSelfContained({
     asarPath,
     verbose: input.verbose ?? false,
+    ...(input.windowsCrossCandidate ? { windowsCrossCandidate: true } : {}),
   });
 
   yield* Effect.log(
     `[desktop-artifact] Validated Windows payload (${String(fileCount)} files, ${String(unpackedFiles.length)} sidecar natives).`,
   );
+  if (input.windowsCrossCandidate)
+    yield* Effect.log(
+      "[desktop-artifact] Candidate only: pending Windows native validation; NOT release-ready.",
+    );
   return { packagedAppDir, fileCount, unpackedFiles } as const;
 });
 
@@ -3916,6 +3970,7 @@ const buildDesktopArtifact = Effect.fn("buildDesktopArtifact")(function* (
         runtimeArchivePath: options.wslRuntime,
       }),
       verbose: options.verbose,
+      ...(options.windowsCrossCandidate ? { windowsCrossCandidate: true } : {}),
     });
   }
 
@@ -3996,6 +4051,12 @@ const buildDesktopArtifactCli = Command.make("build-desktop-artifact", {
   mockUpdateServerPort: Flag.Int("mock-update-server-port").pipe(
     Flag.withSchema(Schema.Int.check(Schema.isBetween({ minimum: 1, maximum: 65535 }))),
     Flag.withDescription("Mock update server port (env: T3CODE_DESKTOP_MOCK_UPDATE_SERVER_PORT)."),
+    Flag.optional,
+  ),
+  windowsCrossCandidate: Flag.Boolean("windows-cross-candidate").pipe(
+    Flag.withDescription(
+      "Non-Windows win/nsis/x64 candidate: strict structure, native validation pending.",
+    ),
     Flag.optional,
   ),
   wslRuntime: Flag.String("wsl-runtime").pipe(
