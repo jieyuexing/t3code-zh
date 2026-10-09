@@ -342,6 +342,36 @@ export async function main() {
       tagCommit: map.get(`refs/tags/${tag}^{}`) ?? map.get(`refs/tags/${tag}`),
     };
   };
+  // gh uploads stall through the proxy (HTTP 408 on large assets), so assets go up with curl.
+  // The token stays in memory and reaches curl only through a stdin config, never argv/env/files.
+  const upload = (asset, release) => {
+    const token = gh("auth", "token");
+    const url = `https://uploads.github.com/repos/${REPO}/releases/${release.id}/assets?name=${encodeURIComponent(asset.name)}`;
+    const result = NodeChildProcess.spawnSync(
+      "/usr/bin/curl",
+      [
+        "--fail-with-body",
+        "--silent",
+        "--show-error",
+        "--proxy",
+        "http://127.0.0.1:2080",
+        "--config",
+        "-",
+        "-H",
+        "Accept: application/vnd.github+json",
+        "-H",
+        "Content-Type: application/octet-stream",
+        "--data-binary",
+        `@${asset.file}`,
+        url,
+      ],
+      { input: `header = "Authorization: Bearer ${token}"\n`, encoding: "utf8", env: {} },
+    );
+    if (result.status !== 0)
+      throw new Error(
+        `Upload failed for ${asset.name}: ${(result.stderr || "").trim().slice(0, 300)}`,
+      );
+  };
   const assertUnchanged = () => {
     if (!sameSource(source, sourceIdentity(root)))
       throw new Error("Source changed during preflight");
@@ -353,6 +383,7 @@ export async function main() {
     dryRun: values["dry-run"],
     remoteState,
     gh,
+    upload,
     assertUnchanged,
     scratch,
     notes,
@@ -364,6 +395,7 @@ export function publishPrepared({
   dryRun,
   remoteState,
   gh,
+  upload = (asset) => gh("release", "upload", tag, asset.file, "-R", REPO),
   assertUnchanged,
   scratch,
   notes,
@@ -411,8 +443,7 @@ export function publishPrepared({
     state = remoteState();
     checkRemoteState(state, prepared, tag);
     if (!state.release) throw new Error("Draft disappeared");
-    if (!state.release.assets.some((a) => a.name === asset.name))
-      gh("release", "upload", tag, asset.file, "-R", REPO);
+    if (!state.release.assets.some((a) => a.name === asset.name)) upload(asset, state.release);
     state = remoteState();
     checkRemoteState(state, prepared, tag);
     const uploaded = state.release?.assets.find((a) => a.name === asset.name);
