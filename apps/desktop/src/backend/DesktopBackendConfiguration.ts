@@ -105,6 +105,7 @@ const shouldUseEnvironmentProxy = (): boolean =>
 // across the wsl.exe boundary without WSLENV. The dev-server URL travels as
 // the `--dev-url` CLI flag instead.
 const WSL_FORWARDED_ENV_NAMES = [
+  "T3CODE_RESOURCE_MONITOR_ENABLED",
   "OPENAI_API_KEY",
   "ANTHROPIC_API_KEY",
   "T3CODE_TELEMETRY_ENABLED",

@@ -20,6 +20,35 @@ describe("ResourceMonitorBinary", () => {
     vi.restoreAllMocks();
   });
 
+  it.effect("does not inspect binary paths when native monitoring is disabled", () =>
+    Effect.gen(function* () {
+      const config = yield* ServerConfig.ServerConfig;
+      const fileSystem = yield* FileSystem.FileSystem;
+      const exists = vi.fn(() => Effect.succeed(true));
+      const getReport = vi.spyOn(process.report, "getReport");
+      const service = yield* ResourceMonitorBinary.make().pipe(
+        Effect.provideService(ServerConfig.ServerConfig, {
+          ...config,
+          resourceMonitorEnabled: false,
+          resourceMonitorPath: "/custom/monitor",
+        }),
+        Effect.provideService(FileSystem.FileSystem, { ...fileSystem, exists }),
+        Effect.provideService(HostProcessPlatform, "linux"),
+        Effect.provideService(HostProcessEnvironment, {
+          T3CODE_RESOURCE_MONITOR_PATH: "/override/monitor",
+        }),
+      );
+      const error = yield* Effect.flip(service.resolve);
+      expect(error._tag).toBe("ResourceMonitorBinaryDisabled");
+      expect(exists).not.toHaveBeenCalled();
+      expect(getReport).not.toHaveBeenCalled();
+    }).pipe(
+      Effect.provide(ServerConfig.layerTest(process.cwd(), { prefix: "t3-monitor-disabled-" })),
+      Effect.scoped,
+      Effect.provide(NodeServices.layer),
+    ),
+  );
+
   it.effect("skips Linux libc detection on Windows", () =>
     Effect.gen(function* () {
       const getReport = vi.spyOn(process.report, "getReport").mockImplementation(() => {
