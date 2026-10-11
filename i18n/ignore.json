@@ -203,6 +203,10 @@
     "category": "code",
     "reason": "Canvas 字体声明"
   },
+  ":host {\n    --trees-bg-override: transparent;\n    --trees-selected-bg-override: color-mix(in srgb, currentColor 12%, transparent);\n    --trees-hover-bg-override: color-mix(in srgb, currentColor 7%, transparent);\n    --trees-border-color-override: color-mix(in srgb, currentColor 14%, transparent);\n    --trees-font-family-override: var(--font-sans);\n    --trees-font-size-override: 0.75rem;\n  }\n  button[data-type='item'], button[data-type='item']::before { border-radius: var(--radius-md); }\n  svg[data-icon-name='t3-tree-icon-loading'] { opacity: 0.6; }\n  @media (prefers-reduced-motion: no-preference) {\n    svg[data-icon-name='t3-tree-icon-loading'] { animation: t3-tree-spin 1s linear infinite; }\n  }\n  @keyframes t3-tree-spin { to { transform: rotate(360deg); } }": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
+  },
   ":host {\n    --trees-bg-override: transparent;\n    --trees-selected-bg-override: color-mix(in srgb, currentColor 12%, transparent);\n    --trees-hover-bg-override: color-mix(in srgb, currentColor 7%, transparent);\n    --trees-border-color-override: color-mix(in srgb, currentColor 14%, transparent);\n    --trees-font-family-override: var(--font-sans);\n    --trees-font-size-override: 12px;\n  }\n  button[data-type='item'] { border-radius: 5px; }": {
     "category": "code",
     "reason": "CSS stylesheet"
@@ -210,6 +214,10 @@
   ":host {\n    --trees-bg-override: transparent;\n    --trees-selected-bg-override: color-mix(in srgb, currentColor 12%, transparent);\n    --trees-hover-bg-override: color-mix(in srgb, currentColor 7%, transparent);\n    --trees-border-color-override: color-mix(in srgb, currentColor 14%, transparent);\n    --trees-font-family-override: var(--font-sans);\n    --trees-font-size-override: 12px;\n  }\n  button[data-type='item'] { border-radius: 5px; }\n  svg[data-icon-name='t3-tree-icon-loading'] { opacity: 0.6; }\n  @media (prefers-reduced-motion: no-preference) {\n    svg[data-icon-name='t3-tree-icon-loading'] { animation: t3-tree-spin 1s linear infinite; }\n  }\n  @keyframes t3-tree-spin { to { transform: rotate(360deg); } }": {
     "category": "code",
     "reason": "文件树主题的 CSS 模板与动画关键帧，属于样式源码，必须保持原值。"
+  },
+  ":where(:focus-visible){outline:2px solid var(--ring)}:focus-visible{outline-width:2px!important;outline-offset:-2px!important}": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
   },
   "<!doctype html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <meta\n      http-equiv=\"Content-Security-Policy\"\n      content=\"default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'\"\n    >\n    <meta name=\"color-scheme\" content=\"dark\">\n    <style>\n      html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #111; }\n      body { display: grid; place-items: center; }\n      img { width: 100%; height: 100%; object-fit: contain; user-select: none; -webkit-user-drag: none; }\n    </style>\n  </head>\n  <body>\n    <img id=\"preview-frame\" alt=\"Live browser preview\">\n    <script>\n      const frame = document.getElementById(\"preview-frame\");\n      window.previewPictureInPicture.onFrame((next) => {\n        frame.src = \"data:image/jpeg;base64,\" + next.data;\n      });\n    </script>\n  </body>\n</html>": {
     "category": "code",
@@ -786,6 +794,10 @@
   "Gemini Enterprise": {
     "category": "brand",
     "reason": "product name"
+  },
+  "GitCafe": {
+    "category": "brand",
+    "reason": "GitCafe 托管平台品牌名。"
   },
   "GitHub": {
     "category": "brand",
@@ -1615,9 +1627,17 @@
     "category": "code",
     "reason": "HTML_RENDER_THEME_GUIDE / LAYOUT_GUIDE 为 Agent 工具描述中的英文生成指令，含 CSS 合同；不改写模型输入。"
   },
+  "The operation either timed out or was not allowed. See: https://www.w3.org/TR/webauthn-2/#sctn-privacy-considerations-client.": {
+    "category": "code",
+    "reason": "注入网页的 WebAuthn bridge 异常消息，属于页面 API 行为，保留原文。"
+  },
   "The page sits on the thread's own background, so by default leave html, body, and the outermost element with no background color. This overrides general style preferences such as a fixed black page background.": {
     "category": "code",
     "reason": "HTML_RENDER_THEME_GUIDE / LAYOUT_GUIDE 为 Agent 工具描述中的英文生成指令，含 CSS 合同；不改写模型输入。"
+  },
+  "The passkey request options are invalid.": {
+    "category": "code",
+    "reason": "注入网页的 WebAuthn bridge 异常消息，属于页面 API 行为，保留原文。"
   },
   "The pull request is #{0}, titled `{1}`, at `{2}`.": {
     "category": "protocol",
@@ -1815,9 +1835,17 @@
     "category": "code",
     "reason": "CSS class / style string"
   },
+  "[&_svg]:-mx-0.5 relative inline-flex shrink-0 cursor-pointer select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg border font-medium text-base text-foreground outline-none transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 hover:bg-accent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-64 aria-disabled:opacity-64 data-pressed:bg-input/64 data-pressed:text-accent-foreground sm:text-sm [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
+  },
   "[&_svg]:-mx-0.5 relative inline-flex shrink-0 cursor-pointer select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg border font-medium text-base text-foreground outline-none transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-64 aria-disabled:opacity-64 data-pressed:bg-input/64 data-pressed:text-accent-foreground sm:text-sm [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0": {
     "category": "code",
     "reason": "CSS class / style string"
+  },
+  "[--control-icon-color:currentColor] [&_svg]:-mx-0.5 relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-[var(--control-radius)] border font-medium text-base outline-none transition-[box-shadow,scale] [&:active:not([aria-haspopup])]:scale-[0.97] before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--control-radius)-1px)] pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-64 aria-disabled:cursor-not-allowed aria-disabled:opacity-64 sm:text-sm [&_svg:not([class*='text-'])]:text-[var(--control-icon-color)] [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
   },
   "[--control-icon-color:currentColor] [&_svg]:-mx-0.5 relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-[var(--control-radius)] border font-medium text-base outline-none transition-[box-shadow,scale] [&:active:not([aria-haspopup])]:scale-[0.97] before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--control-radius)-1px)] pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-64 aria-disabled:cursor-not-allowed aria-disabled:opacity-64 sm:text-sm [&_svg:not([class*='text-'])]:text-[var(--control-icon-color)] [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0": {
     "category": "code",
@@ -1846,6 +1874,10 @@
   "[surface.test.ts](apps/web/src/terminal/ghostty/surface.test.ts) and align the header with": {
     "category": "code",
     "reason": "font preview sample prompt text"
+  },
+  "[text-box:trim-both_cap_alphabetic] overflow-x-clip overflow-y-visible": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
   },
   "\\b(?:is not connected|disconnected|could not establish a WebSocket connection)\\.(?: {0})?$": {
     "category": "code",
@@ -2090,6 +2122,10 @@
   "button[aria-label=\"Scroll to end\"]": {
     "category": "code",
     "reason": "CSS selector matching aria-label of the scroll button"
+  },
+  "cafe pr checkout 123": {
+    "category": "code",
+    "reason": "可执行的 CLI 命令或 shell 语句，保留原始语法。"
   },
   "checking for updates": {
     "category": "dev-only",
@@ -2515,6 +2551,14 @@
     "category": "code",
     "reason": "internal atom/command identifier"
   },
+  "environment-data:filesystem:invalidate-metadata": {
+    "category": "internal",
+    "reason": "environment-data Atom 内部调试标识，不是用户显示标签。"
+  },
+  "environment-data:filesystem:metadata": {
+    "category": "internal",
+    "reason": "environment-data Atom 内部调试标识，不是用户显示标签。"
+  },
   "environment-data:git:prepare-pull-request-thread": {
     "category": "code",
     "reason": "internal atom/command identifier"
@@ -2915,6 +2959,10 @@
     "category": "code",
     "reason": "internal atom/command identifier"
   },
+  "environment-data:server:run-storage-cleanup": {
+    "category": "internal",
+    "reason": "environment-data Atom 内部调试标识，不是用户显示标签。"
+  },
   "environment-data:server:scheduled-task:delete": {
     "category": "code",
     "reason": "internal atom/command identifier"
@@ -2958,6 +3006,10 @@
   "environment-data:server:source-control-discovery": {
     "category": "code",
     "reason": "internal atom/command identifier"
+  },
+  "environment-data:server:storage-cleanup-report": {
+    "category": "internal",
+    "reason": "environment-data Atom 内部调试标识，不是用户显示标签。"
   },
   "environment-data:server:trace-diagnostics": {
     "category": "code",
@@ -3115,9 +3167,17 @@
     "category": "code",
     "reason": "桌面 t3 启动器或 Windows PATH 操作的可执行脚本，必须保持原文。"
   },
+  "export XDG_RUNTIME_DIR": {
+    "category": "code",
+    "reason": "可执行的 CLI 命令或 shell 语句，保留原始语法。"
+  },
   "export function formatUser(user: User) {": {
     "category": "code",
     "reason": "diff sample code"
+  },
+  "failed to copy context-menu image": {
+    "category": "internal",
+    "reason": "logWindowWarning 的内部日志消息，不是界面文案。"
   },
   "failed to destroy windows before shutdown": {
     "category": "dev-only",
@@ -3210,6 +3270,10 @@
   "flex w-full items-center rounded-lg {0}": {
     "category": "code",
     "reason": "Tailwind CSS 类名组合，不是显示文案。"
+  },
+  "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
   },
   "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background": {
     "category": "code",
@@ -3338,6 +3402,10 @@
   "group absolute z-20 touch-none border-0 bg-transparent p-0 outline-none before:absolute before:-inset-1 before:content-[''] focus-visible:bg-foreground/[0.04]": {
     "category": "code",
     "reason": "Tailwind class names"
+  },
+  "group flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left outline-none transition-colors duration-150 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/25": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
   },
   "group flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left outline-none transition-colors duration-150 focus-visible:ring-1 focus-visible:ring-primary/25": {
     "category": "code",
@@ -3527,6 +3595,10 @@
     "category": "code",
     "reason": "生成的 Node.js 启动脚本源码"
   },
+  "in-data-disabled:pointer-events-none in-[.range-middle]:rounded-none in-[.range-end:not(.range-start)]:rounded-s-none in-[.range-start:not(.range-end)]:rounded-e-none in-[.range-middle]:in-data-selected:bg-accent in-data-selected:bg-primary in-[.range-middle]:in-data-selected:text-foreground in-data-disabled:text-muted-foreground/72 in-data-outside:text-muted-foreground/72 in-data-selected:in-data-outside:text-primary-foreground in-data-selected:text-primary-foreground in-data-disabled:line-through outline-none in-[[data-selected]:not(.range-middle)]:transition-[border-radius,box-shadow] focus-visible:z-1 focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring/50": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
+  },
   "in-data-disabled:pointer-events-none in-[.range-middle]:rounded-none in-[.range-end:not(.range-start)]:rounded-s-none in-[.range-start:not(.range-end)]:rounded-e-none in-[.range-middle]:in-data-selected:bg-accent in-data-selected:bg-primary in-[.range-middle]:in-data-selected:text-foreground in-data-disabled:text-muted-foreground/72 in-data-outside:text-muted-foreground/72 in-data-selected:in-data-outside:text-primary-foreground in-data-selected:text-primary-foreground in-data-disabled:line-through outline-none in-[[data-selected]:not(.range-middle)]:transition-[border-radius,box-shadow] focus-visible:z-1 focus-visible:ring-[3px] focus-visible:ring-ring/50": {
     "category": "code",
     "reason": "CSS class / style string"
@@ -3539,13 +3611,25 @@
     "category": "code",
     "reason": "Tailwind/CSS class 字符串，属于样式代码。"
   },
+  "inline-flex h-6 min-w-6 cursor-pointer items-center justify-center rounded-md px-0.75 text-icon-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
+  },
   "inline-flex h-6 min-w-6 cursor-pointer items-center justify-center rounded-md px-0.75 text-icon-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring": {
     "category": "code",
     "reason": "Tailwind class list"
   },
+  "inline-flex h-6 shrink-0 items-center gap-1 rounded-full border px-2 text-xs outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
+  },
   "inline-flex h-6 shrink-0 items-center gap-1 rounded-full border px-2 text-xs outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring": {
     "category": "code",
     "reason": "Tailwind class names"
+  },
+  "inline-flex h-[1.41em] max-w-full items-center gap-[0.33em] rounded-[0.5em] border px-[0.5em] align-middle font-medium text-[0.86em] leading-none [&_svg]:block [&_svg]:size-[1.17em] [&_svg]:shrink-0 [&_svg]:self-center [button&,a&,[data-popup-open]&]:cursor-pointer [button&,a&]:transition-colors [button&,a&]:motion-reduce:transition-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-foreground disabled:cursor-default": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
   },
   "inline-flex h-[1.41em] max-w-full items-center gap-[0.33em] rounded-[0.5em] border px-[0.5em] align-middle font-medium text-[0.86em] leading-none [&_svg]:block [&_svg]:size-[1.17em] [&_svg]:shrink-0 [&_svg]:self-center [button&,a&,[data-popup-open]&]:cursor-pointer [button&,a&]:transition-colors [button&,a&]:motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground disabled:cursor-default": {
     "category": "code",
@@ -3558,6 +3642,10 @@
   "inline-flex shrink-0 cursor-pointer items-center gap-0.5 whitespace-nowrap font-medium underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-64": {
     "category": "code",
     "reason": "CSS class / style string"
+  },
+  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-message-action font-medium text-base text-message-action-foreground shadow-xs shadow-message-action/24 outline-none hover:bg-message-action-hover focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-64 disabled:shadow-none sm:text-sm": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
   },
   "inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-message-action font-medium text-base text-message-action-foreground shadow-xs shadow-message-action/24 outline-none hover:bg-message-action-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-64 disabled:shadow-none sm:text-sm": {
     "category": "code",
@@ -3807,6 +3895,10 @@
     "category": "code",
     "reason": "CSS class / style string"
   },
+  "peer/menu-button flex w-full cursor-pointer items-center gap-[var(--sidebar-control-gap)] overflow-hidden text-left outline-hidden ring-ring transition-[width,height,padding] hover:bg-sidebar-row-hover hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-inset active:bg-sidebar-row-active active:text-sidebar-foreground disabled:pointer-events-none disabled:opacity-64 aria-disabled:pointer-events-none aria-disabled:opacity-64 data-[active=true]:bg-sidebar-row-selected data-[active=true]:font-medium data-[active=true]:text-sidebar-foreground data-[state=open]:hover:bg-sidebar-row-hover data-[state=open]:hover:text-sidebar-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-[var(--sidebar-content-inset)]! [&>span:last-child]:truncate [&>svg:not([class*='size-'])]:size-4 [&>svg]:shrink-0 [&>svg]:text-[var(--sidebar-icon-color)] hover:[&>svg]:text-sidebar-foreground active:[&>svg]:text-sidebar-foreground data-[active=true]:[&>svg]:text-sidebar-foreground": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
+  },
   "pinOrderMidpoint: bounds out of order": {
     "category": "dev-only",
     "reason": "internal invariant error / debug label"
@@ -3967,6 +4059,10 @@
     "category": "code",
     "reason": "CSS class / style string"
   },
+  "relative has-focus:border-ring has-focus:ring-ring/50 has-focus:ring-[3px] has-focus:ring-inset border border-input shadow-xs/5 rounded-lg px-[calc(--spacing(3)-1px)] h-9 sm:h-8 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:-me-1": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
+  },
   "relative inline-flex cursor-pointer select-none items-center justify-between gap-2 border rounded-lg text-left text-base outline-none transition-[color,box-shadow,background-color] data-disabled:pointer-events-none data-disabled:opacity-64 sm:text-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4": {
     "category": "code",
     "reason": "CSS class / style string"
@@ -3975,13 +4071,25 @@
     "category": "code",
     "reason": "Tailwind class list"
   },
+  "relative inline-flex shrink-0 cursor-pointer items-center justify-center whitespace-nowrap rounded-(--control-radius) border border-transparent text-base outline-none hover:bg-accent data-pressed:bg-accent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-64 data-disabled:pointer-events-none data-disabled:opacity-64 pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 [&:active:not([aria-haspopup])]:scale-[0.97] [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:-mx-0.5 [&_svg[data-composer-control-icon]]:mx-0": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
+  },
   "relative inline-flex shrink-0 cursor-pointer items-center justify-center whitespace-nowrap rounded-(--control-radius) border border-transparent text-base outline-none hover:bg-accent data-pressed:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-64 data-disabled:pointer-events-none data-disabled:opacity-64 pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 [&:active:not([aria-haspopup])]:scale-[0.97] [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:-mx-0.5 [&_svg[data-composer-control-icon]]:mx-0": {
     "category": "code",
     "reason": "Tailwind class list"
   },
+  "relative inline-flex shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-sm border border-transparent font-medium outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-64 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-3.5 sm:[&_svg:not([class*='size-'])]:size-3 [&_svg]:pointer-events-none [&_svg]:shrink-0 [button&,a&]:cursor-pointer [button&,a&]:pointer-coarse:after:absolute [button&,a&]:pointer-coarse:after:size-full [button&,a&]:pointer-coarse:after:min-h-11 [button&,a&]:pointer-coarse:after:min-w-11": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
+  },
   "relative inline-flex shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-sm border border-transparent font-medium outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-64 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-3.5 sm:[&_svg:not([class*='size-'])]:size-3 [&_svg]:pointer-events-none [&_svg]:shrink-0 [button&,a&]:cursor-pointer [button&,a&]:pointer-coarse:after:absolute [button&,a&]:pointer-coarse:after:size-full [button&,a&]:pointer-coarse:after:min-h-11 [button&,a&]:pointer-coarse:after:min-w-11": {
     "category": "code",
     "reason": "CSS class / style string"
+  },
+  "relative inline-flex w-full min-w-0 items-center rounded-[var(--control-radius)] border text-base text-foreground ring-ring/24 transition-shadow has-[input:focus-visible,textarea:focus-visible]:has-[input[aria-invalid],textarea[aria-invalid]]:border-destructive/64 has-[input:focus-visible,textarea:focus-visible]:has-[input[aria-invalid],textarea[aria-invalid]]:ring-destructive/16 has-[textarea]:h-auto has-data-[align=block-end]:h-auto has-data-[align=block-start]:h-auto has-data-[align=block-end]:flex-col has-data-[align=block-start]:flex-col has-[input:focus-visible,textarea:focus-visible]:border-ring has-[input[aria-invalid],textarea[aria-invalid]]:border-destructive/36 has-autofill:bg-foreground/4 has-[input:disabled,textarea:disabled]:opacity-64 has-[input:disabled,textarea:disabled,input:focus-visible,textarea:focus-visible,input[aria-invalid],textarea[aria-invalid]]:shadow-none has-[input:focus-visible,textarea:focus-visible]:ring-[3px] has-[input:focus-visible,textarea:focus-visible]:ring-inset sm:text-sm dark:has-autofill:bg-foreground/8 dark:has-[input[aria-invalid],textarea[aria-invalid]]:ring-destructive/24 has-data-[align=inline-start]:**:[[data-size=sm]_input]:ps-1.5 has-data-[align=inline-end]:**:[[data-size=sm]_input]:pe-1.5 *:[[data-slot=input-control],[data-slot=textarea-control]]:contents *:[[data-slot=input-control],[data-slot=textarea-control]]:before:hidden has-[[data-align=block-start],[data-align=block-end]]:**:[input]:h-auto has-data-[align=inline-start]:**:[input]:ps-2 has-data-[align=inline-end]:**:[input]:pe-2 has-data-[align=block-end]:**:[input]:pt-1.5 has-data-[align=block-start]:**:[input]:pb-1.5 **:[textarea]:min-h-20.5 **:[textarea]:resize-none **:[textarea]:py-[calc(--spacing(3)-1px)] **:[textarea]:max-sm:min-h-23.5 **:[textarea_button]:rounded-[calc(var(--control-radius)-1px)]": {
+    "category": "code",
+    "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
   },
   "relative inline-flex w-full min-w-0 items-center rounded-[var(--control-radius)] border text-base text-foreground ring-ring/24 transition-shadow has-[input:focus-visible,textarea:focus-visible]:has-[input[aria-invalid],textarea[aria-invalid]]:border-destructive/64 has-[input:focus-visible,textarea:focus-visible]:has-[input[aria-invalid],textarea[aria-invalid]]:ring-destructive/16 has-[textarea]:h-auto has-data-[align=block-end]:h-auto has-data-[align=block-start]:h-auto has-data-[align=block-end]:flex-col has-data-[align=block-start]:flex-col has-[input:focus-visible,textarea:focus-visible]:border-ring has-[input[aria-invalid],textarea[aria-invalid]]:border-destructive/36 has-autofill:bg-foreground/4 has-[input:disabled,textarea:disabled]:opacity-64 has-[input:disabled,textarea:disabled,input:focus-visible,textarea:focus-visible,input[aria-invalid],textarea[aria-invalid]]:shadow-none has-[input:focus-visible,textarea:focus-visible]:ring-[3px] sm:text-sm dark:has-autofill:bg-foreground/8 dark:has-[input[aria-invalid],textarea[aria-invalid]]:ring-destructive/24 has-data-[align=inline-start]:**:[[data-size=sm]_input]:ps-1.5 has-data-[align=inline-end]:**:[[data-size=sm]_input]:pe-1.5 *:[[data-slot=input-control],[data-slot=textarea-control]]:contents *:[[data-slot=input-control],[data-slot=textarea-control]]:before:hidden has-[[data-align=block-start],[data-align=block-end]]:**:[input]:h-auto has-data-[align=inline-start]:**:[input]:ps-2 has-data-[align=inline-end]:**:[input]:pe-2 has-data-[align=block-end]:**:[input]:pt-1.5 has-data-[align=block-start]:**:[input]:pb-1.5 **:[textarea]:min-h-20.5 **:[textarea]:resize-none **:[textarea]:py-[calc(--spacing(3)-1px)] **:[textarea]:max-sm:min-h-23.5 **:[textarea_button]:rounded-[calc(var(--control-radius)-1px)]": {
     "category": "code",
