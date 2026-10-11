@@ -1,5 +1,4 @@
 import {
-  mcpInput,
   NonNegativeInt,
   OrchestratorMcpFailure,
   PreviewAutomationUnavailableError,
@@ -27,12 +26,10 @@ const PreviewListTool = Tool.make("t3_preview_list", {
   ...shared,
   description:
     "List this thread's preview tabs. Pages reflect the current server state and may shift as tabs change.",
-  parameters: mcpInput(
-    Schema.Struct({
-      cursor: Schema.optional(NonNegativeInt),
-      limit: Schema.optional(Schema.Int.check(Schema.isBetween({ minimum: 1, maximum: 50 }))),
-    }),
-  ),
+  parameters: Schema.Struct({
+    cursor: Schema.optional(NonNegativeInt),
+    limit: Schema.optional(Schema.Int.check(Schema.isBetween({ minimum: 1, maximum: 50 }))),
+  }),
   success: Schema.Struct({
     ...PreviewListResult.fields,
     nextCursor: Schema.NullOr(NonNegativeInt),
@@ -44,7 +41,7 @@ const PreviewCloseTool = Tool.make("t3_preview_close", {
   ...shared,
   description:
     "Close one preview tab owned by this thread through the normal server/host tab lifecycle. This does not wait for renderer cleanup.",
-  parameters: mcpInput(Schema.Struct({ tabId: PreviewTabId })),
+  parameters: Schema.Struct({ tabId: PreviewTabId }),
   success: Schema.Struct({}),
 }).annotate(Tool.Destructive, true);
 export const PreviewControlsToolkit = Toolkit.make(PreviewListTool, PreviewCloseTool);
