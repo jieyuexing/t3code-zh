@@ -1,5 +1,4 @@
 import {
-  mcpInput,
   BackgroundActivityProfile,
   BackgroundActivityProfileSelection,
   ExecutionEnvironmentDescriptor,
@@ -56,15 +55,13 @@ const EnvironmentPreferencesTool = Tool.make("t3_environment_preferences_update"
   ...shared,
   description:
     "Update selected environment-wide preferences through normal settings persistence and notifications. Requires a live full-access/default calling thread. Omitted fields are preserved; empty customInstructions clears them.",
-  parameters: mcpInput(
-    Schema.Struct({
-      defaultThreadEnvMode: ServerSettingsPatch.fields.defaultThreadEnvMode,
-      newWorktreesStartFromOrigin: ServerSettingsPatch.fields.newWorktreesStartFromOrigin,
-      enableProviderUpdateChecks: ServerSettingsPatch.fields.enableProviderUpdateChecks,
-      backgroundActivity: Schema.optionalKey(Schema.Struct({ profile: BackgroundActivityProfile })),
-      sourceControlWritingStyle: ServerSettingsPatch.fields.sourceControlWritingStyle,
-    }),
-  ),
+  parameters: Schema.Struct({
+    defaultThreadEnvMode: ServerSettingsPatch.fields.defaultThreadEnvMode,
+    newWorktreesStartFromOrigin: ServerSettingsPatch.fields.newWorktreesStartFromOrigin,
+    enableProviderUpdateChecks: ServerSettingsPatch.fields.enableProviderUpdateChecks,
+    backgroundActivity: Schema.optionalKey(Schema.Struct({ profile: BackgroundActivityProfile })),
+    sourceControlWritingStyle: ServerSettingsPatch.fields.sourceControlWritingStyle,
+  }),
   success: Schema.Struct(PreferenceFields),
 }).annotate(Tool.Destructive, true);
 export const EnvironmentToolkit = Toolkit.make(EnvironmentReadTool, EnvironmentPreferencesTool);
