@@ -1,6 +1,6 @@
 import type { HostPowerSnapshot } from "@t3tools/contracts";
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { HostProcessEnvironment, HostProcessPlatform } from "@t3tools/shared/hostProcess";
+import * as HostProcess from "@t3tools/shared/HostProcess";
 import { describe, expect, it, vi } from "@effect/vitest";
 import * as DateTime from "effect/DateTime";
 import * as Deferred from "effect/Deferred";
@@ -252,8 +252,8 @@ describe("disabled native monitor", () => {
           resourceMonitorEnabled: false,
         }),
         Effect.provideService(ChildProcessSpawner.ChildProcessSpawner, { ...spawner, spawn }),
-        Effect.provideService(HostProcessPlatform, "win32"),
-        Effect.provideService(HostProcessEnvironment, {
+        Effect.provideService(HostProcess.Platform, "win32"),
+        Effect.provideService(HostProcess.Environment, {
           T3CODE_RESOURCE_MONITOR_PATH: "/override/monitor.exe",
         }),
       );
