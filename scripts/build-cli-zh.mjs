@@ -6,7 +6,7 @@ import * as NodeFS from "node:fs";
 import * as NodePath from "node:path";
 import * as NodeOS from "node:os";
 import * as Effect from "effect/Effect";
-import { HostProcessPlatform } from "@t3tools/shared/hostProcess";
+import * as HostProcess from "@t3tools/shared/HostProcess";
 
 // 由 build-desktop-zh 的同一盖章/恢复事务调用；两个目标串行且各自立即归档。
 const { values } = NodeUtil.parseArgs({
@@ -81,7 +81,7 @@ const serverConfig = NodeFS.readFileSync(NodePath.join(root, "apps/server/vite.c
 const nodeVersion = serverConfig.match(/const SEA_NODE_VERSION = "([0-9.]+)";/)?.[1];
 if (!nodeVersion || process.versions.node !== nodeVersion)
   throw new Error("SEA host must match the pinned target Node");
-const hostPlatform = Effect.runSync(HostProcessPlatform);
+const hostPlatform = Effect.runSync(HostProcess.Platform);
 const cacheRoot =
   hostPlatform === "darwin"
     ? NodePath.join(NodeOS.homedir(), "Library/Caches/tsdown")
