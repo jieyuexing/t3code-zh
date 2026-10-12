@@ -3799,6 +3799,10 @@
     "category": "code",
     "reason": "Tailwind class list"
   },
+  "max-h-[calc(100vh-0.5rem)] min-w-0 max-w-sm overflow-y-auto overflow-x-hidden p-1": {
+    "category": "code",
+    "reason": "contextMenuFallback 的 DOM className 样式类列表，不是显示文案。"
+  },
   "max-h-[min(24rem,70vh)] min-w-0 max-w-sm overflow-y-auto overflow-x-hidden p-1": {
     "category": "code",
     "reason": "Tailwind/CSS class string"
