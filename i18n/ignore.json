@@ -95,6 +95,10 @@
     "category": "code",
     "reason": "桌面 t3 启动器或 Windows PATH 操作的可执行脚本，必须保持原文。"
   },
+  "(function(){var s=document.getElementById(\"t3-theme\"),n=0;if(!s)return;var b={0};function a(t){if(!t||typeof t!==\"object\"||!t.variables||typeof t.variables!==\"object\")return;var c=\":root{color-scheme:\"+(t.appearance===\"light\"?\"light\":\"dark\")+\";\";for(var k in t.variables){if(/^--[a-z0-9-]+$/.test(k))c+=k+\":\"+String(t.variables[k]).replace(/[;{}<>]/g,\"\")+\";\";}s.textContent=c+\"}\"+b;}try{var m=/[#&]{1}=([^&]*)/.exec(location.hash);if(m){a(JSON.parse(decodeURIComponent(m[1])));history.replaceState(history.state,\"\",location.pathname+location.search);}}catch(e){}window.addEventListener(\"message\",function(e){var d=e.data,p=d&&d.params;if(d&&d.jsonrpc===\"2.0\"&&d.method==={2}&&p&&p.styles)a({appearance:p.theme,variables:p.styles.variables});});document.addEventListener(\"click\",function(e){var l=e.isTrusted?e.composedPath().find(function(t){return t&&t.matches&&t.matches(\"a[href]\");}):null,u;if(!l)return;try{u=new URL(l.getAttribute(\"href\"),document.baseURI);}catch(x){return;}if(!/^https?:$/.test(u.protocol)||u.href.split(\"#\")[0]===location.href.split(\"#\")[0])return;if(window.parent!==window){e.preventDefault();window.parent.postMessage({jsonrpc:\"2.0\",id:\"t3-link-\"+(++n),method:{3},params:{url:u.href,metaKey:e.metaKey,ctrlKey:e.ctrlKey}},\"*\");}else{l.setAttribute(\"target\",\"_blank\");l.setAttribute(\"rel\",\"noopener\");}},true);if(window.parent!==window){var h,o,z=function(){var r=document.documentElement,v=Math.ceil(r.scrollHeight>r.clientHeight?r.scrollHeight:r.getBoundingClientRect().height);if(v===h)return;h=v;window.parent.postMessage({jsonrpc:\"2.0\",method:{4},params:{height:v}},\"*\");};if(window.ResizeObserver){o=new ResizeObserver(z);o.observe(document.documentElement);}document.addEventListener(\"DOMContentLoaded\",function(){if(o&&document.body)o.observe(document.body);z();});window.addEventListener(\"load\",z);var K=[],B=[],C={5};window.addEventListener(\"message\",function(e){var d=e.data,p=d&&d.params;if(e.source===window.parent&&d&&d.jsonrpc===\"2.0\"&&d.method==={6}&&p&&Array.isArray(p.shortcuts)&&Array.isArray(p.blocked)){K=p.shortcuts;B=p.blocked;}});window.addEventListener(\"keydown\",function(e){var t=e.composedPath()[0],c=e.code||\"\",l=e.key.toLowerCase(),x=/^[a-z]$/.test(l)?[l]:[l,/^Key[A-Z]$/.test(c)?c.slice(3).toLowerCase():\"\",C.hasOwnProperty(c)?C[c]:\"\"],f,m=function(s){return s&&s.metaKey===e.metaKey&&s.ctrlKey===e.ctrlKey&&s.shiftKey===e.shiftKey&&s.altKey===e.altKey&&x.indexOf(s.key)>-1;};if(!e.isTrusted||e.isComposing||e.getModifierState(\"AltGraph\")&&!/^[a-z0-9]$/i.test(e.key)||t&&(t.isContentEditable||/^(?:INPUT|TEXTAREA|SELECT)$/.test(t.tagName))||!K.some(m)||B.some(m))return;f=function(v){window.removeEventListener(\"keydown\",f);if(v!==e||e.defaultPrevented)return;e.preventDefault();window.parent.postMessage({jsonrpc:\"2.0\",method:{7},params:{key:e.key,code:e.code,metaKey:e.metaKey,ctrlKey:e.ctrlKey,shiftKey:e.shiftKey,altKey:e.altKey,repeat:e.repeat}},\"*\");};window.addEventListener(\"keydown\",f);setTimeout(function(){window.removeEventListener(\"keydown\",f);});},true);}})();": {
+    "category": "code",
+    "reason": "htmlRender 注入 iframe 的 bootstrap 脚本，属于执行代码而非界面文案。"
+  },
   "(function(){var s=document.getElementById(\"t3-theme\"),n=0;if(!s)return;var b={0};function a(t){if(!t||typeof t!==\"object\"||!t.variables||typeof t.variables!==\"object\")return;var c=\":root{color-scheme:\"+(t.appearance===\"light\"?\"light\":\"dark\")+\";\";for(var k in t.variables){if(/^--[a-z0-9-]+$/.test(k))c+=k+\":\"+String(t.variables[k]).replace(/[;{}<>]/g,\"\")+\";\";}s.textContent=c+\"}\"+b;}try{var m=/[#&]{1}=([^&]*)/.exec(location.hash);if(m){a(JSON.parse(decodeURIComponent(m[1])));history.replaceState(history.state,\"\",location.pathname+location.search);}}catch(e){}window.addEventListener(\"message\",function(e){var d=e.data,p=d&&d.params;if(d&&d.jsonrpc===\"2.0\"&&d.method==={2}&&p&&p.styles)a({appearance:p.theme,variables:p.styles.variables});});document.addEventListener(\"click\",function(e){var l=e.isTrusted?e.composedPath().find(function(t){return t&&t.matches&&t.matches(\"a[href]\");}):null,u;if(!l)return;try{u=new URL(l.getAttribute(\"href\"),document.baseURI);}catch(x){return;}if(!/^https?:$/.test(u.protocol)||u.href.split(\"#\")[0]===location.href.split(\"#\")[0])return;if(window.parent!==window){e.preventDefault();window.parent.postMessage({jsonrpc:\"2.0\",id:\"t3-link-\"+(++n),method:{3},params:{url:u.href,metaKey:e.metaKey,ctrlKey:e.ctrlKey}},\"*\");}else{l.setAttribute(\"target\",\"_blank\");l.setAttribute(\"rel\",\"noopener\");}},true);if(window.parent!==window){var h,o,z=function(){var r=document.documentElement,v=Math.ceil(r.scrollHeight>r.clientHeight?r.scrollHeight:r.getBoundingClientRect().height);if(v===h)return;h=v;window.parent.postMessage({jsonrpc:\"2.0\",method:{4},params:{height:v}},\"*\");};if(window.ResizeObserver){o=new ResizeObserver(z);o.observe(document.documentElement);}document.addEventListener(\"DOMContentLoaded\",function(){if(o&&document.body)o.observe(document.body);z();});window.addEventListener(\"load\",z);}})();": {
     "category": "code",
     "reason": "htmlRender 的内联引导脚本，包含主题、链接与尺寸的协议处理；不是 UI 文案，必须保持可执行源码。"
@@ -523,6 +527,10 @@
     "category": "brand",
     "reason": "Conventional Commits spec name"
   },
+  "Could not record the update install.": {
+    "category": "dev-only",
+    "reason": "DesktopUpdates 的 logUpdaterWarning 日志消息，仅写入日志。"
+  },
   "Could not save language. / 无法保存语言设置。": {
     "category": "protocol",
     "reason": "已是中英双语并列的固定提示，无需再翻译"
@@ -630,6 +638,14 @@
   "DataSpell": {
     "category": "brand",
     "reason": "editor/IDE product name"
+  },
+  "Database reader exited with code {0}": {
+    "category": "code",
+    "reason": "nodeSqliteClient 读取 worker 的底层诊断（SqlError 原因），供故障定位，保留原文。"
+  },
+  "Database reader failed: {0}": {
+    "category": "code",
+    "reason": "nodeSqliteClient 读取 worker 的底层诊断（SqlError 原因），供故障定位，保留原文。"
   },
   "Declined by the user.": {
     "category": "protocol",
@@ -2239,6 +2255,14 @@
     "category": "dev-only",
     "reason": "log message"
   },
+  "const { parentPort, workerData } = require(\"node:worker_threads\");\nconst { DatabaseSync } = require(\"node:sqlite\");\nconst db = new DatabaseSync(workerData.filename);\nconst version = db.prepare(\"SELECT sqlite_version() AS version\").get().version;\nconst [major, minor] = version.split(\".\").map(Number);\nif (major < 3 || (major === 3 && minor < 51)) throw new Error(\"SQLite \" + version + \" has no NOOP checkpoint\");\n// macOS fsync() does not flush the drive cache; F_FULLFSYNC does. Other platforms ignore this.\ndb.exec(\"PRAGMA checkpoint_fullfsync = ON;\");\nconst frames = db.prepare(\"PRAGMA wal_checkpoint(NOOP)\");\nconst checkpoint = db.prepare(\"PRAGMA wal_checkpoint(PASSIVE)\");\nconst finish = () => {\n  const { log, checkpointed } = frames.get();\n  if (log >= workerData.frames && checkpointed < log) checkpoint.get();\n};\nlet idle;\nparentPort.on(\"message\", (request) => {\n  const { log, checkpointed } = frames.get();\n  if (log - checkpointed >= workerData.frames) checkpoint.get();\n  clearTimeout(idle);\n  idle = setTimeout(finish, workerData.idleMs);\n  parentPort.postMessage(request);\n});": {
+    "category": "code",
+    "reason": "nodeSqliteClient 以源码字符串启动的 worker 脚本，属于执行代码而非界面文案。"
+  },
+  "const { parentPort, workerData } = require(\"node:worker_threads\");\nconst { DatabaseSync } = require(\"node:sqlite\");\nlet db;\ntry {\n  // A read-only open cannot be undone by SQL, unlike PRAGMA query_only.\n  const next = new DatabaseSync(workerData.filename, {\n    readOnly: true,\n    allowExtension: workerData.allowExtension,\n  });\n  next.exec(\"PRAGMA busy_timeout = 5000;\");\n  // Without WAL a reader's shared lock blocks the writer's commits, so refuse.\n  const mode = String(next.prepare(\"PRAGMA journal_mode\").get().journal_mode).toLowerCase();\n  if (mode !== \"wal\") throw new Error(\"database uses journal_mode \" + mode + \", not wal\");\n  db = next;\n  parentPort.postMessage({ type: \"ready\" });\n} catch (error) {\n  parentPort.postMessage({ type: \"unavailable\", message: String(error && error.message ? error.message : error) });\n}\nconst statements = new Map();\nconst prepare = (sql, cached) => {\n  if (!cached) return db.prepare(sql);\n  let statement = statements.get(sql);\n  if (statement === undefined) {\n    statement = db.prepare(sql);\n    if (statements.size >= workerData.prepareCacheSize) statements.delete(statements.keys().next().value);\n  } else {\n    statements.delete(sql);\n  }\n  statements.set(sql, statement);\n  return statement;\n};\nparentPort.on(\"message\", ({ id, sql, params, cached, values, raw, safeIntegers }) => {\n  let operation = \"open\";\n  try {\n    if (db === undefined) throw new Error(\"database reader is unavailable\");\n    operation = \"prepare\";\n    const statement = prepare(sql, cached);\n    operation = \"execute\";\n    statement.setReadBigInts(safeIntegers);\n    if (statement.columns().length > 0) {\n      statement.setReturnArrays(values);\n      parentPort.postMessage({ id, rows: statement.all(...params) });\n    } else {\n      const result = statement.run(...params);\n      parentPort.postMessage({ id, rows: raw ? result : [] });\n    }\n  } catch (error) {\n    parentPort.postMessage({\n      id,\n      error: {\n        operation,\n        message: String(error && error.message ? error.message : error),\n        code: error && error.code,\n        errcode: error && error.errcode,\n        errstr: error && error.errstr,\n      },\n    });\n  }\n});": {
+    "category": "code",
+    "reason": "nodeSqliteClient 以源码字符串启动的 worker 脚本，属于执行代码而非界面文案。"
+  },
   "could not allocate port for WSL backend": {
     "category": "dev-only",
     "reason": "log message"
@@ -3235,6 +3259,10 @@
     "category": "code",
     "reason": "Python 脚本"
   },
+  "exited with code {0}": {
+    "category": "dev-only",
+    "reason": "nodeSqliteClient checkpoint worker 交还时的警告日志原因，仅写入日志。"
+  },
   "export ELECTRON_RUN_AS_NODE=1": {
     "category": "code",
     "reason": "桌面 t3 启动器或 Windows PATH 操作的可执行脚本，必须保持原文。"
@@ -3979,6 +4007,10 @@
     "category": "semantic-value",
     "reason": "Git remote 默认名称的 placeholder；保留技术名称，避免误导用户输入远端名。"
   },
+  "pan-x pinch-zoom": {
+    "category": "code",
+    "reason": "CSS touch-action 属性值。"
+  },
   "paragraph list*": {
     "category": "code",
     "reason": "ProseMirror 内容表达式，描述 paragraph 和 list 节点规则，必须保留。"
@@ -4411,6 +4443,10 @@
     "category": "code",
     "reason": "Tailwind class list"
   },
+  "the last update install did not apply": {
+    "category": "dev-only",
+    "reason": "DesktopUpdates 的 logUpdaterWarning 日志消息，仅写入日志。"
+  },
   "thread automation run now": {
     "category": "dev-only",
     "reason": "atom command label for internal logging"
@@ -4602,6 +4638,10 @@
   "while kill -0 \"$mounter\" 2>/dev/null; do": {
     "category": "code",
     "reason": "桌面 t3 启动器或 Windows PATH 操作的可执行脚本，必须保持原文。"
+  },
+  "worker did not open the database within {0} ms": {
+    "category": "code",
+    "reason": "nodeSqliteClient 读取 worker 启动超时的底层诊断，供故障定位，保留原文。"
   },
   "worker-src 'self' blob:": {
     "category": "code",
