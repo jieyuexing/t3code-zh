@@ -153,6 +153,50 @@ describe("display-only translation", () => {
       }
     },
   );
+  it.each(["zh-CN", "en"])(
+    "translates real child-input banner labels without changing request kinds in %s",
+    (locale) => {
+      vi.stubEnv("VITEST", "");
+      const filename = NodePath.join(repoRoot, "packages/client-runtime/src/state/threadShell.ts");
+      const source = NodeFS.readFileSync(filename, "utf8");
+      const ast = babel.parseSync(source, {
+        filename,
+        configFile: false,
+        babelrc: false,
+        parserOpts: { plugins: ["typescript"] },
+      });
+      ast.program.body = ast.program.body.filter(
+        (node) =>
+          node.type === "ExportNamedDeclaration" &&
+          node.declaration?.id?.name === "childThreadInputsTitle",
+      );
+      const dictionary = readDictionary();
+      const code = NodeModule.stripTypeScriptTypes(
+        babel.transformFromAstSync(ast, source, {
+          filename,
+          configFile: false,
+          babelrc: false,
+          plugins: [[plugin, { dictionary }]],
+        }).code,
+      )
+        .replace(/^import[^;]+;\n/gm, "")
+        .replaceAll("export ", "");
+      const { __t, __tf } = createTranslator(dictionary, () => locale);
+      const title = new Function("_t", "_tf", code + ";return childThreadInputsTitle;")(__t, __tf);
+      for (const [flags, english, chinese] of [
+        [[false], "Subagent needs input", "子 Agent 需要输入"],
+        [[true], "Subagent needs approval", "子 Agent 需要审批"],
+        [[false, false], "2 subagents need input", "2 个子 Agent 需要输入"],
+        [[true, true], "2 subagents need approval", "2 个子 Agent 需要审批"],
+        [[true, false], "2 subagents need you", "2 个子 Agent 需要你响应"],
+      ]) {
+        const children = Object.freeze(
+          flags.map((hasPendingApprovals) => Object.freeze({ hasPendingApprovals })),
+        );
+        expect(title(children)).toBe(locale === "en" ? english : chinese);
+      }
+    },
+  );
   it("joins both split JSX suffixes and complete relative-time labels without a Chinese gap", async () => {
     const { relativeTimeSuffix, joinRelativeTime } = await import("./display.js");
     expect(joinRelativeTime({ value: "3 分钟", suffix: "前" })).toBe("3 分钟前");

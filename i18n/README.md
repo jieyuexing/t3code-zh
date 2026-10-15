@@ -11,7 +11,7 @@ desktop 通过现有 bridge / IPC 保存同一选项。主进程在启动求值�
 ## 候选规则
 
 - JSX 文本按 React 的换行/缩进语义整理，保留同一行有意义的空格。key trim 后查表，运行时拼回原首尾空白。
-- JSX 文案属性与文案对象属性由 `uiProperties` 集中维护，包括 camelCase 的 ariaLabel/accessibilityLabel、tooltipText、disabledReason、各类按钮标签等。直接 JSX 表达式与三元/`??`/`||` 分支也入选。`*Label` 等文案变量/函数返回值、`*_LABEL_BY_*` 等标签表，以及 `labels`/dialog `buttons` 数组支持单词文案；JSX 的 headers/steps 数组可译，HTTP headers 保持原值。
+- JSX 文案属性与文案对象属性由 `uiProperties` 集中维护，包括 camelCase 的 ariaLabel/accessibilityLabel、tooltipText、disabledReason、各类按钮标签等。直接 JSX 表达式与三元/`??`/`||` 分支也入选。`*Label` 等文案变量/函数返回值、子 Agent 输入提示函数 `childThreadInputsTitle` 中仅用于标题插值的 `need` 局部词（按文件覆盖 input/approval/you）、`*_LABEL_BY_*` 等标签表，以及 `labels`/dialog `buttons` 数组支持单词文案；JSX 的 headers/steps 数组可译，HTTP headers 保持原值。
 - inputProps、permissions、presentation、size 等复合 prop 只开放内部独立识别的文案字段；直接 size/value、id 等仍受保护。事件回调中支持 toast 文案对象、confirm/alert/Notification、错误消息 setter、经过核对的本地提示包装器和 clipboard API 的提示参数。name 默认不开放，仅识别文件筛选器、媒体预览、内置浏览器 profile、脚本显示名等已审核结构；这些结构中的 id、文件扩展名、URL 不翻译。
 - 任意位置包含空格分隔的至少两个英文字词的字面量入选；这会包括部分错误、命令或内部文本，**候选不是自动批准的译文**。模板的每个表达式按序成为 `{0}`、`{1}`；译文可重排或省略，嵌套片段先从内向外改写，表达式仍按原顺序求值、转换成字符串一次。转换前固定原 AST 的分类结果，避免改写局部 helper 后使调用点漏译。含字面 `{数字}` 的模板有歧义，进入复核清单。
 - 保护规则优先于词典：import/export、TS 类型/enum、对象 key、比较与 `in`、case、字符串匹配/替换调用、Schema/Literal、日志调用、非文案属性、import.meta/URL、tagged template、注入脚本参数等保持原样。`searchTerms` 保留英文；Settings 搜索额外查询当前语言的 title、分区名和有词典条目的别名，英文关键词仍可匹配。

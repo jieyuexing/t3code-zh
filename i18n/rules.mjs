@@ -427,7 +427,11 @@ function uiContext(path) {
     if (
       node.type === "VariableDeclarator" &&
       child.key === "init" &&
-      labelBinding(propertyName(node.id))
+      (labelBinding(propertyName(node.id)) ||
+        // This helper's local word is only interpolated into its banner title;
+        // request kinds and approval flags are separate values and stay unchanged.
+        (propertyName(node.id) === "need" &&
+          propertyName(parent.getFunctionParent()?.node.id) === "childThreadInputsTitle"))
     )
       return "prop";
     if (

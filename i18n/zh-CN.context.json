@@ -38,5 +38,10 @@
   },
   "apps/web/src/components/usage/UsagePage.tsx": {
     "Share": "占比"
+  },
+  "packages/client-runtime/src/state/threadShell.ts": {
+    "approval": "审批",
+    "input": "输入",
+    "you": "你响应"
   }
 }
