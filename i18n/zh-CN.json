@@ -6996,7 +6996,7 @@
   "to return it to disk; it pauses and restarts the background service. Quit the desktop app first if it hosts this environment.": "上运行该命令，将空间归还给磁盘；命令会暂停并重启后台服务。如果此环境由桌面应用托管，请先退出桌面应用。",
   "to start": "以开始",
   "to use your tailnet.": "以使用你的 tailnet。",
-  "tokens": "令牌",
+  "tokens": "个 token",
   "tokens have no known price": "个 Token 没有已知价格",
   "tokens of history, then send": "个 token 的历史压缩为摘要后发送",
   "tokens)": "个 token）",
