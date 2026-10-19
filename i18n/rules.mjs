@@ -100,6 +100,7 @@ const componentTextProps = new Map([
   ["PullRequestCopyableCode", new Set(["target"])],
   ["NetworkAccessDescription", new Set(["fallback"])],
   ["SettingsRow", new Set(["status"])],
+  ["DraftProjectName", new Set(["value"])],
   ["PullRequestsUnavailableState", new Set(["error"])],
   ["SnapShotSetupDialog", new Set(["error"])],
   ["ThreadErrorBanner", new Set(["error"])],
@@ -332,6 +333,7 @@ export function protectionReason(path, filename) {
         context &&
         (textArrays.has(name) ||
           uiContainers.has(name) ||
+          (jsxName(parent) === "ScopeMenu" && name === "allOption") ||
           /^on[A-Z]/.test(name ?? "") ||
           name === "testConnection" ||
           (name === "value" &&
@@ -495,7 +497,7 @@ function isRelativeTimePart(property) {
   if (!["value", "suffix"].includes(propertyName(property.node.key))) return false;
   const fn = property.getFunctionParent();
   return (
-    /^formatRelativeTime(?:Until)?$/.test(propertyName(fn?.node.id) ?? "") &&
+    /^formatRelative(?:Time(?:Until)?|Elapsed)$/.test(propertyName(fn?.node.id) ?? "") &&
     property.parentPath.node.properties.some((part) => propertyName(part.key) === "suffix")
   );
 }

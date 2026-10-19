@@ -78,7 +78,7 @@ describe("file and line translations", () => {
     const file = NodePath.join(repoRoot, "apps/web/src/components/device/DeviceToolsPanel.tsx");
     const relative = "apps/web/src/components/device/DeviceToolsPanel.tsx";
     const partial = extract([file], {
-      [relative]: { "Clear::line=211": "清透" },
+      [relative]: { "Clear::line=205": "清透" },
     }).candidates.filter((x) => x.key === "Clear");
     expect(partial[0].contextTranslatedOccurrences).toBe(1);
     expect(partial[0].occurrenceCount).toBe(2);

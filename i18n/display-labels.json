@@ -94,5 +94,15 @@
       "No limits reported.",
       "This account has no subscription limits."
     ]
+  },
+  {
+    "file": "apps/web/src/components/settings/ScheduledTasksSettings.tsx",
+    "source": "ScheduledTasksSettings summaries keys; displayLabel translates only the displayed prefix, leaving grouping keys and machine names unchanged",
+    "keys": [
+      "Not connected:",
+      "Loading scheduled tasks on",
+      "Could not load scheduled tasks:",
+      "No tasks on"
+    ]
   }
 ]

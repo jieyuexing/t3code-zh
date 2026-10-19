@@ -14,7 +14,7 @@
     "Unable to load the": "无法加载"
   },
   "apps/web/src/components/device/DeviceToolsPanel.tsx": {
-    "Clear::line=211": "清透",
+    "Clear::line=205": "清透",
     "Motion": "运动"
   },
   "apps/web/src/components/onboarding/WelcomeWizard.tsx": {

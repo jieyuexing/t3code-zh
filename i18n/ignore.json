@@ -83,6 +83,10 @@
     "category": "code",
     "reason": "页面注入 JS"
   },
+  "(() => {\n  let doc = document;\n  for (;;) {\n    const active = doc.activeElement;\n    if (active?.tagName !== \"IFRAME\" && active?.tagName !== \"FRAME\") return doc;\n    if (!active.contentDocument) return null;\n    doc = active.contentDocument;\n  }\n})()": {
+    "category": "code",
+    "reason": "预览输入定位注入脚本，必须保持可执行源码。"
+  },
   "(Enter)": {
     "category": "key-name",
     "reason": "keyboard key hint"
@@ -98,6 +102,10 @@
   "(function(){var s=document.getElementById(\"t3-theme\"),n=0;if(!s)return;var b={0};function a(t){if(!t||typeof t!==\"object\"||!t.variables||typeof t.variables!==\"object\")return;var c=\":root{color-scheme:\"+(t.appearance===\"light\"?\"light\":\"dark\")+\";\";for(var k in t.variables){if(/^--[a-z0-9-]+$/.test(k))c+=k+\":\"+String(t.variables[k]).replace(/[;{}<>]/g,\"\")+\";\";}s.textContent=c+\"}\"+b;}try{var m=/[#&]{1}=([^&]*)/.exec(location.hash);if(m){a(JSON.parse(decodeURIComponent(m[1])));history.replaceState(history.state,\"\",location.pathname+location.search);}}catch(e){}window.addEventListener(\"message\",function(e){var d=e.data,p=d&&d.params;if(d&&d.jsonrpc===\"2.0\"&&d.method==={2}&&p&&p.styles)a({appearance:p.theme,variables:p.styles.variables});});document.addEventListener(\"click\",function(e){var l=e.isTrusted?e.composedPath().find(function(t){return t&&t.matches&&t.matches(\"a[href]\");}):null,u;if(!l)return;try{u=new URL(l.getAttribute(\"href\"),document.baseURI);}catch(x){return;}if(!/^https?:$/.test(u.protocol)||u.href.split(\"#\")[0]===location.href.split(\"#\")[0])return;if(window.parent!==window){e.preventDefault();window.parent.postMessage({jsonrpc:\"2.0\",id:\"t3-link-\"+(++n),method:{3},params:{url:u.href,metaKey:e.metaKey,ctrlKey:e.ctrlKey}},\"*\");}else{l.setAttribute(\"target\",\"_blank\");l.setAttribute(\"rel\",\"noopener\");}},true);if(window.parent!==window){var h,o,z=function(){var r=document.documentElement,v=Math.ceil(r.scrollHeight>r.clientHeight?r.scrollHeight:r.getBoundingClientRect().height);if(v===h)return;h=v;window.parent.postMessage({jsonrpc:\"2.0\",method:{4},params:{height:v}},\"*\");};if(window.ResizeObserver){o=new ResizeObserver(z);o.observe(document.documentElement);}document.addEventListener(\"DOMContentLoaded\",function(){if(o&&document.body)o.observe(document.body);z();});window.addEventListener(\"load\",z);var K=[],B=[],C={5};window.addEventListener(\"message\",function(e){var d=e.data,p=d&&d.params;if(e.source===window.parent&&d&&d.jsonrpc===\"2.0\"&&d.method==={6}&&p&&Array.isArray(p.shortcuts)&&Array.isArray(p.blocked)){K=p.shortcuts;B=p.blocked;}});window.addEventListener(\"keydown\",function(e){var t=e.composedPath()[0],c=e.code||\"\",l=e.key.toLowerCase(),x=/^[a-z]$/.test(l)?[l]:[l,/^Key[A-Z]$/.test(c)?c.slice(3).toLowerCase():\"\",C.hasOwnProperty(c)?C[c]:\"\"],f,m=function(s){return s&&s.metaKey===e.metaKey&&s.ctrlKey===e.ctrlKey&&s.shiftKey===e.shiftKey&&s.altKey===e.altKey&&x.indexOf(s.key)>-1;};if(!e.isTrusted||e.isComposing||e.getModifierState(\"AltGraph\")&&!/^[a-z0-9]$/i.test(e.key)||t&&(t.isContentEditable||/^(?:INPUT|TEXTAREA|SELECT)$/.test(t.tagName))||!K.some(m)||B.some(m))return;f=function(v){window.removeEventListener(\"keydown\",f);if(v!==e||e.defaultPrevented)return;e.preventDefault();window.parent.postMessage({jsonrpc:\"2.0\",method:{7},params:{key:e.key,code:e.code,metaKey:e.metaKey,ctrlKey:e.ctrlKey,shiftKey:e.shiftKey,altKey:e.altKey,repeat:e.repeat}},\"*\");};window.addEventListener(\"keydown\",f);setTimeout(function(){window.removeEventListener(\"keydown\",f);});},true);}})();": {
     "category": "code",
     "reason": "htmlRender 注入 iframe 的 bootstrap 脚本，属于执行代码而非界面文案。"
+  },
+  "(function(){var s=document.getElementById(\"t3-theme\"),n=0;if(!s)return;var b={0};function a(t){if(!t||typeof t!==\"object\"||!t.variables||typeof t.variables!==\"object\")return;var c=\":root{color-scheme:\"+(t.appearance===\"light\"?\"light\":\"dark\")+\";\";for(var k in t.variables){if(/^--[a-z0-9-]+$/.test(k))c+=k+\":\"+String(t.variables[k]).replace(/[;{}<>]/g,\"\")+\";\";}s.textContent=c+\"}\"+b;}try{var m=/[#&]{1}=([^&]*)/.exec(location.hash);if(m){a(JSON.parse(decodeURIComponent(m[1])));history.replaceState(history.state,\"\",location.pathname+location.search);}}catch(e){}window.addEventListener(\"message\",function(e){var d=e.data,p=d&&d.params;if(d&&d.jsonrpc===\"2.0\"&&d.method==={2}&&p&&p.styles)a({appearance:p.theme,variables:p.styles.variables});});document.addEventListener(\"click\",function(e){var l=e.isTrusted?e.composedPath().find(function(t){return t&&t.matches&&t.matches(\"a[href]\");}):null,u;if(!l)return;try{u=new URL(l.getAttribute(\"href\"),document.baseURI);}catch(x){return;}if(!/^https?:$/.test(u.protocol)||u.href.split(\"#\")[0]===location.href.split(\"#\")[0])return;if(window.parent!==window){e.preventDefault();window.parent.postMessage({jsonrpc:\"2.0\",id:\"t3-link-\"+(++n),method:{3},params:{url:u.href,metaKey:e.metaKey,ctrlKey:e.ctrlKey}},\"*\");}else{l.setAttribute(\"target\",\"_blank\");l.setAttribute(\"rel\",\"noopener\");}},true);if(window.parent!==window){var h,o,z=function(){var r=document.documentElement,v=Math.ceil(r.scrollHeight>r.clientHeight?r.scrollHeight:r.getBoundingClientRect().height);if(v===h)return;h=v;window.parent.postMessage({jsonrpc:\"2.0\",method:{4},params:{height:v}},\"*\");};if(window.ResizeObserver){o=new ResizeObserver(z);o.observe(document.documentElement);}document.addEventListener(\"DOMContentLoaded\",function(){if(o&&document.body)o.observe(document.body);z();});window.addEventListener(\"load\",z);window.addEventListener(\"click\",function(e){var t=e.composedPath()[0],u;if(!e.isTrusted||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||!t||t.tagName!==\"IMG\"||t.closest(\"a[href],button\"))return;u=t.currentSrc||t.src;if(u)setTimeout(function(){if(!e.defaultPrevented)window.parent.postMessage({jsonrpc:\"2.0\",method:{5},params:{src:u,name:t.alt||t.title||\"\"}},\"*\");});});var K=[],B=[],C={6};window.addEventListener(\"message\",function(e){var d=e.data,p=d&&d.params;if(e.source===window.parent&&d&&d.jsonrpc===\"2.0\"&&d.method==={7}&&p&&Array.isArray(p.shortcuts)&&Array.isArray(p.blocked)){K=p.shortcuts;B=p.blocked;}});window.addEventListener(\"keydown\",function(e){var t=e.composedPath()[0],c=e.code||\"\",l=e.key.toLowerCase(),x=/^[a-z]$/.test(l)?[l]:[l,/^Key[A-Z]$/.test(c)?c.slice(3).toLowerCase():\"\",C.hasOwnProperty(c)?C[c]:\"\"],f,m=function(s){return s&&s.metaKey===e.metaKey&&s.ctrlKey===e.ctrlKey&&s.shiftKey===e.shiftKey&&s.altKey===e.altKey&&x.indexOf(s.key)>-1;};if(!e.isTrusted||e.isComposing||e.getModifierState(\"AltGraph\")&&!/^[a-z0-9]$/i.test(e.key)||t&&(t.isContentEditable||/^(?:INPUT|TEXTAREA|SELECT)$/.test(t.tagName))||!K.some(m)||B.some(m))return;f=function(v){window.removeEventListener(\"keydown\",f);if(v!==e||e.defaultPrevented)return;e.preventDefault();window.parent.postMessage({jsonrpc:\"2.0\",method:{8},params:{key:e.key,code:e.code,metaKey:e.metaKey,ctrlKey:e.ctrlKey,shiftKey:e.shiftKey,altKey:e.altKey,repeat:e.repeat}},\"*\");};window.addEventListener(\"keydown\",f);setTimeout(function(){window.removeEventListener(\"keydown\",f);});},true);}})();": {
+    "category": "code",
+    "reason": "HTML 渲染主题、图片和快捷键消息的注入脚本，包含协议值，保持原文。"
   },
   "(function(){var s=document.getElementById(\"t3-theme\"),n=0;if(!s)return;var b={0};function a(t){if(!t||typeof t!==\"object\"||!t.variables||typeof t.variables!==\"object\")return;var c=\":root{color-scheme:\"+(t.appearance===\"light\"?\"light\":\"dark\")+\";\";for(var k in t.variables){if(/^--[a-z0-9-]+$/.test(k))c+=k+\":\"+String(t.variables[k]).replace(/[;{}<>]/g,\"\")+\";\";}s.textContent=c+\"}\"+b;}try{var m=/[#&]{1}=([^&]*)/.exec(location.hash);if(m){a(JSON.parse(decodeURIComponent(m[1])));history.replaceState(history.state,\"\",location.pathname+location.search);}}catch(e){}window.addEventListener(\"message\",function(e){var d=e.data,p=d&&d.params;if(d&&d.jsonrpc===\"2.0\"&&d.method==={2}&&p&&p.styles)a({appearance:p.theme,variables:p.styles.variables});});document.addEventListener(\"click\",function(e){var l=e.isTrusted?e.composedPath().find(function(t){return t&&t.matches&&t.matches(\"a[href]\");}):null,u;if(!l)return;try{u=new URL(l.getAttribute(\"href\"),document.baseURI);}catch(x){return;}if(!/^https?:$/.test(u.protocol)||u.href.split(\"#\")[0]===location.href.split(\"#\")[0])return;if(window.parent!==window){e.preventDefault();window.parent.postMessage({jsonrpc:\"2.0\",id:\"t3-link-\"+(++n),method:{3},params:{url:u.href,metaKey:e.metaKey,ctrlKey:e.ctrlKey}},\"*\");}else{l.setAttribute(\"target\",\"_blank\");l.setAttribute(\"rel\",\"noopener\");}},true);if(window.parent!==window){var h,o,z=function(){var r=document.documentElement,v=Math.ceil(r.scrollHeight>r.clientHeight?r.scrollHeight:r.getBoundingClientRect().height);if(v===h)return;h=v;window.parent.postMessage({jsonrpc:\"2.0\",method:{4},params:{height:v}},\"*\");};if(window.ResizeObserver){o=new ResizeObserver(z);o.observe(document.documentElement);}document.addEventListener(\"DOMContentLoaded\",function(){if(o&&document.body)o.observe(document.body);z();});window.addEventListener(\"load\",z);}})();": {
     "category": "code",
@@ -231,6 +239,10 @@
     "category": "code",
     "reason": "CSS 源码或 Tailwind 类名，控制样式与焦点状态，不是界面文案。"
   },
+  ":where(img:not(a[href] img,button img)){cursor:zoom-in}": {
+    "category": "style",
+    "reason": "图片查看器光标 CSS 选择器与声明。"
+  },
   "; caused by {0}": {
     "category": "diagnostic",
     "reason": "DesktopUpdates.describeUpdateErrorCause 的有界日志诊断片段；只进入 updater 日志，不是 UI 文案，保持原始诊断语义。"
@@ -311,6 +323,10 @@
     "category": "code",
     "reason": "SVG"
   },
+  "@ECHO off": {
+    "category": "command",
+    "reason": "Windows npm 可执行文件 shim 的批处理命令。"
+  },
   "@echo off": {
     "category": "code",
     "reason": "桌面 t3 启动器或 Windows PATH 操作的可执行脚本，必须保持原文。"
@@ -358,6 +374,10 @@
   "Antigravity IDE": {
     "category": "brand",
     "reason": "编辑器/IDE 产品名"
+  },
+  "App Store": {
+    "category": "brand",
+    "reason": "Apple 应用商店品牌名。"
   },
   "Apple Silicon host detected while running Intel build; updates will switch to arm64 packages": {
     "category": "dev-only",
@@ -827,6 +847,10 @@
     "category": "code",
     "reason": "环境变量名，按术语表保留。"
   },
+  "GOTO start": {
+    "category": "command",
+    "reason": "Windows npm 可执行文件 shim 的批处理跳转命令。"
+  },
   "Galaxy Z Fold 5": {
     "category": "model",
     "reason": "设备型号名"
@@ -858,6 +882,10 @@
   "GoLand": {
     "category": "brand",
     "reason": "editor/IDE product name"
+  },
+  "Google Play": {
+    "category": "brand",
+    "reason": "Google 应用商店品牌名。"
   },
   "GraphQL": {
     "category": "brand",
@@ -1494,6 +1522,10 @@
   "SCSS": {
     "category": "brand",
     "reason": "编程语言、标记语言或框架名称，按术语表保留原名。"
+  },
+  "SET dp0=%~dp0": {
+    "category": "command",
+    "reason": "Windows npm 可执行文件 shim 的批处理变量赋值。"
   },
   "SF Mono": {
     "category": "code",
@@ -2667,6 +2699,10 @@
     "category": "code",
     "reason": "internal atom/command identifier"
   },
+  "environment-data:orchestration-v2:command-output": {
+    "category": "identifier",
+    "reason": "environment-data 订阅 Atom 的内部标识。"
+  },
   "environment-data:orchestration-v2:dispatch-command": {
     "category": "code",
     "reason": "internal atom/command identifier"
@@ -3038,6 +3074,10 @@
   "environment-data:server:consume-reset-credit": {
     "category": "code",
     "reason": "internal atom/command identifier"
+  },
+  "environment-data:server:database-storage": {
+    "category": "identifier",
+    "reason": "environment-data 数据库空间订阅 Atom 的内部标识。"
   },
   "environment-data:server:host-resources": {
     "category": "code",
@@ -3819,6 +3859,10 @@
     "category": "protocol",
     "reason": "评审评论 rangeLabel 默认值，持久化并写入发给 Agent 的上下文，且被 composerContextRecords 的正则解析"
   },
+  "linear-gradient(to bottom, black calc(100% - 1.75rem), transparent)": {
+    "category": "style",
+    "reason": "工作流脚本折叠渐变遮罩 CSS 值。"
+  },
   "linear-gradient(to bottom, black calc(100% - {0}rem), transparent)": {
     "category": "code",
     "reason": "CSS linear-gradient template"
@@ -4535,6 +4579,10 @@
     "category": "protocol",
     "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
   },
+  "underline line-through": {
+    "category": "style",
+    "reason": "终端下划线与删除线组合 CSS 属性值。"
+  },
   "unexpected BrowserWindow creation": {
     "category": "dev-only",
     "reason": "test harness"
@@ -4694,6 +4742,10 @@
   "{0}\n\n> Assistant quote:\n{1}": {
     "category": "protocol",
     "reason": "发送给模型的提示词模板"
+  },
+  "{0}\n/* A 1fr track's automatic minimum grows with the currently mounted lines. In split\n   wrap mode that shifts width between columns, rewraps rows and makes the virtualizer\n   repeatedly correct the scroll position. Keep both code columns at the same width. */\n[data-diff-type=\"split\"][data-overflow=\"wrap\"] {\n  --diffs-code-grid: var(--diffs-grid-number-column-width) minmax(0, 1fr);\n}\n\n:is(\n  [data-line],\n  [data-line-annotation],\n  [data-merge-conflict],\n  [data-merge-conflict-actions],\n  [data-no-newline]\n)[data-selected-line] {\n  --diffs-line-bg: light-dark(\n    color-mix(\n      in lab,\n      var(--code-background) 88%,\n      color-mix(in srgb, var(--code-background) 50%, var(--diffs-modified-base))\n    ),\n    color-mix(\n      in lab,\n      var(--code-background) 80%,\n      color-mix(in srgb, var(--code-background) 70%, var(--diffs-modified-base))\n    )\n  ) !important;\n}\n\n:is([data-gutter-buffer], [data-column-number])[data-selected-line] {\n  --diffs-line-bg: light-dark(\n    color-mix(\n      in lab,\n      var(--code-background) 91%,\n      color-mix(in srgb, var(--code-background) 35%, var(--diffs-modified-base))\n    ),\n    color-mix(\n      in lab,\n      var(--code-background) 85%,\n      color-mix(in srgb, var(--code-background) 60%, var(--diffs-modified-base))\n    )\n  ) !important;\n}\n\n[data-indicators=\"bars\"]\n  :is([data-column-number], [data-gutter-buffer=\"annotation\"])[data-selected-line] {\n  position: relative;\n}\n\n[data-indicators=\"bars\"]\n  :is([data-column-number], [data-gutter-buffer=\"annotation\"])[data-selected-line]::before {\n  position: absolute !important;\n  inset-block: 0 !important;\n  inset-inline-start: 0 !important;\n  display: block !important;\n  width: 4px !important;\n  min-width: 4px !important;\n  max-width: 4px !important;\n  height: auto !important;\n  padding: 0 !important;\n  content: \"\" !important;\n  background-color: var(--diffs-modified-base) !important;\n  background-image: none !important;\n}\n\n[data-file-info] {\n  background-color: var(--code-background) !important;\n  border-block-color: transparent !important;\n  color: var(--code-foreground) !important;\n}\n\n[data-diffs-header] {\n  position: sticky !important;\n  top: 0;\n  z-index: 4;\n  background-color: var(--code-background) !important;\n  border-bottom-color: transparent !important;\n  align-items: center !important;\n  font-family: var(--font-sans) !important;\n  font-size: 12px !important;\n  line-height: 1 !important;\n  /* Collapsed items are never remeasured: the painted header must match diffHeaderHeight.\n     Center controls in that height instead of adding padding to their intrinsic height. */\n  height: 32px !important;\n  min-height: 32px !important;\n  padding-block: 0 !important;\n  padding-inline: 8px 12px !important;\n}\n\n[data-diffs-header]:hover {\n  /* A native scrollbar gutter cannot be painted by descendants. Use an inset edge cue instead\n     of a full-width band that would look accidentally clipped at the gutter. */\n  background-color: var(--code-background) !important;\n  box-shadow: inset 3px 0 color-mix(in srgb, var(--code-foreground) 24%, transparent);\n}\n\n/* Hunk separators are the way to the unchanged lines between hunks. They keep the library's\n   layout, with the expand button in its own cell, but sit one step off the code surface so they\n   read as quiet controls; hover brings them forward. */\n:is([data-separator=\"line-info\"], [data-separator=\"line-info-basic\"]) {\n  /* Exact and margin-free: the virtualizer places rows from hunkSeparatorHeight below. */\n  height: 24px !important;\n  margin-block: 0 !important;\n  --diffs-bg-separator: color-mix(in srgb, var(--code-background) 97%, var(--code-foreground));\n}\n\n:is([data-separator=\"line-info\"], [data-separator=\"line-info-basic\"]) [data-separator-content] {\n  color: color-mix(in srgb, var(--code-foreground) 50%, var(--code-background)) !important;\n  font-family: var(--font-sans) !important;\n  font-size: 11px !important;\n  text-decoration: none !important;\n}\n\n:is([data-separator=\"line-info\"], [data-separator=\"line-info-basic\"]) [data-expand-button] {\n  color: color-mix(in srgb, var(--code-foreground) 50%, var(--code-background)) !important;\n}\n\n:is([data-separator=\"line-info\"], [data-separator=\"line-info-basic\"])[data-expand-index]\n  :is([data-separator-content], [data-expand-button]):hover {\n  color: var(--code-foreground) !important;\n  background-color: color-mix(\n    in srgb,\n    var(--code-background) 92%,\n    var(--code-foreground)\n  ) !important;\n}\n\n[data-diffs-header] [data-header-content] {\n  align-items: center !important;\n  line-height: 1 !important;\n}\n\n/* Pierre clips file names with overflow: hidden for its start ellipsis. A 1em line box cuts off\n   descenders; give the clipped names room inside the fixed-height header. */\n[data-diffs-header] :is([data-title], [data-prev-name]) {\n  line-height: 16px !important;\n}\n\n[data-diffs-header] [data-metadata] {\n  align-items: center !important;\n  line-height: 1 !important;\n  font-variant-numeric: tabular-nums;\n}\n\n[data-diffs-header] [data-additions-count],\n[data-diffs-header] [data-deletions-count] {\n  font-family: var(--font-mono) !important;\n  font-size: 11px !important;\n  font-variant-numeric: tabular-nums;\n  line-height: 1 !important;\n}\n\n[data-diffs-header] [data-change-icon],\n[data-diffs-header] [data-rename-icon] {\n  display: block;\n  flex-shrink: 0;\n}\n\n[data-title] {\n  cursor: pointer;\n  transition: color 120ms ease;\n  font-family: var(--font-sans) !important;\n}\n\n[data-title]:hover {\n  color: color-mix(in srgb, var(--code-foreground) 84%, var(--primary)) !important;\n}\n\n/* Expanding a file mounts its body all at once; easing it in matches the 200ms the app's\n   collapsibles take. Appearance only — the viewer owns geometry, so height cannot animate.\n   Departing content cuts, the same one-way rule the pull request chrome fold follows. */\n[data-diff],\n[data-file] {\n  transition: opacity 200ms ease-out;\n}\n\n@starting-style {\n  [data-diff],\n  [data-file] {\n    opacity: 0;\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  [data-diff],\n  [data-file] {\n    transition: none;\n  }\n}": {
+    "category": "style",
+    "reason": "差异查看器的完整 CSS 样式源码，包含选择器与变量，不是显示文案。"
   },
   "{0}\n/* A 1fr track's automatic minimum grows with the currently mounted lines. In split\n   wrap mode that shifts width between columns, rewraps rows and makes the virtualizer\n   repeatedly correct the scroll position. Keep both code columns at the same width. */\n[data-diff-type=\"split\"][data-overflow=\"wrap\"] {\n  --diffs-code-grid: var(--diffs-grid-number-column-width) minmax(0, 1fr);\n}\n\n:is(\n  [data-line],\n  [data-line-annotation],\n  [data-merge-conflict],\n  [data-merge-conflict-actions],\n  [data-no-newline]\n)[data-selected-line] {\n  --diffs-line-bg: light-dark(\n    color-mix(\n      in lab,\n      var(--code-background) 88%,\n      color-mix(in srgb, var(--code-background) 50%, var(--diffs-modified-base))\n    ),\n    color-mix(\n      in lab,\n      var(--code-background) 80%,\n      color-mix(in srgb, var(--code-background) 70%, var(--diffs-modified-base))\n    )\n  ) !important;\n}\n\n:is([data-gutter-buffer], [data-column-number])[data-selected-line] {\n  --diffs-line-bg: light-dark(\n    color-mix(\n      in lab,\n      var(--code-background) 91%,\n      color-mix(in srgb, var(--code-background) 35%, var(--diffs-modified-base))\n    ),\n    color-mix(\n      in lab,\n      var(--code-background) 85%,\n      color-mix(in srgb, var(--code-background) 60%, var(--diffs-modified-base))\n    )\n  ) !important;\n}\n\n[data-indicators=\"bars\"]\n  :is([data-column-number], [data-gutter-buffer=\"annotation\"])[data-selected-line] {\n  position: relative;\n}\n\n[data-indicators=\"bars\"]\n  :is([data-column-number], [data-gutter-buffer=\"annotation\"])[data-selected-line]::before {\n  position: absolute !important;\n  inset-block: 0 !important;\n  inset-inline-start: 0 !important;\n  display: block !important;\n  width: 4px !important;\n  min-width: 4px !important;\n  max-width: 4px !important;\n  height: auto !important;\n  padding: 0 !important;\n  content: \"\" !important;\n  background-color: var(--diffs-modified-base) !important;\n  background-image: none !important;\n}\n\n[data-file-info] {\n  background-color: var(--code-background) !important;\n  border-block-color: transparent !important;\n  color: var(--code-foreground) !important;\n}\n\n[data-diffs-header] {\n  position: sticky !important;\n  top: 0;\n  z-index: 4;\n  background-color: var(--code-background) !important;\n  border-bottom-color: transparent !important;\n  align-items: center !important;\n  font-family: var(--font-sans) !important;\n  font-size: 12px !important;\n  line-height: 1 !important;\n  min-height: 32px !important;\n  padding-block: 6px !important;\n  padding-inline: 8px 12px !important;\n}\n\n[data-diffs-header]:hover {\n  /* A native scrollbar gutter cannot be painted by descendants. Use an inset edge cue instead\n     of a full-width band that would look accidentally clipped at the gutter. */\n  background-color: var(--code-background) !important;\n  box-shadow: inset 3px 0 color-mix(in srgb, var(--code-foreground) 24%, transparent);\n}\n\n/* Hunk separators are the way to the unchanged lines between hunks. They keep the library's\n   layout, with the expand button in its own cell, but sit one step off the code surface so they\n   read as quiet controls; hover brings them forward. */\n:is([data-separator=\"line-info\"], [data-separator=\"line-info-basic\"]) {\n  /* Exact and margin-free: the virtualizer places rows from hunkSeparatorHeight below. */\n  height: 24px !important;\n  margin-block: 0 !important;\n  --diffs-bg-separator: color-mix(in srgb, var(--code-background) 97%, var(--code-foreground));\n}\n\n:is([data-separator=\"line-info\"], [data-separator=\"line-info-basic\"]) [data-separator-content] {\n  color: color-mix(in srgb, var(--code-foreground) 50%, var(--code-background)) !important;\n  font-family: var(--font-sans) !important;\n  font-size: 11px !important;\n  text-decoration: none !important;\n}\n\n:is([data-separator=\"line-info\"], [data-separator=\"line-info-basic\"]) [data-expand-button] {\n  color: color-mix(in srgb, var(--code-foreground) 50%, var(--code-background)) !important;\n}\n\n:is([data-separator=\"line-info\"], [data-separator=\"line-info-basic\"])[data-expand-index]\n  :is([data-separator-content], [data-expand-button]):hover {\n  color: var(--code-foreground) !important;\n  background-color: color-mix(\n    in srgb,\n    var(--code-background) 92%,\n    var(--code-foreground)\n  ) !important;\n}\n\n[data-diffs-header] [data-header-content] {\n  align-items: center !important;\n  line-height: 1 !important;\n}\n\n/* Pierre clips file names with overflow: hidden for its start ellipsis. A 1em line box cuts off\n   descenders. Only the clipped names get room: 16px plus the header's 12px of padding stays\n   inside its 32px min-height, which diffHeaderHeight assumes. */\n[data-diffs-header] :is([data-title], [data-prev-name]) {\n  line-height: 16px !important;\n}\n\n[data-diffs-header] [data-metadata] {\n  align-items: center !important;\n  line-height: 1 !important;\n  font-variant-numeric: tabular-nums;\n}\n\n[data-diffs-header] [data-additions-count],\n[data-diffs-header] [data-deletions-count] {\n  font-family: var(--font-mono) !important;\n  font-size: 11px !important;\n  font-variant-numeric: tabular-nums;\n  line-height: 1 !important;\n}\n\n[data-diffs-header] [data-change-icon],\n[data-diffs-header] [data-rename-icon] {\n  display: block;\n  flex-shrink: 0;\n}\n\n[data-title] {\n  cursor: pointer;\n  transition: color 120ms ease;\n  font-family: var(--font-sans) !important;\n}\n\n[data-title]:hover {\n  color: color-mix(in srgb, var(--code-foreground) 84%, var(--primary)) !important;\n}\n\n/* Expanding a file mounts its body all at once; easing it in matches the 200ms the app's\n   collapsibles take. Appearance only — the viewer owns geometry, so height cannot animate.\n   Departing content cuts, the same one-way rule the pull request chrome fold follows. */\n[data-diff],\n[data-file] {\n  transition: opacity 200ms ease-out;\n}\n\n@starting-style {\n  [data-diff],\n  [data-file] {\n    opacity: 0;\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  [data-diff],\n  [data-file] {\n    transition: none;\n  }\n}": {
     "category": "code",

@@ -105,6 +105,12 @@ describe("display-only translation", () => {
       const names = new Set([
         "parseTimestampDate",
         "formatRelativeTime",
+        "relativeTimeUnitMs",
+        "relativeTimeElapsedMs",
+        "formatRelativeElapsed",
+        "MINUTE_MS",
+        "HOUR_MS",
+        "DAY_MS",
         "formatRelativeTimeLabel",
         "formatRelativeTimeUntil",
         "formatRelativeTimeUntilLabel",
@@ -115,9 +121,14 @@ describe("display-only translation", () => {
         babelrc: false,
         parserOpts: { plugins: ["typescript"] },
       });
-      ast.program.body = ast.program.body.filter(
-        (node) => node.type === "ExportNamedDeclaration" && names.has(node.declaration?.id?.name),
-      );
+      ast.program.body = ast.program.body.filter((node) => {
+        const declaration = node.type === "ExportNamedDeclaration" ? node.declaration : node;
+        return (
+          names.has(declaration?.id?.name) ||
+          (declaration?.type === "VariableDeclaration" &&
+            declaration.declarations.every((item) => names.has(item.id?.name)))
+        );
+      });
       const dictionary = readDictionary();
       const code = NodeModule.stripTypeScriptTypes(
         babel.transformFromAstSync(ast, source, {
@@ -258,5 +269,36 @@ describe("display-only translation", () => {
         { id: "serviceTier", value: id },
       ]);
     },
+  );
+});
+
+it("translates scheduled-task summary prefixes without changing machine names or grouping keys", async () => {
+  const { displayLabel } = await import("./display.js");
+  const file = NodePath.join(
+    repoRoot,
+    "apps/web/src/components/settings/ScheduledTasksSettings.tsx",
+  );
+  const source = NodeFS.readFileSync(file, "utf8");
+  const ast = babel.parseSync(source, {
+    filename: file,
+    configFile: false,
+    babelrc: false,
+    parserOpts: { plugins: ["typescript", "jsx"] },
+  });
+  let initializer;
+  babel.traverse(ast, {
+    VariableDeclarator(path) {
+      if (path.node.id.name === "summary" && path.node.init.type === "TemplateLiteral")
+        initializer = path.node.init;
+    },
+  });
+  const expression = babel.transformFromAstSync(
+    babel.types.file(babel.types.program([babel.types.expressionStatement(initializer)])),
+    source,
+    { configFile: false, babelrc: false },
+  ).code;
+  const summarize = new Function("label", "entries", "displayLabel", `return ${expression}`);
+  expect(summarize("Not connected:", ["High", "Settings"], displayLabel)).toBe(
+    "未连接： High, Settings",
   );
 });

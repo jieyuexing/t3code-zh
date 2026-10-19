@@ -354,3 +354,15 @@ describe("UI candidates and rewriting", () => {
     expect(transform("<button>New thread</button>")).toContain("__t as");
   });
 });
+
+it("recognizes scope option labels and draft fallbacks while preserving their values", () => {
+  expect(
+    candidates('<ScopeMenu allOption={{value: "New thread", label: "Settings"}} />').map(
+      (item) => item.key,
+    ),
+  ).toEqual(["Settings"]);
+  expect(
+    candidates('<DraftProjectName value={selected ?? "Settings"} />').map((item) => item.key),
+  ).toEqual(["Settings"]);
+  expect(candidates('<Other value="Settings" allOption={{label: "Settings"}} />')).toEqual([]);
+});
