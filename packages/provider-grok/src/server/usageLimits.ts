@@ -103,10 +103,6 @@ export function grokUsageResponseToLimits(
   return makeUsageLimits({ checkedAt, windows: [window] });
 }
 
-/**
- * The grok.com login the CLI uses by default, or undefined when the CLI is
- * configured to pick another account, endpoint, or an API key.
- */
 const readGrokCredential = Effect.fn("readGrokCredential")(function* (
   environment: NodeJS.ProcessEnv,
 ) {
@@ -173,10 +169,6 @@ const readGrokCredential = Effect.fn("readGrokCredential")(function* (
   return credential?.auth_mode === "api_key" ? undefined : credential;
 });
 
-/**
- * Reads the default grok.com login once and reports its usage limits along with
- * its email, so the email always names the account whose quota was read.
- */
 export const readGrokAccount = Effect.fn("readGrokAccount")(function* (
   environment: NodeJS.ProcessEnv = process.env,
 ) {
@@ -194,7 +186,6 @@ export const readGrokAccount = Effect.fn("readGrokAccount")(function* (
   if (!token) {
     return { email, usageLimits: makeUnavailableUsageLimits({ checkedAt, reason: "unsupported" }) };
   }
-  // A failed quota request still knows which account it asked about.
   const usageLimits = yield* Effect.gen(function* () {
     const client = yield* HttpClient.HttpClient;
     const response = yield* client.execute(
