@@ -423,6 +423,10 @@
     "category": "brand",
     "reason": "产品 Beta 阶段标识，沿用 Alpha 品牌口径。"
   },
+  "Bing": {
+    "category": "brand",
+    "reason": "搜索引擎品牌名，保留原文。"
+  },
   "Bitbucket": {
     "category": "brand",
     "reason": "Bitbucket"
@@ -434,6 +438,10 @@
   "Brave Safe Storage": {
     "category": "code",
     "reason": "钥匙串/存储项名称"
+  },
+  "Brave Search": {
+    "category": "brand",
+    "reason": "搜索引擎品牌名，保留原文。"
   },
   "Bring the checked-out branch up to date with `{0}` using this repository's convention, resolve every conflict while preserving the intent of both sides, and verify the project still builds before pushing.": {
     "category": "protocol",
@@ -735,6 +743,10 @@
     "category": "protocol",
     "reason": "预填入输入框并最终发送给 Agent 的提示词模板"
   },
+  "DuckDuckGo": {
+    "category": "brand",
+    "reason": "搜索引擎品牌名，保留原文。"
+  },
   "Duplicate context presentation definition: {0}": {
     "category": "dev-only",
     "reason": "开发者断言错误：重复的上下文呈现定义"
@@ -754,6 +766,10 @@
   "Each member of a kind union needs a literal string `kind`.": {
     "category": "dev-only",
     "reason": "schema validation developer message"
+  },
+  "Ecosia": {
+    "category": "brand",
+    "reason": "搜索引擎品牌名，保留原文。"
   },
   "Elixir": {
     "category": "brand",
@@ -882,6 +898,10 @@
   "GoLand": {
     "category": "brand",
     "reason": "editor/IDE product name"
+  },
+  "Google": {
+    "category": "brand",
+    "reason": "搜索引擎品牌名，保留原文。"
   },
   "Google Play": {
     "category": "brand",
@@ -1066,6 +1086,10 @@
   "KILL": {
     "category": "code",
     "reason": "signal name KILL"
+  },
+  "Kagi": {
+    "category": "brand",
+    "reason": "搜索引擎品牌名，保留原文。"
   },
   "Kiro": {
     "category": "brand",
@@ -3663,6 +3687,10 @@
     "category": "code",
     "reason": "示例 URL 占位符"
   },
+  "https://example.com/search?q=%s": {
+    "category": "url",
+    "reason": "自定义搜索 URL 模板示例，保留协议、查询参数和 %s 占位符。"
+  },
   "https://hub.example.ts.net:8318": {
     "category": "code",
     "reason": "示例 URL 占位符"
@@ -3982,6 +4010,10 @@
   "npx t3@{0}": {
     "category": "code",
     "reason": "npx 命令"
+  },
+  "object-src 'self' blob: http: https:": {
+    "category": "code",
+    "reason": "Electron Content Security Policy 指令，属于协议配置。"
   },
   "oklch(0.222003 0.03479 328.979)": {
     "category": "code",
