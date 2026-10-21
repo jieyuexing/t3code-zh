@@ -18,6 +18,7 @@ import {
 import { loadRepoEnv } from "../../scripts/lib/public-config";
 import { thirdPartyLicensesPlugin } from "../../scripts/lib/third-party-licenses";
 import { tailwindPlugins } from "./vite/tailwind";
+import { warmBundledDevPlugin } from "./vite/warmBundledDev";
 import { webI18nPlugin } from "../../i18n/web-build.mjs";
 
 const repoEnv = loadRepoEnv();
@@ -188,6 +189,7 @@ export default defineConfig(({ mode }) => {
       webI18nPlugin(mode),
       react({ compiler: true }),
       tailwindPlugins(bundledDev),
+      warmBundledDevPlugin(),
     ],
     optimizeDeps: {
       include: [
@@ -241,7 +243,8 @@ export default defineConfig(({ mode }) => {
       // Transform the whole module graph at server start instead of on the
       // first request. Without this, a cold worktree discovers and transforms
       // modules one import-level at a time while the browser waits — which
-      // over a tailnet origin turns into minutes of waterfall.
+      // over a tailnet origin turns into minutes of waterfall. Bundled dev
+      // ignores this; warmBundledDevPlugin covers it there.
       warmup: {
         clientFiles: ["./src/main.tsx"],
       },
