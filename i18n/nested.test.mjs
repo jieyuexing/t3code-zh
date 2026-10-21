@@ -193,7 +193,7 @@ describe("inline HTML text spans", () => {
 describe("reported production locations", () => {
   it("compacts translated relative times by structure, without English comparisons", () => {
     const source = NodeFS.readFileSync(
-      NodePath.join(repoRoot, "apps/web/src/components/Sidebar.tsx"),
+      NodePath.join(repoRoot, "apps/web/src/components/sidebar/SidebarThreadRow.tsx"),
       "utf8",
     );
     const helper = source.match(/function compactSidebarTimeLabel\([\s\S]+?\n}/)[0];

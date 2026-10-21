@@ -535,6 +535,10 @@
     "category": "protocol",
     "reason": "OpenAPI spec summary/description for relay API"
   },
+  "Clerk: OAuth flow was cancelled.": {
+    "category": "protocol",
+    "reason": "仿照 Clerk SDK 的取消错误文本交给 Clerk 的 OAuth 流程处理，保留原文。"
+  },
   "Cloud-user environment links and registered devices.": {
     "category": "protocol",
     "reason": "OpenAPI spec summary/description for relay API"
@@ -1030,6 +1034,10 @@
   "Invalid Date": {
     "category": "code",
     "reason": "序列化回退值，非界面文案"
+  },
+  "Invalid H.264 Exp-Golomb value": {
+    "category": "code",
+    "reason": "H.264 码流解析的底层诊断，不是界面文案。"
   },
   "Invalid P-256 public key coordinate length.": {
     "category": "protocol",
@@ -1883,6 +1891,10 @@
     "category": "protocol",
     "reason": "发送给 Agent 的提示词，不是界面文案"
   },
+  "Truncated H.264 SPS": {
+    "category": "code",
+    "reason": "H.264 码流解析的底层诊断，不是界面文案。"
+  },
   "TypeScript": {
     "category": "brand",
     "reason": "编程语言、标记语言或框架名称，按术语表保留原名。"
@@ -2366,6 +2378,10 @@
   "cloud account cleanup": {
     "category": "dev-only",
     "reason": "atom command label, console warn only"
+  },
+  "col-start-1 row-start-1 flex min-w-0 items-center gap-1 text-sm text-muted-foreground transition-[opacity,transform] ease-out motion-reduce:transform-none motion-reduce:transition-none sm:text-xs": {
+    "category": "style",
+    "reason": "CSS 类名。"
   },
   "color-mix(in oklab, var(--color-muted-foreground) 72%, transparent)": {
     "category": "code",
@@ -3194,6 +3210,10 @@
   "environment-data:server:database-storage": {
     "category": "identifier",
     "reason": "environment-data 数据库空间订阅 Atom 的内部标识。"
+  },
+  "environment-data:server:describe-outdated-server": {
+    "category": "code",
+    "reason": "internal atom/command identifier"
   },
   "environment-data:server:host-resources": {
     "category": "code",

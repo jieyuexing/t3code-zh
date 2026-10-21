@@ -83,7 +83,15 @@ describe("display-only translation", () => {
   });
   it("keeps the original seed during rename even when its presentation is Chinese", async () => {
     const { displayThreadTitle } = await import("./display.js");
-    const { resolveRenameCommit } = await import("../apps/web/src/components/chat/ChatHeader.tsx");
+    // Upstream keeps the helper module-private; evaluate the production source directly.
+    const source = NodeFS.readFileSync(
+      NodePath.join(repoRoot, "apps/web/src/components/chat/ChatHeader.tsx"),
+      "utf8",
+    );
+    const helper = source.match(/function resolveRenameCommit\([\s\S]+?\n}\n/)[0];
+    const resolveRenameCommit = new Function(
+      `${NodeModule.stripTypeScriptTypes(helper)}; return resolveRenameCommit;`,
+    )();
     const originalTitle = "New thread";
     expect(displayThreadTitle(originalTitle)).toBe("新建线程");
     expect(resolveRenameCommit({ title: originalTitle, originalTitle })).toEqual({
@@ -147,16 +155,15 @@ describe("display-only translation", () => {
         "joinRelativeTime",
         code + ";return {past:formatRelativeTimeLabel, future:formatRelativeTimeUntilLabel};",
       )(__t, __tf, joinRelativeTime);
-      vi.spyOn(Date, "now").mockReturnValue(1_700_000_000_000);
+      const now = 1_700_000_000_000;
+      vi.spyOn(Date, "now").mockReturnValue(now);
       try {
-        expect(past(new Date(Date.now() - 180_000).toISOString())).toBe(
+        expect(past(new Date(now - 180_000).toISOString())).toBe(
           locale === "en" ? "3m ago" : "3 分钟前",
         );
-        expect(past(new Date(Date.now()).toISOString())).toBe(
-          locale === "en" ? "just now" : "刚刚",
-        );
+        expect(past(new Date(now).toISOString())).toBe(locale === "en" ? "just now" : "刚刚");
         expect(past("invalid")).toBe("");
-        expect(future(new Date(Date.now() + 180_000).toISOString())).toBe(
+        expect(future(new Date(now + 180_000).toISOString())).toBe(
           locale === "en" ? "3m left" : `3 分钟${dictionary.left}`,
         );
       } finally {
@@ -232,7 +239,8 @@ describe("display-only translation", () => {
     "retains semantic selection for %s while translating the combined reasoning and speed label",
     async (id, label) => {
       const { buildTraitsTriggerDisplay } =
-        await import("../apps/web/src/components/chat/TraitsPicker.tsx");
+        await import("../packages/client-runtime/src/modelTraits.ts");
+      const { displayLabel } = await import("./display.js");
       const descriptors = [
         {
           id: "reasoningEffort",
@@ -259,6 +267,7 @@ describe("display-only translation", () => {
         descriptors,
         primarySelectDescriptorId: "reasoningEffort",
         ultrathinkPromptControlled: false,
+        displayLabel,
       });
       expect(result).toEqual({ label });
       expect(descriptors).toEqual(original);
