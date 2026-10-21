@@ -1,5 +1,3 @@
-"use client";
-
 import { displayLabel } from "../../../../../i18n/display.js";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import * as Option from "effect/Option";
