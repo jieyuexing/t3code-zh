@@ -51,6 +51,14 @@
     "category": "code",
     "reason": "桌面 t3 启动器或 Windows PATH 操作的可执行脚本，必须保持原文。"
   },
+  "$env.PATH | each {|p| if ($p | str starts-with '~') {": {
+    "category": "code",
+    "reason": "Nushell 脚本片段，由 shell.ts 拼装后交给子进程执行。"
+  },
+  "$p | path expand --no-symlink } else { $p } } | str join (char esep)": {
+    "category": "code",
+    "reason": "Nushell 脚本片段，由 shell.ts 拼装后交给子进程执行。"
+  },
   "(() => {\n              try {\n                const selectorMatched = {0};\n                const textMatched = {1};\n                const urlMatched = {2};\n                return { matched: selectorMatched && textMatched && urlMatched };\n              } catch (error) {\n                return { invalidSelector: true, message: String(error) };\n              }\n            })()": {
     "category": "code",
     "reason": "页面注入 JS"
@@ -222,6 +230,10 @@
   "600 {0}px \"Segoe UI\", sans-serif": {
     "category": "code",
     "reason": "Canvas 字体声明"
+  },
+  ":host {\n    --trees-bg-override: transparent;\n    --trees-selected-bg-override: color-mix(in srgb, currentColor 12%, transparent);\n    --trees-hover-bg-override: color-mix(in srgb, currentColor 7%, transparent);\n    --trees-border-color-override: color-mix(in srgb, currentColor 14%, transparent);\n    --trees-font-family-override: var(--font-sans);\n    --trees-font-size-override: 0.75rem;\n  }\n  [data-truncate-content='visible'] { overflow: hidden; text-overflow: ellipsis; }\n  [data-truncate-marker] { display: none; }\n  button[data-type='item'], button[data-type='item']::before { border-radius: var(--radius-md); }\n  svg[data-icon-name='t3-tree-icon-loading'] { opacity: 0.6; }\n  @media (prefers-reduced-motion: no-preference) {\n    svg[data-icon-name='t3-tree-icon-loading'] { animation: t3-tree-spin 1s linear infinite; }\n  }\n  @keyframes t3-tree-spin { to { transform: rotate(360deg); } }": {
+    "category": "style",
+    "reason": "文件树主题 CSS 文本。"
   },
   ":host {\n    --trees-bg-override: transparent;\n    --trees-selected-bg-override: color-mix(in srgb, currentColor 12%, transparent);\n    --trees-hover-bg-override: color-mix(in srgb, currentColor 7%, transparent);\n    --trees-border-color-override: color-mix(in srgb, currentColor 14%, transparent);\n    --trees-font-family-override: var(--font-sans);\n    --trees-font-size-override: 0.75rem;\n  }\n  button[data-type='item'], button[data-type='item']::before { border-radius: var(--radius-md); }\n  svg[data-icon-name='t3-tree-icon-loading'] { opacity: 0.6; }\n  @media (prefers-reduced-motion: no-preference) {\n    svg[data-icon-name='t3-tree-icon-loading'] { animation: t3-tree-spin 1s linear infinite; }\n  }\n  @keyframes t3-tree-spin { to { transform: rotate(360deg); } }": {
     "category": "code",
@@ -402,6 +414,14 @@
   "Asus Zenbook Fold": {
     "category": "model",
     "reason": "设备型号名"
+  },
+  "Attached image": {
+    "category": "protocol",
+    "reason": "线程标题种子，随创建线程命令写入服务端数据；与 New thread、File: {0} 一样保持英文。"
+  },
+  "Attached images": {
+    "category": "protocol",
+    "reason": "线程标题种子，随创建线程命令写入服务端数据；与 New thread、File: {0} 一样保持英文。"
   },
   "Azure DevOps": {
     "category": "brand",
@@ -755,6 +775,10 @@
     "category": "dev-only",
     "reason": "开发者断言错误：重复的上下文呈现处理器"
   },
+  "EAS Simulator": {
+    "category": "brand",
+    "reason": "Expo 的产品名。"
+  },
   "ECI assignment value out of range": {
     "category": "dev-only",
     "reason": "第三方二维码库的内部异常"
@@ -903,6 +927,10 @@
     "category": "brand",
     "reason": "搜索引擎品牌名，保留原文。"
   },
+  "Google Chrome": {
+    "category": "brand",
+    "reason": "浏览器应用名，用于匹配窗口标题。"
+  },
   "Google Play": {
     "category": "brand",
     "reason": "Google 应用商店品牌名。"
@@ -1006,6 +1034,10 @@
   "Invalid P-256 public key coordinate length.": {
     "category": "protocol",
     "reason": "DPoP 验证原因，属于协议响应内容"
+  },
+  "Invalid WAL frame counts": {
+    "category": "code",
+    "reason": "nodeSqliteClient 的 SQL、worker 源码与底层诊断，不是界面文案。"
   },
   "Invalid argument": {
     "category": "dev-only",
@@ -1118,6 +1150,10 @@
   "Let content set the page's height. Avoid viewport-based heights such as 100vh or height:100% on html or body; the frame grows to fit the page, so they can make it grow again and again.": {
     "category": "code",
     "reason": "HTML_RENDER_THEME_GUIDE / LAYOUT_GUIDE 为 Agent 工具描述中的英文生成指令，含 CSS 合同；不改写模型输入。"
+  },
+  "Let content set the page's height. The frame grows to fit the page, so a height that follows the viewport makes it grow again and again: html_preview and html_render reject vh, svh, lvh, and dvh units, and height:100% on html or body has the same problem.": {
+    "category": "code",
+    "reason": "html_render 版式指南，作为提示词交给 Agent，与同组句子一致保留原文。"
   },
   "Liberation Mono": {
     "category": "code",
@@ -1307,6 +1343,10 @@
     "category": "protocol",
     "reason": "发送给 Agent 的提示词，不是界面文案"
   },
+  "Node SQLite lacks transaction-state or statement-authorizer support": {
+    "category": "code",
+    "reason": "nodeSqliteClient 的 SQL、worker 源码与底层诊断，不是界面文案。"
+  },
   "Not supported for a desktop preview tab: {0}": {
     "category": "protocol",
     "reason": "CdpRelay 返回给 CDP 客户端（Agent 的自动化工具）的协议错误，不是界面文案。"
@@ -1394,6 +1434,14 @@
   "PR #{0} review guide": {
     "category": "protocol",
     "reason": "PR 导览提问的 Agent 上下文或 reviewComments 元数据，随 handoff 传递；保持原始提示词与字段内容，不按界面语言改写。"
+  },
+  "PRAGMA journal_size_limit": {
+    "category": "code",
+    "reason": "nodeSqliteClient 的 SQL、worker 源码与底层诊断，不是界面文案。"
+  },
+  "PRAGMA wal_checkpoint(NOOP)": {
+    "category": "code",
+    "reason": "nodeSqliteClient 的 SQL、worker 源码与底层诊断，不是界面文案。"
   },
   "PhpStorm": {
     "category": "brand",
@@ -1495,6 +1543,10 @@
     "category": "protocol",
     "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
   },
+  "Request value to test, in placeholder syntax without braces: headers.x-github-event, body.action, query.source.": {
+    "category": "protocol",
+    "reason": "Schema description，进入 MCP 工具参数说明交给 Agent。"
+  },
   "Requested visual changes:": {
     "category": "semantic-value",
     "reason": "composerContextLegacySend 生成的结构化 agent 上下文分隔符，被 Legacy parser 精确匹配及 indexOf 查找。"
@@ -1506,6 +1558,10 @@
   "Review remarks with no line to attach them to:": {
     "category": "protocol",
     "reason": "发送给 Agent 的提示词，不是界面文案"
+  },
+  "Review: {0}": {
+    "category": "protocol",
+    "reason": "线程标题种子，随创建线程命令写入服务端数据；与 New thread、File: {0} 一样保持英文。"
   },
   "Rider": {
     "category": "brand",
@@ -1547,6 +1603,10 @@
     "category": "brand",
     "reason": "编程语言、标记语言或框架名称，按术语表保留原名。"
   },
+  "SELECT sqlite_version() AS version": {
+    "category": "code",
+    "reason": "nodeSqliteClient 的 SQL、worker 源码与底层诊断，不是界面文案。"
+  },
   "SET dp0=%~dp0": {
     "category": "command",
     "reason": "Windows npm 可执行文件 shim 的批处理变量赋值。"
@@ -1562,6 +1622,10 @@
   "SQL": {
     "category": "brand",
     "reason": "编程语言、标记语言或框架名称，按术语表保留原名。"
+  },
+  "SQLite {0} has no NOOP checkpoint": {
+    "category": "code",
+    "reason": "nodeSqliteClient 的 SQL、worker 源码与底层诊断，不是界面文案。"
   },
   "SSH": {
     "category": "protocol",
@@ -2031,6 +2095,10 @@
     "category": "code",
     "reason": "transport.ts 用英文正则识别网络错误；保持表达式与 rpc/session.ts 的错误生产文本一致。"
   },
+  "\\bstopped responding for \\d+s\\. {0}$": {
+    "category": "code",
+    "reason": "transport.ts 用英文正则识别网络错误；保持表达式与 rpc/session.ts 的错误生产文本一致。"
+  },
   "ab": {
     "category": "code",
     "reason": "Match-whole-word toggle glyph"
@@ -2227,6 +2295,10 @@
     "category": "code",
     "reason": "Chromium LevelDB/Snappy 解析器的底层诊断标记，供故障定位，保留原文。"
   },
+  "body.action": {
+    "category": "semantic-value",
+    "reason": "输入框占位示例，展示请求占位语法或取值，需与实际可填值一致。"
+  },
   "bootstrap backend start requested": {
     "category": "dev-only",
     "reason": "Effect 结构化日志消息，仅写入日志"
@@ -2326,6 +2398,10 @@
   "const { parentPort, workerData } = require(\"node:worker_threads\");\nconst { DatabaseSync } = require(\"node:sqlite\");\nconst db = new DatabaseSync(workerData.filename);\nconst version = db.prepare(\"SELECT sqlite_version() AS version\").get().version;\nconst [major, minor] = version.split(\".\").map(Number);\nif (major < 3 || (major === 3 && minor < 51)) throw new Error(\"SQLite \" + version + \" has no NOOP checkpoint\");\n// macOS fsync() does not flush the drive cache; F_FULLFSYNC does. Other platforms ignore this.\ndb.exec(\"PRAGMA checkpoint_fullfsync = ON;\");\nconst frames = db.prepare(\"PRAGMA wal_checkpoint(NOOP)\");\nconst checkpoint = db.prepare(\"PRAGMA wal_checkpoint(PASSIVE)\");\nconst finish = () => {\n  const { log, checkpointed } = frames.get();\n  if (log >= workerData.frames && checkpointed < log) checkpoint.get();\n};\nlet idle;\nparentPort.on(\"message\", (request) => {\n  const { log, checkpointed } = frames.get();\n  if (log - checkpointed >= workerData.frames) checkpoint.get();\n  clearTimeout(idle);\n  idle = setTimeout(finish, workerData.idleMs);\n  parentPort.postMessage(request);\n});": {
     "category": "code",
     "reason": "nodeSqliteClient 以源码字符串启动的 worker 脚本，属于执行代码而非界面文案。"
+  },
+  "const { parentPort, workerData } = require(\"node:worker_threads\");\nconst { DatabaseSync } = require(\"node:sqlite\");\nconst { statSync } = require(\"node:fs\");\nlet db;\nlet frames;\nlet checkpoint;\nlet truncate;\nlet journalSizeLimit = -1;\nlet generation = 0;\nlet nextTruncateId = 0;\nlet pendingTruncate;\nlet pendingBarriers = 0;\nlet idle;\nconst initialize = () => {\n  if (db !== undefined) return;\n  // The writer switches to WAL after constructing the client.\n  db = new DatabaseSync(workerData.filename);\n  db.exec(\"PRAGMA busy_timeout = 5000;\");\n  const mode = String(db.prepare(\"PRAGMA journal_mode\").get().journal_mode).toLowerCase();\n  if (mode !== \"wal\") throw new Error(\"database uses journal_mode \" + mode + \", not wal\");\n  // macOS requires F_FULLFSYNC to flush the drive cache.\n  db.exec(\"PRAGMA checkpoint_fullfsync = ON;\");\n  frames = db.prepare(\"PRAGMA wal_checkpoint(NOOP)\");\n  checkpoint = db.prepare(\"PRAGMA wal_checkpoint(PASSIVE)\");\n  truncate = db.prepare(\"PRAGMA wal_checkpoint(TRUNCATE)\");\n};\nconst atCeiling = (state) => state.log >= workerData.backpressureFrames;\nconst exceedsSizeLimit = () =>\n  journalSizeLimit >= 0 && statSync(workerData.filename + \"-wal\").size > journalSizeLimit;\nconst schedule = (state, blocked) => {\n  if (blocked || state.log - state.checkpointed >= workerData.frames) {\n    idle = setTimeout(() => check(undefined, undefined, true), workerData.idleMs);\n  }\n};\nconst check = (id, nextJournalSizeLimit, force, nextGeneration = generation) => {\n  initialize();\n  if (Number.isSafeInteger(nextGeneration)) generation = Math.max(generation, nextGeneration);\n  if (Number.isSafeInteger(nextJournalSizeLimit)) journalSizeLimit = nextJournalSizeLimit;\n  let state = frames.get();\n  const oversized = exceedsSizeLimit();\n  if (force || state.log - state.checkpointed >= workerData.frames || oversized) {\n    checkpoint.get();\n    state = frames.get();\n  }\n  if (state.checkpointed === state.log && (atCeiling(state) || oversized)) {\n    pendingTruncate = { truncateId: ++nextTruncateId, checkId: id, generation, state };\n    parentPort.postMessage({\n      type: \"truncate-request\",\n      truncateId: pendingTruncate.truncateId,\n      checkId: id,\n      generation,\n      ...state,\n    });\n    return;\n  }\n  const blocked = (atCeiling(state) || oversized) && state.checkpointed < state.log;\n  parentPort.postMessage({ type: \"checkpoint\", id, generation, ...state, blocked });\n  schedule(state, blocked);\n};\nconst finishTruncate = (truncateId) => {\n  if (pendingTruncate === undefined || pendingTruncate.truncateId !== truncateId) return;\n  const pending = pendingTruncate;\n  parentPort.postMessage({ type: \"truncate-start\", truncateId });\n  let busy;\n  // Admission is paused here; a pinned reader must not make truncation wait.\n  db.exec(\"PRAGMA busy_timeout = 0;\");\n  try {\n    busy = truncate.get().busy !== 0;\n  } finally {\n    db.exec(\"PRAGMA busy_timeout = 5000;\");\n  }\n  const state = frames.get();\n  const blocked = (atCeiling(state) && (busy || state.checkpointed < state.log)) || exceedsSizeLimit();\n  pendingTruncate = undefined;\n  parentPort.postMessage({\n    type: \"checkpoint\",\n    id: pending.checkId,\n    generation: pending.generation,\n    truncateId,\n    ...state,\n    blocked,\n  });\n  while (pendingBarriers > 0) {\n    pendingBarriers--;\n    parentPort.postMessage(\"barrier\");\n  }\n  schedule(state, blocked);\n};\nparentPort.on(\"message\", (request) => {\n  clearTimeout(idle);\n  if (request && request.type === \"truncate\") {\n    finishTruncate(request.truncateId);\n    return;\n  }\n  const isBarrier = request === \"barrier\";\n  if (pendingTruncate !== undefined) {\n    if (isBarrier) pendingBarriers++;\n    else if (request && request.type === \"check\") {\n      // Retire the request without labeling the pending snapshot with a newer generation.\n      parentPort.postMessage({\n        type: \"checkpoint\",\n        id: request.id,\n        generation: pendingTruncate.generation,\n        ...pendingTruncate.state,\n        blocked: true,\n      });\n    }\n    return;\n  }\n  const input = request && typeof request === \"object\" ? request : {};\n  check(input.id, input.journalSizeLimit, input.force, input.generation);\n  if (isBarrier) {\n    if (pendingTruncate !== undefined) pendingBarriers++;\n    else parentPort.postMessage(\"barrier\");\n  }\n});": {
+    "category": "code",
+    "reason": "nodeSqliteClient 的 SQL、worker 源码与底层诊断，不是界面文案。"
   },
   "const { parentPort, workerData } = require(\"node:worker_threads\");\nconst { DatabaseSync } = require(\"node:sqlite\");\nlet db;\ntry {\n  // A read-only open cannot be undone by SQL, unlike PRAGMA query_only.\n  const next = new DatabaseSync(workerData.filename, {\n    readOnly: true,\n    allowExtension: workerData.allowExtension,\n  });\n  next.exec(\"PRAGMA busy_timeout = 5000;\");\n  // Without WAL a reader's shared lock blocks the writer's commits, so refuse.\n  const mode = String(next.prepare(\"PRAGMA journal_mode\").get().journal_mode).toLowerCase();\n  if (mode !== \"wal\") throw new Error(\"database uses journal_mode \" + mode + \", not wal\");\n  db = next;\n  parentPort.postMessage({ type: \"ready\" });\n} catch (error) {\n  parentPort.postMessage({ type: \"unavailable\", message: String(error && error.message ? error.message : error) });\n}\nconst statements = new Map();\nconst prepare = (sql, cached) => {\n  if (!cached) return db.prepare(sql);\n  let statement = statements.get(sql);\n  if (statement === undefined) {\n    statement = db.prepare(sql);\n    if (statements.size >= workerData.prepareCacheSize) statements.delete(statements.keys().next().value);\n  } else {\n    statements.delete(sql);\n  }\n  statements.set(sql, statement);\n  return statement;\n};\nparentPort.on(\"message\", ({ id, sql, params, cached, values, raw, safeIntegers }) => {\n  let operation = \"open\";\n  try {\n    if (db === undefined) throw new Error(\"database reader is unavailable\");\n    operation = \"prepare\";\n    const statement = prepare(sql, cached);\n    operation = \"execute\";\n    statement.setReadBigInts(safeIntegers);\n    if (statement.columns().length > 0) {\n      statement.setReturnArrays(values);\n      parentPort.postMessage({ id, rows: statement.all(...params) });\n    } else {\n      const result = statement.run(...params);\n      parentPort.postMessage({ id, rows: raw ? result : [] });\n    }\n  } catch (error) {\n    parentPort.postMessage({\n      id,\n      error: {\n        operation,\n        message: String(error && error.message ? error.message : error),\n        code: error && error.code,\n        errcode: error && error.errcode,\n        errstr: error && error.errstr,\n      },\n    });\n  }\n});": {
     "category": "code",
@@ -2683,6 +2759,10 @@
     "category": "code",
     "reason": "internal atom/command identifier"
   },
+  "environment-data:device:eas-account": {
+    "category": "code",
+    "reason": "internal atom/command identifier"
+  },
   "environment-data:device:list": {
     "category": "code",
     "reason": "internal atom/command identifier"
@@ -2704,6 +2784,10 @@
     "reason": "internal atom/command identifier"
   },
   "environment-data:filesystem:browse": {
+    "category": "code",
+    "reason": "internal atom/command identifier"
+  },
+  "environment-data:filesystem:get-metadata": {
     "category": "code",
     "reason": "internal atom/command identifier"
   },
@@ -2851,6 +2935,10 @@
     "category": "code",
     "reason": "internal atom/command identifier"
   },
+  "environment-data:projects:list-ignored-files": {
+    "category": "code",
+    "reason": "internal atom/command identifier"
+  },
   "environment-data:projects:open-scratch": {
     "category": "code",
     "reason": "internal atom/command identifier"
@@ -2912,6 +3000,10 @@
     "reason": "internal atom/command identifier"
   },
   "environment-data:pull-requests:activity": {
+    "category": "code",
+    "reason": "internal atom/command identifier"
+  },
+  "environment-data:pull-requests:change-breakdown": {
     "category": "code",
     "reason": "internal atom/command identifier"
   },
@@ -3315,6 +3407,10 @@
     "category": "code",
     "reason": "internal atom/command identifier"
   },
+  "environment-data:vcs:read-refs": {
+    "category": "code",
+    "reason": "internal atom/command identifier"
+  },
   "environment-data:vcs:refresh-status": {
     "category": "code",
     "reason": "internal atom/command identifier"
@@ -3431,9 +3527,17 @@
     "category": "code",
     "reason": "Tailwind class list"
   },
+  "flex h-full min-w-0 flex-1 items-center rounded-s-lg {0} {1}": {
+    "category": "style",
+    "reason": "CSS 类名或样式值。"
+  },
   "flex items-center justify-between gap-2": {
     "category": "code",
     "reason": "Tailwind class list"
+  },
+  "flex min-w-0 items-center gap-1.5 opacity-55 in-data-highlighted:opacity-100 in-data-popup-open:opacity-100": {
+    "category": "style",
+    "reason": "CSS 类名或样式值。"
   },
   "flex min-w-0 shrink": {
     "category": "code",
@@ -3542,6 +3646,10 @@
   "ghostty_row_get(wrap continuation)": {
     "category": "code",
     "reason": "C API 函数调用描述"
+  },
+  "git clone": {
+    "category": "command",
+    "reason": "git 命令名，作为流程图标注保留原文。"
   },
   "git clone --single-branch --branch {0} https://bitbucket.org/{1}.git t3code-pr-{2}": {
     "category": "code",
@@ -3739,6 +3847,14 @@
     "category": "model",
     "reason": "设备型号名"
   },
+  "if $env.{0}? == null { '' } else if": {
+    "category": "code",
+    "reason": "Nushell 脚本片段，由 shell.ts 拼装后交给子进程执行。"
+  },
+  "if ($env.PATH? | describe | str starts-with 'list') {": {
+    "category": "code",
+    "reason": "Nushell 脚本片段，由 shell.ts 拼装后交给子进程执行。"
+  },
   "if [ -n \"$ver\" ]; then printf \"nodeVersion:%s\\n\" \"$ver\"; fi": {
     "category": "protocol",
     "reason": "shell script text run in WSL"
@@ -3875,6 +3991,10 @@
     "category": "code",
     "reason": "install command"
   },
+  "killed by {0}": {
+    "category": "dev-only",
+    "reason": "后端子进程退出原因，与 code=N 并列写入日志。"
+  },
   "left 80ms linear, top 80ms linear, background-color 80ms linear": {
     "category": "code",
     "reason": "CSS value"
@@ -3894,6 +4014,10 @@
   "linear-gradient(to bottom, black calc(100% - {0}rem), transparent)": {
     "category": "code",
     "reason": "CSS linear-gradient template"
+  },
+  "linear-gradient(to right, var(--color-muted) {0}, transparent {1}, transparent {2}, var(--color-muted) {3})": {
+    "category": "style",
+    "reason": "CSS 类名或样式值。"
   },
   "linux password store configured": {
     "category": "dev-only",
@@ -4082,6 +4206,10 @@
   "openai/gpt-5": {
     "category": "model",
     "reason": "自定义模型输入框占位示例，模型 slug"
+  },
+  "opened, reopened": {
+    "category": "semantic-value",
+    "reason": "输入框占位示例，展示请求占位语法或取值，需与实际可填值一致。"
   },
   "optionId": {
     "category": "code",
@@ -4795,6 +4923,10 @@
     "category": "code",
     "reason": "CLI command"
   },
+  "{0} could not establish a WebSocket connection.{1}": {
+    "category": "code",
+    "reason": "transport.ts 用英文正则识别网络错误；保持表达式与 rpc/session.ts 的错误生产文本一致。"
+  },
   "{0} flex-1 justify-start rounded-e-none {1}": {
     "category": "code",
     "reason": "CSS/Tailwind class string"
@@ -4835,6 +4967,10 @@
     "category": "code",
     "reason": "CSS/Tailwind class string"
   },
+  "{0} stopped responding for {1}s. {2}": {
+    "category": "code",
+    "reason": "transport.ts 用英文正则识别网络错误；保持表达式与 rpc/session.ts 的错误生产文本一致。"
+  },
   "{0} stopped responding.": {
     "category": "code",
     "reason": "transport.ts 用英文正则识别网络错误；保持表达式与 rpc/session.ts 的错误生产文本一致。"
@@ -4866,6 +5002,14 @@
   "{0}{1} to {2}{3}": {
     "category": "protocol",
     "reason": "评审评论 rangeLabel，被 composerContextRecords 的正则 /^([+-])(\\d+)(?: to \\1(\\d+))?$/ 解析并发送给 Agent"
+  },
+  "{{body.id}}": {
+    "category": "semantic-value",
+    "reason": "输入框占位示例，展示请求占位语法或取值，需与实际可填值一致。"
+  },
+  "{{headers.delivery-id}}": {
+    "category": "semantic-value",
+    "reason": "输入框占位示例，展示请求占位语法或取值，需与实际可填值一致。"
   },
   "~/.config/hypr/hyprland.conf": {
     "category": "code",
