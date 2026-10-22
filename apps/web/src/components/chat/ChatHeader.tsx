@@ -36,6 +36,7 @@ import {
 } from "../WorkspaceBreadcrumb";
 import { observeResize } from "~/lib/observeResize";
 import { cn } from "~/lib/utils";
+import { textDirection } from "~/textDirection";
 import { useClientSettings } from "../../hooks/useSettings";
 
 interface ChatHeaderProps {
@@ -344,6 +345,7 @@ export const ChatHeader = memo(function ChatHeader({
           {renamingTitle !== null ? (
             <input
               autoFocus
+              dir="auto"
               aria-label="Thread title"
               className="min-w-0 flex-1 rounded-sm bg-transparent text-sm font-medium text-foreground outline-none ring-1 ring-inset ring-ring/50 focus:ring-ring"
               defaultValue={renamingTitle}
@@ -377,7 +379,7 @@ export const ChatHeader = memo(function ChatHeader({
                   />
                 }
               >
-                <h2 className="min-w-0">
+                <h2 className="min-w-0" dir={textDirection(titleLabel)}>
                   <WorkspaceBreadcrumbText>{titleLabel}</WorkspaceBreadcrumbText>
                 </h2>
                 <ChevronDownIcon
@@ -390,7 +392,15 @@ export const ChatHeader = memo(function ChatHeader({
             </Tooltip>
           ) : (
             <Tooltip>
-              <TooltipTrigger render={<h2 aria-label={titleLabel} className="min-w-0 flex-1" />}>
+              <TooltipTrigger
+                render={
+                  <h2
+                    aria-label={titleLabel}
+                    className="min-w-0 flex-1"
+                    dir={textDirection(titleLabel)}
+                  />
+                }
+              >
                 <WorkspaceBreadcrumbText>{titleLabel}</WorkspaceBreadcrumbText>
               </TooltipTrigger>
               <TooltipPopup side="top">{titleLabel}</TooltipPopup>
