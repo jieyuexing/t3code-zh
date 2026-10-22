@@ -991,6 +991,10 @@
     "category": "code",
     "reason": "font family name"
   },
+  "I've reached the limit for using my ChatGPT plan in T3 Code. Could you increase our workspace's usage limits so I can continue?\n\nGo to admin.openai.com → Workspace → Usage limits. Thank you!": {
+    "category": "protocol",
+    "reason": "复制给工作区管理员的请求正文，指向英文的 OpenAI 管理后台路径，保留原文。"
+  },
   "INT": {
     "category": "code",
     "reason": "signal name INT"
@@ -1551,7 +1555,7 @@
     "category": "protocol",
     "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
   },
-  "Request value to test, in placeholder syntax without braces: headers.x-github-event, body.action, query.source.": {
+  "Request value to test, in placeholder syntax without braces: headers.x-github-event, body.action, query.source. A segment ending in [] fans out over an array, so body.issue.labels[].name tests every label's name.": {
     "category": "protocol",
     "reason": "Schema description，进入 MCP 工具参数说明交给 Agent。"
   },
