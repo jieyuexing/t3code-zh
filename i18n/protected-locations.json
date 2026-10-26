@@ -59,5 +59,10 @@
     "line": 798,
     "key": "s",
     "reason": "JSX 英文复数后缀可为空译文；ResourceTelemetryDiagnostics 的 s 是秒单位，按该位置保护避免同 key 混用。"
+  },
+  {
+    "file": "packages/shared/src/claudeCompaction.ts",
+    "key": "Don't ask again",
+    "reason": "Claude 压缩对话框的答案常量，服务端以英文原文作选项并比对，网页端 ContextWindowMeter 也按它判断“不再询问”；翻译后网页端比对失效。"
   }
 ]
