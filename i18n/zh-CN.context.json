@@ -38,9 +38,6 @@
   "apps/web/src/components/pullRequest/PullRequestMarkdownEditor.tsx": {
     "Write": "编写"
   },
-  "apps/web/src/components/settings/GitHubAccountSettings.tsx": {
-    "Sign in with": "请在服务器主机上使用"
-  },
   "apps/web/src/components/settings/ThemeSettings.tsx": {
     "added": "已添加",
     "updated": "已更新"
