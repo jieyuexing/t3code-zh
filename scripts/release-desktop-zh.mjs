@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// 完整套装的唯一发布入口。所有本地检查先于任何 GitHub 写入。
+// 中文版 Release 的唯一发布入口。所有本地检查先于任何 GitHub 写入。
+// 套装必须含 Windows x64 运行包（141 从它更新）；DMG、NSIS、Linux 运行包可选，NSIS 须与所嵌 Linux 包同套。
 import * as NodeChildProcess from "node:child_process";
 import * as NodeFS from "node:fs";
 import * as NodePath from "node:path";
@@ -30,8 +31,8 @@ export function releaseTag(version, explicit) {
 }
 export function preflightSuite(suiteFile, currentSource) {
   const suite = readJson(suiteFile);
-  if (suite.schema !== 1 || !Array.isArray(suite.artifacts) || suite.artifacts.length !== 4)
-    throw new Error("Complete suite requires four artifacts");
+  if (suite.schema !== 1 || !Array.isArray(suite.artifacts) || suite.artifacts.length === 0)
+    throw new Error("Suite requires artifacts");
   if (currentSource.dirty)
     throw new Error("Release requires clean source including untracked inputs");
   const base = NodePath.dirname(NodePath.resolve(suiteFile));
@@ -63,12 +64,14 @@ export function preflightSuite(suiteFile, currentSource) {
       ...(entry.materials ? { materials: resolve(entry.materials) } : {}),
     });
   }
-  for (const kind of ["dmg", "nsis", "linux", "windows"])
-    if (!kinds.has(kind)) throw new Error(`Missing asset: ${kind}`);
-  const linux = artifacts.find((a) => a.candidate.kind === "linux").candidate;
-  const nsis = artifacts.find((a) => a.candidate.kind === "nsis").candidate;
-  if (nsis.embeddedWslSha256 !== linux.sha256)
-    throw new Error("Embedded WSL differs from suite Linux archive");
+  if (!kinds.has("windows")) throw new Error("Missing asset: windows");
+  const nsis = artifacts.find((a) => a.candidate.kind === "nsis")?.candidate;
+  if (nsis) {
+    const linux = artifacts.find((a) => a.candidate.kind === "linux")?.candidate;
+    if (!linux) throw new Error("Missing asset: linux (embedded by nsis)");
+    if (nsis.embeddedWslSha256 !== linux.sha256)
+      throw new Error("Embedded WSL differs from suite Linux archive");
+  }
   const first = artifacts[0].candidate;
   if (artifacts.some((a) => a.candidate.upstreamCommit !== first.upstreamCommit))
     throw new Error("Mixed upstream identity");
@@ -127,6 +130,18 @@ export function preflightSuite(suiteFile, currentSource) {
     ),
   );
   return { version: suite.version, source: currentSource, artifacts, assets, setSha256 };
+}
+const KIND_LABELS = {
+  dmg: "macOS arm64 DMG",
+  nsis: "Windows x64 NSIS",
+  linux: "Linux x64 CLI",
+  windows: "Windows x64 CLI",
+};
+export function suiteContents(prepared) {
+  return Object.keys(KIND_LABELS)
+    .filter((kind) => prepared.artifacts.some((a) => a.candidate.kind === kind))
+    .map((kind) => KIND_LABELS[kind])
+    .join("、");
 }
 export function checkRemoteState({ release, tagCommit, originHead }, prepared, tag) {
   if (originHead !== prepared.source.head)
@@ -256,9 +271,9 @@ export async function main() {
       ),
     },
   });
-  if (!values.suite || !values["seven-zip"])
+  if (!values.suite)
     throw new Error(
-      "Usage: release-desktop-zh.mjs --suite suite.json --seven-zip /existing/7za [--dry-run] [--tag zh-vV-rN]",
+      "Usage: release-desktop-zh.mjs --suite suite.json [--seven-zip /existing/7za] [--dry-run] [--tag zh-vV-rN]",
     );
   const root = NodeURL.fileURLToPath(new URL("../", import.meta.url));
   ghEnvironment(process.env);
@@ -284,7 +299,10 @@ export async function main() {
   if (!process.env.TMPDIR)
     throw new Error("Set task-owned TMPDIR/TMP/TEMP before release preflight");
   const scratch = NodeFS.mkdtempSync(NodePath.join(process.env.TMPDIR, "zh-release-"));
-  await checkInstallerOriginal(prepared, values["seven-zip"], scratch);
+  if (prepared.artifacts.some((a) => a.candidate.kind === "nsis")) {
+    if (!values["seven-zip"]) throw new Error("NSIS suite requires --seven-zip");
+    await checkInstallerOriginal(prepared, values["seven-zip"], scratch);
+  }
   const merge = git(root, "log", "-1", "--merges", "--format=%H", "--grep=^merge", "HEAD");
   const body = merge ? git(root, "log", "-1", "--format=%B", merge) : "";
   const start = body.search(/^更新说明/m);
@@ -292,8 +310,8 @@ export async function main() {
   const notes = [
     `基于上游 v${version} 的简体中文版。`,
     "",
-    "包含 macOS arm64 DMG、Windows x64 NSIS、Linux/Windows x64 CLI。产品版本和资产名沿用默认值。",
-    "macOS 为 ad-hoc 签名，未公证。验证范围与 SHA-256 见 PROVENANCE.json / SHA256SUMS；不含安装、GUI、provider 或生产环境验收。",
+    `包含 ${suiteContents(prepared)}。产品版本和资产名沿用默认值。`,
+    `${prepared.artifacts.some((a) => a.candidate.kind === "dmg") ? "macOS 为 ad-hoc 签名，未公证。" : ""}验证范围与 SHA-256 见 PROVENANCE.json / SHA256SUMS；不含安装、GUI、provider 或生产环境验收。`,
     "",
     body
       .slice(start)
@@ -407,7 +425,7 @@ export function publishPrepared({
   if (dryRun) {
     assertUnchanged();
     log(
-      `[zh-release] DRY RUN accepted ${tag}: six assets, complete same-source suite; no GitHub writes`,
+      `[zh-release] DRY RUN accepted ${tag}: ${prepared.assets.length} assets, same-source suite; no GitHub writes`,
     );
     return;
   }

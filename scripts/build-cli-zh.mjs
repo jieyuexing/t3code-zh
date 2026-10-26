@@ -65,6 +65,11 @@ const archiveArgs = [
     values[name],
   ]),
 ];
+// CLI 目标 Node 固定在根 package.json 的 engines.node；SEA 宿主必须同版。
+const nodeVersion = JSON.parse(NodeFS.readFileSync(NodePath.join(root, "package.json"), "utf8"))
+  .engines?.node;
+if (!nodeVersion || process.versions.node !== nodeVersion)
+  throw new Error(`SEA host must be Node ${nodeVersion}; running ${process.versions.node}`);
 // 下载来源和依赖基线先验失败，不能花完构建时间才发现复用无效。
 await run(process.execPath, [...archiveArgs, "--verify-template-only"]);
 await run("vp", ["run", "--filter", "t3", "build"]);
@@ -77,10 +82,6 @@ await run(process.execPath, [
 ]);
 // tsdown 0.23 的 SEA main 使用绝对路径；用同一已校验的目标 Node 再封装，
 // 将 blob 中的源文件名改为仓库相对路径，避免候选泄漏构建者的 home 路径。
-const serverConfig = NodeFS.readFileSync(NodePath.join(root, "apps/server/vite.config.ts"), "utf8");
-const nodeVersion = serverConfig.match(/const SEA_NODE_VERSION = "([0-9.]+)";/)?.[1];
-if (!nodeVersion || process.versions.node !== nodeVersion)
-  throw new Error("SEA host must match the pinned target Node");
 const hostPlatform = Effect.runSync(HostProcess.Platform);
 const cacheRoot =
   hostPlatform === "darwin"

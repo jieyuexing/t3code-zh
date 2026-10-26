@@ -45,7 +45,7 @@ vp test run i18n/
 
 翻译时先看同 key 的多处上下文，再加到 `zh-CN.json` 并按 key 排序。品牌、模型、快捷键和协议值在 `ignore.json` 记录 `category` / `reason`。只有部分位置必须保持英文时，放进 `protected-locations.json`（文件、key、原因，可选精确 line），并补规则测试；它们仍出现在复核清单。保护位置测试会检查生产源码，合并后位置移动或消失必须重新核对。Browser/Branch 标签、Mixed/Unavailable 占位符、自定义模型 Fast、主题 token 映射等不可仅凭英文外观认作文案。不要在业务组件中逐条包 `t()`。词典 key 或规则变化后需重新构建/重启自己的 dev 实例，因为字典决定哪些位置在构建时改写。
 
-同步上游的流程是 **merge → coverage → 审查新候选与复核项/位置覆盖/动态标签清单 → 补词典/ignore → focused tests → web 与 desktop 构建 → 更新说明**。 打包用 `npm run dist:desktop:dmg:arm64:zh`，版本号自动取所基于的上游 nightly；构建时调用上游版本盖章脚本，结束后恢复包清单。推送并完成同源四件套及目标验证后，按下文「完整套装发布」使用既有 `scripts/release-desktop-zh.mjs`。单个 DMG 或跨目标候选不能发布。更新说明从 `git log --no-merges <旧基线>..<目标 tag>` 整理用户能感知的新功能、行为变化和重要修复，按桌面/网页、移动端（需另装商店版才有）、服务端与 Agent 分组，写进合并提交正文并在交付时告诉用户；纯 CI、依赖、测试类提交不列。范围不等于全程序数据流证明：常量可能被导出后与服务端英文值比较，标签也可能兼作状态。已发现的线程标题种子按位置保护；Commit/Push 的禁用状态图标仍比较原始标签，连同进度 sentinel、旧上下文分隔符按 key 保留。只有解除语义依赖后才由词典 owner 移除 ignore；词条失去候选位置时也应清理整页 HTML 等旧 key。新词典批次仍需查引用；拆分 JSX 与拼接句子也可能需要后续规则扩展。覆盖率 100% 只表示当前规则内每个 key 有翻译或明确忽略，不表示整个产品已完成中文化或真实客户端验收。
+同步上游的流程是 **merge → coverage → 审查新候选与复核项/位置覆盖/动态标签清单 → 补词典/ignore → focused tests → web 与 desktop 构建 → 更新说明**。 打包用 `npm run dist:desktop:dmg:arm64:zh`，版本号自动取所基于的上游 nightly；构建时调用上游版本盖章脚本，结束后恢复包清单。推送并完成同源套装及目标验证后，按下文「套装发布」使用既有 `scripts/release-desktop-zh.mjs`。不含 Windows x64 运行包的套装或跨源码候选不能发布。更新说明从 `git log --no-merges <旧基线>..<目标 tag>` 整理用户能感知的新功能、行为变化和重要修复，按桌面/网页、移动端（需另装商店版才有）、服务端与 Agent 分组，写进合并提交正文并在交付时告诉用户；纯 CI、依赖、测试类提交不列。范围不等于全程序数据流证明：常量可能被导出后与服务端英文值比较，标签也可能兼作状态。已发现的线程标题种子按位置保护；Commit/Push 的禁用状态图标仍比较原始标签，连同进度 sentinel、旧上下文分隔符按 key 保留。只有解除语义依赖后才由词典 owner 移除 ignore；词条失去候选位置时也应清理整页 HTML 等旧 key。新词典批次仍需查引用；拆分 JSX 与拼接句子也可能需要后续规则扩展。覆盖率 100% 只表示当前规则内每个 key 有翻译或明确忽略，不表示整个产品已完成中文化或真实客户端验收。
 
 ## 跨平台候选
 
@@ -110,9 +110,9 @@ powershell -NoProfile -File C:\isolated\materials\validate-windows-zh.ps1 `
 
 取回私有回执后用同一验证入口 `--artifact ... --candidate ... --receipt /run/receipt.json --materials /task/windows-materials` 重放。检查原件 hash、全部阶段、目标身份、红绿顺序、退出/超时和隔离条件；不接受任意 `passed:true`。只有旧 summary、没有新合同所需原件绑定的历史回执会拒绝，不能补字段伪造成新包通过。原始主机/IP/路径/PID/home 和回执不进入 Release。
 
-### 完整套装发布
+### 套装发布
 
-`release-desktop-zh.mjs` 是唯一 publisher。协调者整合、提交并推送到 `origin/zh-i18n` 后，以同一 clean 源码重新构建 **DMG arm64、NSIS x64、Linux x64 archive、Windows x64 archive**，完成上述各自目标验证。`suite.json` 留任务目录，结构为：
+`release-desktop-zh.mjs` 是唯一 publisher。协调者整合、提交并推送到 `origin/zh-i18n` 后，以同一 clean 源码构建要发布的产物并完成各自目标验证。套装必须含 **Windows x64 archive**（141 的 `t3-141-update win` 只取它和 SHA256SUMS）；DMG arm64、NSIS x64、Linux x64 archive 可选，含 NSIS 时必须同时含它所嵌的 Linux 包。2026-10-26 起手动发布默认只发 Windows x64 archive（方案 A）。`suite.json` 留任务目录，四件齐全时结构为（只发 Windows 时 artifacts 只留最后一项）：
 
 ```json
 {
@@ -147,14 +147,14 @@ powershell -NoProfile -File C:\isolated\materials\validate-windows-zh.ps1 `
 路径相对 suite 文件，也可为绝对私有路径。`V` 换为完整产品版本。先执行：
 
 ```sh
-node scripts/release-desktop-zh.mjs --suite /task/suite.json --seven-zip /existing/7za --dry-run
+node scripts/release-desktop-zh.mjs --suite /task/suite.json --dry-run
+# 套装含 NSIS 时追加 --seven-zip /existing/7za，用于复核安装包原件。
 # 已发布过同版时，必须由协调者明确选尚未使用的修订 tag；不会自动选择。
-node scripts/release-desktop-zh.mjs --suite /task/suite.json --seven-zip /existing/7za \
-  --tag zh-vV-r1 --dry-run
+node scripts/release-desktop-zh.mjs --suite /task/suite.json --tag zh-vV-r1 --dry-run
 ```
 
 dry-run 无 GitHub 写入。完整本地预检通过后才查远端：HEAD 必须精确等于当前 origin/zh-i18n，tag 必须不存在或精确指向它，不能以任意远端包含 HEAD 代替。默认 tag 是 `zh-vV`，显式修订只接受 `zh-vV-rN`；产品版本和资产名不加 zh/rN。已有已发布 Release 永远不变。
 
-获准正式发布时才去掉 `--dry-run`：先建立 draft、上传四个产物和自动生成的 SHA256SUMS/PROVENANCE.json，逐件核对 GitHub 存储 digest/size，完整才 publish。同源码、同套装 draft 可恢复；同名异 hash、额外资产、错误 tag 或另一套源码均拒绝，不删除或覆盖修复。GitHub 经既有 2080 代理，上传使用 gh 自己管理凭据，令牌不进入 argv/env/日志。公开 provenance 只含必要版本、仓库/commit、源码与产物 hash、目标与检查边界，不上传私有候选清单或回执。
+获准正式发布时才去掉 `--dry-run`：先建立 draft、上传套装产物和自动生成的 SHA256SUMS/PROVENANCE.json，逐件核对 GitHub 存储 digest/size，完整才 publish。同源码、同套装 draft 可恢复；同名异 hash、额外资产、错误 tag 或另一套源码均拒绝，不删除或覆盖修复。GitHub 经既有 2080 代理，上传使用 gh 自己管理凭据，令牌不进入 argv/env/日志。公开 provenance 只含必要版本、仓库/commit、源码与产物 hash、目标与检查边界，不上传私有候选清单或回执。
 
 定向验证：`vp test run scripts/build-desktop-zh.test.ts scripts/build-cli-archive.test.ts scripts/build-desktop-artifact.test.ts`、`node --test scripts/release-desktop-zh.test.mjs`。严格自包含测试需祖先无 node_modules 的合格隔离 TMP 根，不移动宿主目录来通过。归档来源检查仍可用 `--verify-template-only`；fixture 通过不能替代 Windows 运行。

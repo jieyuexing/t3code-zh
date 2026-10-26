@@ -11,6 +11,7 @@ import {
   checkRemoteState,
   assertAllUploaded,
   releaseTag,
+  suiteContents,
 } from "./release-desktop-zh.mjs";
 import { fileIdentity, artifactSpec, sourceIdentity } from "./release-source-zh.mjs";
 import { verifyReceipt, parse7zListing } from "./release-validation-zh.mjs";
@@ -18,7 +19,8 @@ import { verifyReceipt, parse7zListing } from "./release-validation-zh.mjs";
 const version = "0.0.46-nightly.20261008.2833";
 const source = { head: "1".repeat(40), treeSha256: "2".repeat(64), dirty: false };
 const write = (file, value) => NodeFS.writeFileSync(file, JSON.stringify(value));
-function fixture() {
+const ALL_KINDS = ["linux", "windows", "dmg", "nsis"];
+function fixture(kinds = ALL_KINDS) {
   const root = NodeFS.mkdtempSync(NodePath.join(NodeOS.tmpdir(), "release-fixture-"));
   const entries = [];
   const candidates = {};
@@ -44,7 +46,7 @@ function fixture() {
     stageRefs[key] = value;
     return identity(`${key}.json`);
   }
-  for (const kind of ["linux", "windows", "dmg", "nsis"]) {
+  for (const kind of kinds) {
     const spec = artifactSpec(version, kind);
     const artifact = NodePath.join(root, spec.name);
     NodeFS.writeFileSync(artifact, `fixture-${kind}`);
@@ -192,8 +194,8 @@ function fixture() {
     close: () => NodeFS.rmSync(root, { recursive: true, force: true }),
   };
 }
-function withFixture(fn) {
-  const f = fixture();
+function withFixture(fn, kinds) {
+  const f = fixture(kinds);
   try {
     fn(f);
   } finally {
@@ -204,9 +206,16 @@ function withFixture(fn) {
 // 先拒绝真实不合格输入，再接受完整 fixture；fixture 不是 Windows 实测。
 for (const [name, mutate] of [
   [
-    "missing asset",
+    "missing windows asset",
     (f) => {
-      f.suite.artifacts.pop();
+      f.suite.artifacts = f.suite.artifacts.filter((e) => e.candidate !== "windows.candidate.json");
+      write(f.suiteFile, f.suite);
+    },
+  ],
+  [
+    "nsis without its embedded linux archive",
+    (f) => {
+      f.suite.artifacts = f.suite.artifacts.filter((e) => e.candidate !== "linux.candidate.json");
       write(f.suiteFile, f.suite);
     },
   ],
@@ -301,6 +310,31 @@ NodeTest.test(
       );
       NodeAssert.throws(() => preflightSuite(f.suiteFile, { ...source, dirty: true }), /clean/);
     }),
+);
+
+NodeTest.test("windows-only suite publishes the CLI archive with provenance and checksums", () =>
+  withFixture(
+    (f) => {
+      const prepared = preflightSuite(f.suiteFile, source);
+      NodeAssert.deepEqual(prepared.assets.map((a) => a.name).sort(), [
+        "PROVENANCE.json",
+        "SHA256SUMS",
+        f.candidates.windows.name,
+      ]);
+      NodeAssert.equal(suiteContents(prepared), "Windows x64 CLI");
+      NodeAssert.match(
+        prepared.assets.find((a) => a.name === "SHA256SUMS").text,
+        new RegExp(`${f.candidates.windows.sha256}  ${f.candidates.windows.name}`),
+      );
+    },
+    ["windows"],
+  ),
+);
+NodeTest.test("suite without the Windows CLI archive is rejected", () =>
+  withFixture(
+    (f) => NodeAssert.throws(() => preflightSuite(f.suiteFile, source), /windows/),
+    ["dmg"],
+  ),
 );
 
 NodeTest.test("draft state rejects wrong branch/tag/source/assets and published releases", () =>
