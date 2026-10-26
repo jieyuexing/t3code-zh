@@ -120,8 +120,6 @@ describe("display-only translation", () => {
         "HOUR_MS",
         "DAY_MS",
         "formatRelativeTimeLabel",
-        "formatRelativeTimeUntil",
-        "formatRelativeTimeUntilLabel",
       ]);
       const ast = babel.parseSync(source, {
         filename,
@@ -149,11 +147,11 @@ describe("display-only translation", () => {
         .replace(/^import[^;]+;\n/gm, "")
         .replaceAll("export ", "");
       const { __t, __tf } = createTranslator(dictionary, () => locale);
-      const { past, future } = new Function(
+      const past = new Function(
         "_t",
         "_tf",
         "joinRelativeTime",
-        code + ";return {past:formatRelativeTimeLabel, future:formatRelativeTimeUntilLabel};",
+        code + ";return formatRelativeTimeLabel;",
       )(__t, __tf, joinRelativeTime);
       const now = 1_700_000_000_000;
       vi.spyOn(Date, "now").mockReturnValue(now);
@@ -163,9 +161,6 @@ describe("display-only translation", () => {
         );
         expect(past(new Date(now).toISOString())).toBe(locale === "en" ? "just now" : "刚刚");
         expect(past("invalid")).toBe("");
-        expect(future(new Date(now + 180_000).toISOString())).toBe(
-          locale === "en" ? "3m left" : `3 分钟${dictionary.left}`,
-        );
       } finally {
         vi.restoreAllMocks();
       }

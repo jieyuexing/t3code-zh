@@ -23,8 +23,11 @@
     "Unable to load the": "无法加载"
   },
   "apps/web/src/components/device/DeviceToolsPanel.tsx": {
-    "Clear::line=205": "清透",
+    "Clear::line=206": "清透",
     "Motion": "运动"
+  },
+  "apps/web/src/components/files/LargeTextViewer.tsx": {
+    "lines": "行"
   },
   "apps/web/src/components/onboarding/WelcomeWizard.tsx": {
     ". You can set": "。之后可在“设置”中配置。",
