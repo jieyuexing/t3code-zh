@@ -2279,6 +2279,10 @@
     "category": "code",
     "reason": "CSS stylesheet"
   },
+  "[data-diffs-header],\n[data-diff],\n[data-file],\n[data-error-wrapper],\n[data-virtualizer-buffer] {\n  --diffs-header-font-family: var(--font-sans) !important;\n  --diffs-font-family: var(--font-mono) !important;\n  --diffs-bg: var(--code-background) !important;\n  --diffs-light-bg: var(--code-background) !important;\n  --diffs-dark-bg: var(--code-background) !important;\n  --diffs-token-light-bg: transparent;\n  --diffs-token-dark-bg: transparent;\n\n  /* Gutter, context, and row tints all derive from the code surface the diff\n     body sits on. Mixing from the canvas leaves the gutter looking unthemed\n     when a palette separates the two. */\n  --diffs-bg-context-override: color-mix(in srgb, var(--code-background) 97%, var(--code-foreground));\n  --diffs-bg-hover-override: color-mix(in srgb, var(--code-background) 94%, var(--code-foreground));\n  --diffs-bg-separator-override: color-mix(\n    in srgb,\n    var(--code-background) 95%,\n    var(--code-foreground)\n  );\n  --diffs-bg-buffer-override: color-mix(in srgb, var(--code-background) 90%, var(--code-foreground));\n\n  --diffs-bg-addition-override: light-dark(\n    color-mix(in srgb, var(--code-background) 50%, var(--diff-addition)),\n    color-mix(in srgb, var(--code-background) 70%, var(--diff-addition))\n  );\n  --diffs-bg-addition-number-override: light-dark(\n    color-mix(in srgb, var(--code-background) 35%, var(--diff-addition)),\n    color-mix(in srgb, var(--code-background) 60%, var(--diff-addition))\n  );\n  --diffs-bg-addition-hover-override: color-mix(in srgb, var(--code-background) 85%, var(--diff-addition));\n  --diffs-bg-addition-emphasis-override: color-mix(\n    in srgb,\n    var(--code-background) 80%,\n    var(--diff-addition)\n  );\n\n  --diffs-bg-deletion-override: light-dark(\n    color-mix(in srgb, var(--code-background) 50%, var(--diff-deletion)),\n    color-mix(in srgb, var(--code-background) 70%, var(--diff-deletion))\n  );\n  --diffs-bg-deletion-number-override: light-dark(\n    color-mix(in srgb, var(--code-background) 35%, var(--diff-deletion)),\n    color-mix(in srgb, var(--code-background) 60%, var(--diff-deletion))\n  );\n  --diffs-bg-deletion-hover-override: color-mix(\n    in srgb,\n    var(--code-background) 85%,\n    var(--diff-deletion)\n  );\n  --diffs-bg-deletion-emphasis-override: color-mix(\n    in srgb,\n    var(--code-background) 80%,\n    var(--diff-deletion)\n  );\n\n  background-color: var(--diffs-bg) !important;\n  color: var(--code-foreground) !important;\n}\n\n/* The library's change-icon colors are tuned for dark canvases; light mode takes the app's darker tokens. */\n[data-change-icon=\"new\"] {\n  color: var(\n    --diff-added-icon,\n    light-dark(var(--diff-addition-foreground), var(--diffs-addition-base))\n  ) !important;\n}\n[data-change-icon=\"deleted\"] {\n  color: light-dark(var(--diff-deletion-foreground), var(--diffs-deletion-base)) !important;\n}\n/* The page sets --diff-modified-icon to a muted T3 blue, so the common case stays quiet. */\n[data-change-icon=\"change\"],\n[data-change-icon=\"rename-pure\"],\n[data-change-icon=\"rename-changed\"] {\n  color: var(\n    --diff-modified-icon,\n    light-dark(var(--info-foreground), var(--diffs-modified-base))\n  ) !important;\n}": {
+    "category": "style",
+    "reason": "差异渲染注入的 CSS 文本"
+  },
   "[data-diffs-header],\n[data-diff],\n[data-file],\n[data-error-wrapper],\n[data-virtualizer-buffer] {\n  --diffs-header-font-family: var(--font-sans) !important;\n  --diffs-font-family: var(--font-mono) !important;\n  --diffs-bg: var(--code-background) !important;\n  --diffs-light-bg: var(--code-background) !important;\n  --diffs-dark-bg: var(--code-background) !important;\n  --diffs-token-light-bg: transparent;\n  --diffs-token-dark-bg: transparent;\n\n  /* Gutter, context, and row tints all derive from the code surface the diff\n     body sits on. Mixing from the canvas leaves the gutter looking unthemed\n     when a palette separates the two. */\n  --diffs-bg-context-override: color-mix(in srgb, var(--code-background) 97%, var(--code-foreground));\n  --diffs-bg-hover-override: color-mix(in srgb, var(--code-background) 94%, var(--code-foreground));\n  --diffs-bg-separator-override: color-mix(\n    in srgb,\n    var(--code-background) 95%,\n    var(--code-foreground)\n  );\n  --diffs-bg-buffer-override: color-mix(in srgb, var(--code-background) 90%, var(--code-foreground));\n\n  --diffs-bg-addition-override: light-dark(\n    color-mix(in srgb, var(--code-background) 50%, var(--diff-addition)),\n    color-mix(in srgb, var(--code-background) 70%, var(--diff-addition))\n  );\n  --diffs-bg-addition-number-override: light-dark(\n    color-mix(in srgb, var(--code-background) 35%, var(--diff-addition)),\n    color-mix(in srgb, var(--code-background) 60%, var(--diff-addition))\n  );\n  --diffs-bg-addition-hover-override: color-mix(in srgb, var(--code-background) 85%, var(--diff-addition));\n  --diffs-bg-addition-emphasis-override: color-mix(\n    in srgb,\n    var(--code-background) 80%,\n    var(--diff-addition)\n  );\n\n  --diffs-bg-deletion-override: light-dark(\n    color-mix(in srgb, var(--code-background) 50%, var(--diff-deletion)),\n    color-mix(in srgb, var(--code-background) 70%, var(--diff-deletion))\n  );\n  --diffs-bg-deletion-number-override: light-dark(\n    color-mix(in srgb, var(--code-background) 35%, var(--diff-deletion)),\n    color-mix(in srgb, var(--code-background) 60%, var(--diff-deletion))\n  );\n  --diffs-bg-deletion-hover-override: color-mix(\n    in srgb,\n    var(--code-background) 85%,\n    var(--diff-deletion)\n  );\n  --diffs-bg-deletion-emphasis-override: color-mix(\n    in srgb,\n    var(--code-background) 80%,\n    var(--diff-deletion)\n  );\n\n  background-color: var(--diffs-bg) !important;\n  color: var(--code-foreground) !important;\n}\n\n/* The library's change-icon colors are tuned for dark canvases; light mode takes the app's darker tokens. */\n[data-change-icon=\"new\"] {\n  color: var(\n    --diff-added-icon,\n    light-dark(var(--diff-addition-foreground), var(--diffs-addition-base))\n  ) !important;\n}\n[data-change-icon=\"deleted\"] {\n  color: light-dark(var(--diff-deletion-foreground), var(--diffs-deletion-base)) !important;\n}\n/* The page sets --diff-modified-icon under the New design: a muted T3 blue, so the common case stays quiet. */\n[data-change-icon=\"change\"],\n[data-change-icon=\"rename-pure\"],\n[data-change-icon=\"rename-changed\"] {\n  color: var(\n    --diff-modified-icon,\n    light-dark(var(--info-foreground), var(--diffs-modified-base))\n  ) !important;\n}": {
     "category": "style",
     "reason": "差异渲染注入的 CSS 文本"
@@ -2458,6 +2462,10 @@
   "bg-sidebar-row-active text-sidebar-foreground font-medium hover:bg-sidebar-row-active hover:text-sidebar-foreground": {
     "category": "code",
     "reason": "Tailwind class list"
+  },
+  "bg-sidebar-row-active text-sidebar-foreground light:ring-1 light:ring-inset light:ring-sidebar-border/70": {
+    "category": "code",
+    "reason": "Tailwind 类名或 CSS 值，不是界面文案"
   },
   "bg-sidebar-row-active text-sidebar-foreground light:shadow-xs light:ring-1 light:ring-inset light:ring-sidebar-border/70": {
     "category": "code",
@@ -3931,6 +3939,10 @@
     "category": "code",
     "reason": "CSP 指令"
   },
+  "gap-1 text-foreground decoration-from-font underline-offset-4 data-popup-open:underline": {
+    "category": "code",
+    "reason": "Tailwind 类名或 CSS 值，不是界面文案"
+  },
   "gap-1 text-foreground underline decoration-foreground/30 decoration-dotted decoration-from-font underline-offset-4 hover:decoration-foreground hover:decoration-solid data-popup-open:decoration-foreground data-popup-open:decoration-solid redesign:no-underline redesign:hover:underline redesign:data-popup-open:underline": {
     "category": "code",
     "reason": "Tailwind 类名或 CSS 值，不是界面文案"
@@ -4463,6 +4475,10 @@
     "category": "code",
     "reason": "Tailwind class names"
   },
+  "mx-auto flex w-full min-w-0 max-w-(--chat-content-max-width) items-center gap-1.5 px-1 pb-2 text-xs text-muted-foreground [&_svg]:size-3.5 [&_svg]:shrink-0": {
+    "category": "code",
+    "reason": "Tailwind 类名或 CSS 值，不是界面文案"
+  },
   "next": {
     "category": "dev-only",
     "reason": "性能基准测试标签/夹具"
@@ -4618,6 +4634,10 @@
   "pnpm dlx": {
     "category": "code",
     "reason": "可执行命令或可执行文件示例，按术语表保留。"
+  },
+  "pointer-coarse:[&_[data-slot=inline-button]]:relative pointer-coarse:[&_[data-slot=inline-button]]:after:absolute pointer-coarse:[&_[data-slot=inline-button]]:after:-inset-x-1.5 pointer-coarse:[&_[data-slot=inline-button]]:after:-inset-y-3.5": {
+    "category": "code",
+    "reason": "Tailwind 类名或 CSS 值，不是界面文案"
   },
   "pointer-events-auto flex shrink-0 flex-col items-center gap-1 rounded-full border border-border/50 bg-background/80 p-1 shadow-sm": {
     "category": "code",
@@ -5103,6 +5123,10 @@
     "category": "code",
     "reason": "Tailwind class string"
   },
+  "transition-opacity duration-150 ease-out starting:opacity-0 motion-reduce:transition-none": {
+    "category": "code",
+    "reason": "Tailwind 类名或 CSS 值，不是界面文案"
+  },
   "trap 'exit 1' HUP INT TERM": {
     "category": "protocol",
     "reason": "shell script text run in WSL"
@@ -5194,6 +5218,10 @@
   "useSidebar must be used within a SidebarProvider.": {
     "category": "dev-only",
     "reason": "developer error thrown for hook misuse"
+  },
+  "user": {
+    "category": "protocol",
+    "reason": "乐观消息的 role 值，由代码比较"
   },
   "using configured backend port": {
     "category": "dev-only",
