@@ -299,6 +299,10 @@
     "category": "code",
     "reason": "HTML/CSS/JS animation template (contains fallback 'Captured window' string inside script)"
   },
+  "<a class=\"button{0}\" href=\"{1}/{2}\">{3}</a>": {
+    "category": "code",
+    "reason": "恢复窗口的按钮 HTML 模板，标签由参数传入"
+  },
   "<div data-t3-context-fragment=\"{0}\">{1}</div>": {
     "category": "protocol",
     "reason": "剪贴板 HTML 片段标记"
@@ -4706,6 +4710,10 @@
   "preview:automation-host:{0}:{1}": {
     "category": "protocol",
     "reason": "internal identifier template"
+  },
+  "primary": {
+    "category": "code",
+    "reason": "恢复窗口按钮的 CSS 类名"
   },
   "primary WSL preflight failed; falling back to Windows": {
     "category": "dev-only",
