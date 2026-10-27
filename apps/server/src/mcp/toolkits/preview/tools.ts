@@ -52,7 +52,7 @@ const readonlyBrowserTool = <T extends Tool.Any>(tool: T): T =>
 const PreviewStatusTool = Tool.make("preview_status", {
   description:
     "Report preview tab state: owner, pending dialog, URL, title, loading, viewport, and size. `tabs` lists this thread's tabs. `profiles` lists logins for `preview_open`. Read any listed tab. Act only on your tab, or an unclaimed tab with no human in control.",
-  parameters: Schema.toCodecJson(PreviewAutomationTabTargetInput),
+  parameters: PreviewAutomationTabTargetInput,
   success: PreviewAutomationStatus,
   failure: PreviewToolFailure,
   dependencies,
@@ -66,7 +66,7 @@ const PreviewOpenTool = browserTool(
   Tool.make("preview_open", {
     description:
       "Open a preview tab in this thread and show it. `open=false` keeps it in the background. Reuses your current tab unless `tabId` or `reuseExistingTab=false` says otherwise. Parallel subagents in one session must each use `reuseExistingTab=false`, then their own returned `tabId`.",
-    parameters: Schema.toCodecJson(PreviewAutomationOpenInput),
+    parameters: PreviewAutomationOpenInput,
     success: PreviewAutomationStatus,
     failure: PreviewToolFailure,
     dependencies,
@@ -79,7 +79,7 @@ const PreviewDialogTool = browserTool(
   Tool.make("preview_dialog", {
     description:
       "Accept or dismiss the dialog `preview_status` reports. Pass `promptText` to accept a prompt. Needs your own tab, or an unclaimed one. Desktop hosts may not support this.",
-    parameters: Schema.toCodecJson(PreviewAutomationDialogInput),
+    parameters: PreviewAutomationDialogInput,
     success: PreviewAutomationStatus,
     failure: PreviewToolFailure,
     dependencies,
@@ -90,7 +90,7 @@ const PreviewNavigateTool = safeBrowserTool(
   Tool.make("preview_navigate", {
     description:
       "Navigate the chosen tab. Pass `url` for a website, or `target:{kind:'environment-port',port}` for a dev server. Exactly one of `url` and `target`.",
-    parameters: Schema.toCodecJson(PreviewAutomationNavigateInput),
+    parameters: PreviewAutomationNavigateInput,
     success: PreviewAutomationStatus,
     failure: PreviewToolFailure,
     dependencies,
@@ -101,7 +101,7 @@ const PreviewResizeTool = safeBrowserTool(
   Tool.make("preview_resize", {
     description:
       "Resize the chosen tab: {mode:'fill'}, {mode:'freeform',width,height}, or {mode:'preset',preset,orientation}. Changes CSS size only, not the user agent.",
-    parameters: Schema.toCodecJson(PreviewAutomationResizeInput),
+    parameters: PreviewAutomationResizeInput,
     success: Schema.Struct({ ...PreviewAutomationResizeResult.fields, ...presentationFields }),
     failure: PreviewToolFailure,
     dependencies,
@@ -114,7 +114,7 @@ const PreviewSetAppearanceTool = safeBrowserTool(
   Tool.make("preview_set_appearance", {
     description:
       "Set `prefers-color-scheme` for the chosen tab: 'dark', 'light', or 'system' to clear the override.",
-    parameters: Schema.toCodecJson(PreviewAutomationSetColorSchemeInput),
+    parameters: PreviewAutomationSetColorSchemeInput,
     success: Schema.Struct({
       ...PreviewAutomationSetColorSchemeResult.fields,
       ...presentationFields,
@@ -131,21 +131,19 @@ export const PreviewSnapshotTool = safeBrowserTool(
   Tool.make("preview_snapshot", {
     description:
       "Use it only when the current request asks for browser work, including checking an edit in the browser. Never use it unasked to verify your own edit, or to repeat a snapshot from an earlier turn. Works on a tab the user is driving. Returns page state, elements, diagnostics, and screenshot size. Target one element with `locator='aria-ref=<ref>'` from `accessibilityTree`, even in frames. Refs die on navigation, a new snapshot, or handoff. Text caps near 20 KB; on your own or an unclaimed tab, `preview_evaluate` reads more. To show a screenshot when asked: `save=true`, then embed ![alt](screenshotPath).",
-    parameters: Schema.toCodecJson(
-      Schema.Struct({
-        ...PreviewAutomationTabTargetInput.fields,
-        includeImage: Schema.optional(
-          Schema.Boolean.annotate({
-            description: "Default false. True only to see the page.",
-          }),
-        ),
-        save: Schema.optional(
-          Schema.Boolean.annotate({
-            description: "Write PNG, return `screenshotPath`.",
-          }),
-        ),
-      }),
-    ),
+    parameters: Schema.Struct({
+      ...PreviewAutomationTabTargetInput.fields,
+      includeImage: Schema.optional(
+        Schema.Boolean.annotate({
+          description: "Default false. True only to see the page.",
+        }),
+      ),
+      save: Schema.optional(
+        Schema.Boolean.annotate({
+          description: "Write PNG, return `screenshotPath`.",
+        }),
+      ),
+    }),
     success: PreviewAutomationSnapshot,
     failure: PreviewToolFailure,
     dependencies,
@@ -178,7 +176,7 @@ const PreviewEvaluateTool = browserTool(
   Tool.make("preview_evaluate", {
     description:
       "Run JavaScript in the page. It can change page state. Returns `{value}`, up to 64 KB. Needs your tab, or an unclaimed one. To read a tab the user drives, use `preview_snapshot`. Page tools reached here: read data only, never create, save, or display. Show results with `html_render`.",
-    parameters: Schema.toCodecJson(PreviewAutomationEvaluateInput),
+    parameters: PreviewAutomationEvaluateInput,
     success: PreviewEvaluateResult,
     failure: PreviewToolFailure,
     dependencies,
@@ -189,7 +187,7 @@ const PreviewWaitForTool = readonlyBrowserTool(
   Tool.make("preview_wait_for", {
     description:
       "Wait until all given locator, selector, text, and URL conditions match in the chosen tab.",
-    parameters: Schema.toCodecJson(PreviewAutomationWaitForInput),
+    parameters: PreviewAutomationWaitForInput,
     success: PreviewActionResult,
     failure: PreviewToolFailure,
     dependencies,
@@ -199,7 +197,7 @@ const PreviewWaitForTool = readonlyBrowserTool(
 const PreviewRecordingStartTool = safeBrowserTool(
   Tool.make("preview_recording_start", {
     description: "Start recording the chosen tab.",
-    parameters: Schema.toCodecJson(PreviewAutomationTabTargetInput),
+    parameters: PreviewAutomationTabTargetInput,
     success: Schema.Struct({ ...PreviewAutomationRecordingStatus.fields, ...presentationFields }),
     failure: PreviewToolFailure,
     dependencies,
@@ -210,7 +208,7 @@ const PreviewRecordingStopTool = safeBrowserTool(
   Tool.make("preview_recording_stop", {
     description:
       "Stop recording the chosen tab. Returns a local path to the recording file (max 50 MiB).",
-    parameters: Schema.toCodecJson(PreviewAutomationTabTargetInput),
+    parameters: PreviewAutomationTabTargetInput,
     success: Schema.Struct({ ...PreviewAutomationRecordingArtifact.fields, ...presentationFields }),
     failure: PreviewToolFailure,
     dependencies: [...dependencies, FileSystem.FileSystem, ServerConfig.ServerConfig],

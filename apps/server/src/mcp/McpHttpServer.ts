@@ -619,9 +619,7 @@ const registerImageTool = Effect.fn("McpHttpServer.registerImageTool")(function*
   R,
 >(
   tool: T,
-  handle: (
-    payload: Tool.ParametersEncoded<T>,
-  ) => Effect.Effect<{ readonly encodedResult: unknown }, E, R>,
+  handle: (payload: Tool.Parameters<T>) => Effect.Effect<{ readonly encodedResult: unknown }, E, R>,
   provide: (
     effect: Effect.Effect<{ readonly encodedResult: unknown }, E, R>,
   ) => Effect.Effect<
@@ -656,7 +654,7 @@ const registerImageTool = Effect.fn("McpHttpServer.registerImageTool")(function*
           fiber.context,
           McpInvocationContext.McpInvocationContext,
         );
-        return provide(handle(payload as Tool.ParametersEncoded<T>)).pipe(
+        return provide(handle(payload as Tool.Parameters<T>)).pipe(
           Effect.provideService(McpInvocationContext.McpInvocationContext, invocation),
           Effect.matchCauseEffect({
             onFailure: imageToolFailure(tool.name, operation, failureText),

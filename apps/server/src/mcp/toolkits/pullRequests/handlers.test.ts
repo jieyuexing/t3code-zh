@@ -620,7 +620,8 @@ describe("pull request guide tools", () => {
     "%s decodes nullable optional target fields with its advertised JSON codec",
     (name) => {
       const parameters = PullRequestsToolkit.tools[name].parametersSchema;
-      const decode = Schema.decodeUnknownSync(parameters);
+      // The MCP server registers every tool with its JSON codec (decodeAsAdvertised in McpHttpServer.ts).
+      const decode = Schema.decodeUnknownSync(Schema.toCodecJson(parameters));
       const target = { url: "https://github.com/owner/repo/pull/1" };
       const wrap = (value: unknown) =>
         name === "read_pull_request_guide" ? value : { pullRequests: [value] };

@@ -31,23 +31,21 @@ import * as McpInvocationContext from "../../McpInvocationContext.ts";
 const ThreadOrganizeTool = Tool.make("t3_thread_organize", {
   description:
     "Pin, snooze, settle, archive, or mark a thread unread. Omit `threadId` for this thread. `snooze` needs `snoozedUntil`. Settling this thread applies at turn end. A failed turn or queued message leaves it active.",
-  parameters: Schema.toCodecJson(
-    Schema.Struct({
-      threadId: Schema.optional(ThreadId),
-      action: Schema.Literals([
-        "pin",
-        "unpin",
-        "snooze",
-        "unsnooze",
-        "settle",
-        "unsettle",
-        "archive",
-        "unarchive",
-        "mark_unread",
-      ]),
-      snoozedUntil: Schema.optional(IsoDateTime),
-    }),
-  ),
+  parameters: Schema.Struct({
+    threadId: Schema.optional(ThreadId),
+    action: Schema.Literals([
+      "pin",
+      "unpin",
+      "snooze",
+      "unsnooze",
+      "settle",
+      "unsettle",
+      "archive",
+      "unarchive",
+      "mark_unread",
+    ]),
+    snoozedUntil: Schema.optional(IsoDateTime),
+  }),
   success: Schema.Union([
     OrchestrationV2DispatchCommandResult,
     Schema.Struct({ settlesWhenTurnEnds: Schema.Literal(true) }),
@@ -151,12 +149,10 @@ const ThreadConfigureTool = Tool.make("t3_thread_configure", {
   ...commandTool,
   description:
     "Read a thread's provider, model, and modes, or set its provider, model, and options with `modelSelection`. Omit `threadId` for this thread. Permission modes stay. Values from `orchestrator_capabilities`.",
-  parameters: Schema.toCodecJson(
-    Schema.Struct({
-      threadId: Schema.optional(ThreadId),
-      modelSelection: Schema.optional(ModelSelection),
-    }),
-  ),
+  parameters: Schema.Struct({
+    threadId: Schema.optional(ThreadId),
+    modelSelection: Schema.optional(ModelSelection),
+  }),
   success: Schema.Union([threadConfiguration, OrchestrationV2DispatchCommandResult]),
 }).annotate(Tool.Destructive, true);
 
@@ -190,12 +186,10 @@ const ThreadSearchTool = Tool.make("t3_thread_search", {
   ...commandTool,
   description:
     "Search active threads by title, branch, PR, project, then message text. Skips subagent threads. `projectId`: one project, else yours, else all outside a thread. Not exhaustive.",
-  parameters: Schema.toCodecJson(
-    Schema.Struct({
-      ...OrchestrationSearchThreadsInput.fields,
-      projectId: Schema.optional(ProjectId),
-    }),
-  ),
+  parameters: Schema.Struct({
+    ...OrchestrationSearchThreadsInput.fields,
+    projectId: Schema.optional(ProjectId),
+  }),
   success: Schema.Struct({
     matches: Schema.Array(
       Schema.Struct({
@@ -218,7 +212,7 @@ const ScheduledTaskRunTool = Tool.make("run_scheduled_task_now", {
   ...commandTool,
   description:
     "Run one scheduled task now. Needs a full-access or default caller. Returns its thread, or null if not started. Success means started, not finished.",
-  parameters: Schema.toCodecJson(Schema.Struct({ taskId: ScheduledTaskId })),
+  parameters: Schema.Struct({ taskId: ScheduledTaskId }),
   success: Schema.Struct({
     taskId: ScheduledTaskId,
     threadId: ScheduledTask.fields.threadId,

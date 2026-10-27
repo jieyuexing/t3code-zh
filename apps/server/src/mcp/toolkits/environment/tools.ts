@@ -55,15 +55,13 @@ const EnvironmentPreferencesTool = Tool.make("t3_environment_preferences_update"
   ...shared,
   description:
     "Update environment-wide preferences. Live full-access or default caller thread only. Omitted fields are unchanged; `customInstructions: ''` clears it.",
-  parameters: Schema.toCodecJson(
-    Schema.Struct({
-      defaultThreadEnvMode: ServerSettingsPatch.fields.defaultThreadEnvMode,
-      newWorktreesStartFromOrigin: ServerSettingsPatch.fields.newWorktreesStartFromOrigin,
-      enableProviderUpdateChecks: ServerSettingsPatch.fields.enableProviderUpdateChecks,
-      backgroundActivity: Schema.optionalKey(Schema.Struct({ profile: BackgroundActivityProfile })),
-      sourceControlWritingStyle: ServerSettingsPatch.fields.sourceControlWritingStyle,
-    }),
-  ),
+  parameters: Schema.Struct({
+    defaultThreadEnvMode: ServerSettingsPatch.fields.defaultThreadEnvMode,
+    newWorktreesStartFromOrigin: ServerSettingsPatch.fields.newWorktreesStartFromOrigin,
+    enableProviderUpdateChecks: ServerSettingsPatch.fields.enableProviderUpdateChecks,
+    backgroundActivity: Schema.optionalKey(Schema.Struct({ profile: BackgroundActivityProfile })),
+    sourceControlWritingStyle: ServerSettingsPatch.fields.sourceControlWritingStyle,
+  }),
   success: Schema.Struct(PreferenceFields),
 }).annotate(Tool.Destructive, true);
 export const EnvironmentToolkit = Toolkit.make(EnvironmentReadTool, EnvironmentPreferencesTool);

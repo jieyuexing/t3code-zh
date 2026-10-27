@@ -32,13 +32,11 @@ const DeviceListTool = Tool.make("device_list", {
     "List iOS Simulators and Android Emulators here, what each host can run, and what is open in this thread's Device panel. Call before `device_open` when you do not know a device id.",
   // An empty struct serializes as `anyOf [object, array]`, which some
   // providers reject and then drop every tool on the server with it.
-  parameters: Schema.toCodecJson(
-    Schema.Struct({
-      hostId: Schema.optional(
-        Schema.String.annotate({ description: "Limit to one device host. Defaults to all hosts." }),
-      ),
-    }),
-  ),
+  parameters: Schema.Struct({
+    hostId: Schema.optional(
+      Schema.String.annotate({ description: "Limit to one device host. Defaults to all hosts." }),
+    ),
+  }),
   success: DeviceToolListResult,
   failure: DeviceToolFailure,
   dependencies,
@@ -52,7 +50,7 @@ const DeviceListTool = Tool.make("device_list", {
 const DeviceOpenTool = Tool.make("device_open", {
   description:
     "Open a simulator or emulator for this thread. Boots it if needed and shows it in the user's Device panel. Returns the `agent-device` CLI call pinned to that device. Drive the device with that CLI.",
-  parameters: Schema.toCodecJson(DeviceToolOpenInput),
+  parameters: DeviceToolOpenInput,
   success: DeviceToolOpenResult,
   failure: DeviceToolFailure,
   dependencies: [
@@ -73,7 +71,7 @@ const DeviceOpenTool = Tool.make("device_open", {
 export const DeviceScreenshotTool = Tool.make("device_screenshot", {
   description:
     "Get a PNG of an open device's screen. For taps and text, use the `agent-device` CLI.",
-  parameters: Schema.toCodecJson(DeviceToolTargetInput),
+  parameters: DeviceToolTargetInput,
   success: DeviceToolScreenshotResult,
   failure: DeviceToolFailure,
   dependencies,
@@ -87,7 +85,7 @@ export const DeviceScreenshotTool = Tool.make("device_screenshot", {
 const DeviceCloseTool = Tool.make("device_close", {
   description:
     "Remove a device from this thread's Device panel. `shutdown=true` also turns it off.",
-  parameters: Schema.toCodecJson(DeviceToolCloseInput),
+  parameters: DeviceToolCloseInput,
   success: Schema.Record(Schema.String, Schema.Never),
   failure: DeviceToolFailure,
   dependencies,

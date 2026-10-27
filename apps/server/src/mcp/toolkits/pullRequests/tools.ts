@@ -270,7 +270,7 @@ export type ListThreadPullRequestsResult = typeof ListThreadPullRequestsResult.T
 
 const LinkPullRequestTool = Tool.make("link_pull_request", {
   description: "Link a PR to this thread. T3 shows its status and settles the thread on merge.",
-  parameters: Schema.toCodecJson(PullRequestTargetInput),
+  parameters: PullRequestTargetInput,
   success: LinkPullRequestResult,
   failure: PullRequestToolError,
   dependencies,
@@ -284,7 +284,7 @@ const LinkPullRequestTool = Tool.make("link_pull_request", {
 const UnlinkPullRequestTool = Tool.make("unlink_pull_request", {
   description:
     "Remove a PR link from this thread. Succeeds with `wasLinked=false` when it was not linked.",
-  parameters: Schema.toCodecJson(PullRequestTargetInput),
+  parameters: PullRequestTargetInput,
   success: UnlinkPullRequestResult,
   failure: PullRequestToolError,
   dependencies,
@@ -298,13 +298,9 @@ const UnlinkPullRequestTool = Tool.make("unlink_pull_request", {
 const ListThreadPullRequestsTool = Tool.make("list_thread_pull_requests", {
   description:
     "List PRs linked to a thread, with last known state and stack order (bottom to top). Call only when you need that list. Never as an end-of-work check.",
-  parameters: Schema.toCodecJson(
-    Schema.Struct({
-      threadId: Schema.optional(
-        ThreadId.annotate({ description: "Thread. Default: this thread." }),
-      ),
-    }),
-  ),
+  parameters: Schema.Struct({
+    threadId: Schema.optional(ThreadId.annotate({ description: "Thread. Default: this thread." })),
+  }),
   success: ListThreadPullRequestsResult,
   failure: PullRequestToolError,
   dependencies,
@@ -318,7 +314,7 @@ const ListThreadPullRequestsTool = Tool.make("list_thread_pull_requests", {
 const WatchPullRequestTool = Tool.make("watch_pull_request", {
   description:
     "Watch an open PR for this thread, linking it first if needed. T3 wakes you on failed checks, passed required checks, new comments or reviews, or conflicts. Handle old comments first. Only later ones wake you. After this call, end your turn. The watch stays on after each wake, so do not call this again on a wake. A wake is not a merge decision. Check readiness yourself.",
-  parameters: Schema.toCodecJson(PullRequestTargetInput),
+  parameters: PullRequestTargetInput,
   success: WatchPullRequestResult,
   failure: PullRequestToolError,
   dependencies,
@@ -332,7 +328,7 @@ const WatchPullRequestTool = Tool.make("watch_pull_request", {
 
 const UnwatchPullRequestTool = Tool.make("unwatch_pull_request", {
   description: "Stop watching a PR for this thread. It stays linked.",
-  parameters: Schema.toCodecJson(PullRequestTargetInput),
+  parameters: PullRequestTargetInput,
   success: WatchPullRequestResult,
   failure: PullRequestToolError,
   dependencies,
@@ -378,11 +374,9 @@ export type ReadPullRequestGuideResult = typeof ReadPullRequestGuideResult.Type;
 const WritePullRequestGuidesTool = Tool.make("write_pull_request_guides", {
   description:
     "Write review guides for up to 20 PRs (the tour in the PR Guide tab). Returns once runs start. Each run takes minutes in a temporary checkout. A run for the same head is joined. Read with `read_pull_request_guide`. Fails while guides are off.",
-  parameters: Schema.toCodecJson(
-    Schema.Struct({
-      pullRequests: Schema.Array(GuideTarget).check(Schema.isMinLength(1), Schema.isMaxLength(20)),
-    }),
-  ),
+  parameters: Schema.Struct({
+    pullRequests: Schema.Array(GuideTarget).check(Schema.isMinLength(1), Schema.isMaxLength(20)),
+  }),
   success: WritePullRequestGuidesResult,
   failure: PullRequestToolError,
   dependencies: guideDependencies,
@@ -396,7 +390,7 @@ const WritePullRequestGuidesTool = Tool.make("write_pull_request_guides", {
 const ReadPullRequestGuideTool = Tool.make("read_pull_request_guide", {
   description:
     "Read a PR's stored review guide and run state. `guide` is null when none exists. Never starts a run.",
-  parameters: Schema.toCodecJson(GuideTarget),
+  parameters: GuideTarget,
   success: ReadPullRequestGuideResult,
   failure: PullRequestToolError,
   dependencies: guideDependencies,

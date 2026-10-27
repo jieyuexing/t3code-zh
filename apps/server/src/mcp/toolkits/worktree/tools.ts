@@ -28,7 +28,7 @@ const WorktreeToolFailure = Schema.Union([WorktreeMcpFailure, OrchestratorMcpFai
 const WorktreeHandoffTool = Tool.make("t3_worktree_handoff", {
   description:
     "Move THIS thread into a new git worktree on a new branch. Runs the setup script by default. A separate agent in a worktree: `t3_thread_launch` with `workspaceStrategy`. Call last in your turn. The move ends the live session. `continuationPrompt` resumes work there next turn. Without it, the thread waits. The worktree stays after the thread is deleted. Fails if this thread has a worktree.",
-  parameters: Schema.toCodecJson(WorktreeMcpHandoffInput),
+  parameters: WorktreeMcpHandoffInput,
   success: WorktreeMcpHandoffResult,
   failure: WorktreeToolFailure,
   failureMode: "return",
@@ -61,16 +61,14 @@ const WorktreeStatusTool = Tool.make("t3_worktree_status", {
 const WorktreeListTool = Tool.make("t3_worktree_list", {
   description:
     "List branch refs and checkout paths for a thread's workspace. Omit `threadId` for this thread. Detached worktrees with no branch are left out.",
-  parameters: Schema.toCodecJson(
-    Schema.Struct({
-      threadId: Schema.optional(ThreadId),
-      query: VcsListRefsInput.fields.query,
-      cursor: VcsListRefsInput.fields.cursor,
-      limit: VcsListRefsInput.fields.limit,
-      refKind: VcsListRefsInput.fields.refKind,
-      includeMatchingRemoteRefs: VcsListRefsInput.fields.includeMatchingRemoteRefs,
-    }),
-  ),
+  parameters: Schema.Struct({
+    threadId: Schema.optional(ThreadId),
+    query: VcsListRefsInput.fields.query,
+    cursor: VcsListRefsInput.fields.cursor,
+    limit: VcsListRefsInput.fields.limit,
+    refKind: VcsListRefsInput.fields.refKind,
+    includeMatchingRemoteRefs: VcsListRefsInput.fields.includeMatchingRemoteRefs,
+  }),
   success: VcsListRefsResult,
   failure: OrchestratorMcpFailure,
   failureMode: "return",
