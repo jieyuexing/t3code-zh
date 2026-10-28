@@ -112,7 +112,13 @@ export function buildTraitsTriggerDisplay(input: {
   reportedModelSelection?: ModelSelection | null | undefined;
   // Display-only label translation; the web client passes its locale dictionary.
   displayLabel?: (label: string) => string;
-}): { label: string } {
+}): {
+  label: string;
+  /** "Fast" or "Ultrafast" when a speed option is on. */
+  speedLabel: string | null;
+  /** Labels other than reasoning and speed, such as context window or thinking. */
+  otherLabels: ReadonlyArray<string>;
+} {
   const displayLabel = input.displayLabel ?? ((label: string) => label);
   let fastModeFallbackLabel: string | null = null;
   let speedLabel: string | null = null;
@@ -170,8 +176,9 @@ export function buildTraitsTriggerDisplay(input: {
     }
   }
 
+  const otherLabels = labels.filter((_, index) => index !== reasoningLabelIndex);
   if (labels.length === 0 && fastModeFallbackLabel !== null) {
-    return { label: displayLabel(fastModeFallbackLabel) };
+    return { label: displayLabel(fastModeFallbackLabel), speedLabel, otherLabels };
   }
   if (speedLabel) {
     if (reasoningLabelIndex >= 0) {
@@ -180,5 +187,5 @@ export function buildTraitsTriggerDisplay(input: {
       labels.push(displayLabel(speedLabel));
     }
   }
-  return { label: labels.join(" · ") };
+  return { label: labels.join(" · "), speedLabel, otherLabels };
 }
