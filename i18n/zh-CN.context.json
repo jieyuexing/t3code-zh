@@ -6,18 +6,41 @@
   "apps/web/src/components/AddProjectToMachineDialog.tsx": {
     "files.": "个文件。"
   },
+  "apps/web/src/components/DiffPanel.tsx": {
+    "of them.": "个。"
+  },
   "apps/web/src/components/Sidebar.tsx": {
     "Active": "收件箱"
   },
   "apps/web/src/components/auth/ConnectAgentSurface.tsx": {
     "on this machine.": "命令。"
   },
+  "apps/web/src/components/chat/ChatHeader.tsx": {
+    "Started by an agent on": "由"
+  },
   "apps/web/src/components/chat/DraftHeroProjectHeading.tsx": {
     "in": "："
+  },
+  "apps/web/src/components/chat/LinkRequestCard.tsx": {
+    "Create a link on": "请在"
   },
   "apps/web/src/components/chat/McpAppFrame.tsx": {
     "The": "",
     "Unable to load the": "无法加载"
+  },
+  "apps/web/src/components/chat/ThreadServersPanel.tsx": {
+    "for your browser.": "以在你的浏览器中打开。"
+  },
+  "apps/web/src/components/clerk/T3ChatUserProfilePage.tsx": {
+    ", then select Refresh.": " 上确认，然后选择“刷新”。",
+    "Confirm on": "请在",
+    "for more tunnels": "以获得更多隧道",
+    "to Premier for": "到 Premier，上限为",
+    "tunnels.": "个隧道。"
+  },
+  "apps/web/src/components/clerk/T3ConnectUserProfilePage.tsx": {
+    ", then select Refresh.": " 上确认，然后选择“刷新”。",
+    "Confirm on": "请在"
   },
   "apps/web/src/components/device/DeviceToolsPanel.tsx": {
     "Clear::line=206": "清透",
@@ -38,9 +61,34 @@
   "apps/web/src/components/pullRequest/PullRequestMarkdownEditor.tsx": {
     "Write": "编写"
   },
+  "apps/web/src/components/settings/AppearanceSettingsPanel.tsx": {
+    "Bars": "条形",
+    "Word": "文字"
+  },
+  "apps/web/src/components/settings/LabsSettingsPanel.tsx": {
+    "pool, added in": "池租用模拟器与仿真器（在"
+  },
+  "apps/web/src/components/settings/LinkedEnvironmentsSettings.tsx": {
+    "Create a link on": "请在",
+    "day": "天"
+  },
+  "apps/web/src/components/settings/SimlockDeviceHostEditor.tsx": {
+    "per environment": "（每个环境一个）",
+    "with": "，命令为"
+  },
+  "apps/web/src/components/settings/SnoozePresetsSettings.tsx": {
+    "In": "延后",
+    "Up to": "最多",
+    "at": "于",
+    "day": "天",
+    "options": "个选项"
+  },
   "apps/web/src/components/settings/ThemeSettings.tsx": {
     "added": "已添加",
     "updated": "已更新"
+  },
+  "apps/web/src/components/sidebar/UpdateEverythingDialog.tsx": {
+    "skipped": "项已跳过"
   },
   "apps/web/src/components/usage/UsagePage.tsx": {
     "Share": "占比"

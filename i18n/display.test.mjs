@@ -264,7 +264,11 @@ describe("display-only translation", () => {
         ultrathinkPromptControlled: false,
         displayLabel,
       });
-      expect(result).toEqual({ label });
+      expect(result.label).toBe(label);
+      // speedLabel stays English: TraitsPicker compares it to pick the bolt icon.
+      expect(result.speedLabel).toBe(
+        id === "priority" ? "Fast" : id === "ultrafast" ? "Ultrafast" : null,
+      );
       expect(descriptors).toEqual(original);
       const { buildProviderOptionSelectionsFromDescriptors } =
         await import("../packages/shared/src/model.ts");
