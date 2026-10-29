@@ -18,6 +18,9 @@
   "apps/web/src/components/chat/ChatHeader.tsx": {
     "Started by an agent on": "由"
   },
+  "apps/web/src/components/chat/ComposerUsageLimits.tsx": {
+    "Use": "使用"
+  },
   "apps/web/src/components/chat/DraftHeroProjectHeading.tsx": {
     "in": "："
   },
@@ -55,6 +58,10 @@
     "them": "",
     "up later from Settings.": ""
   },
+  "apps/web/src/components/pullRequest/PullRequestCodeTab.tsx": {
+    "hidden": "已隐藏（测试）",
+    "test": ""
+  },
   "apps/web/src/components/pullRequest/PullRequestListFilters.tsx": {
     "Host": "托管平台"
   },
@@ -72,8 +79,17 @@
     "Create a link on": "请在",
     "day": "天"
   },
+  "apps/web/src/components/settings/SecretProviderDialog.tsx": {
+    "Provider variables on": "在"
+  },
+  "apps/web/src/components/settings/SecretsSettings.tsx": {
+    "Provider variables that read from": "从",
+    "Update T3 Code on": "请更新"
+  },
   "apps/web/src/components/settings/SimlockDeviceHostEditor.tsx": {
+    "is this gateway.": "指向此网关。",
     "per environment": "（每个环境一个）",
+    "when its": "，前提是其",
     "with": "，命令为"
   },
   "apps/web/src/components/settings/SnoozePresetsSettings.tsx": {
@@ -86,6 +102,9 @@
   "apps/web/src/components/settings/ThemeSettings.tsx": {
     "added": "已添加",
     "updated": "已更新"
+  },
+  "apps/web/src/components/settings/UpdateTrackSwitchDialog.tsx": {
+    "nothing": "（无）"
   },
   "apps/web/src/components/sidebar/UpdateEverythingDialog.tsx": {
     "skipped": "项已跳过"

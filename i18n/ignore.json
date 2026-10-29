@@ -423,6 +423,14 @@
     "category": "brand",
     "reason": "protocol/registry proper name"
   },
+  "AGENT_DEVICE_DAEMON_AUTH_TOKEN": {
+    "category": "code",
+    "reason": "环境变量名"
+  },
+  "AGENT_DEVICE_DAEMON_BASE_URL": {
+    "category": "code",
+    "reason": "环境变量名"
+  },
   "Aa": {
     "category": "code",
     "reason": "Match-case toggle glyph"
@@ -1935,6 +1943,10 @@
     "category": "brand",
     "reason": "product name"
   },
+  "T3 adds an overridable 8px html gutter for selection rings and shadows. Use fluid widths within it.": {
+    "category": "protocol",
+    "reason": "html_render 写给 Agent 的渲染约束说明，不是界面文案"
+  },
   "T3 could not ask for approval here.": {
     "category": "protocol",
     "reason": "MCP Apps 宿主经 JSON-RPC 返回给第三方应用 iframe 的错误文本，由应用或模型解析，不是 T3 界面文案；保持原文。"
@@ -3143,6 +3155,10 @@
     "category": "code",
     "reason": "internal atom/command identifier"
   },
+  "environment-data:device:simlock-identity-check": {
+    "category": "code",
+    "reason": "查询/原子标签标识符"
+  },
   "environment-data:device:state": {
     "category": "code",
     "reason": "internal atom/command identifier"
@@ -3340,6 +3356,10 @@
     "reason": "internal atom/command identifier"
   },
   "environment-data:preview:stop-local-server": {
+    "category": "code",
+    "reason": "查询/原子标签标识符"
+  },
+  "environment-data:projects:create-from-thread": {
     "category": "code",
     "reason": "查询/原子标签标识符"
   },
@@ -4403,6 +4423,14 @@
     "category": "dev-only",
     "reason": "Effect 结构化日志消息，仅写入日志"
   },
+  "ignoring download outside the selected channel or its floor": {
+    "category": "diagnostic",
+    "reason": "更新器日志消息"
+  },
+  "ignoring update outside the selected channel or its floor": {
+    "category": "diagnostic",
+    "reason": "更新器日志消息"
+  },
   "ignoring update that does not match selected channel": {
     "category": "dev-only",
     "reason": "log message"
@@ -4650,6 +4678,10 @@
   "mx-auto flex w-full min-w-0 max-w-(--chat-content-max-width) items-center gap-1.5 px-1 pb-2 text-xs text-muted-foreground [&_svg]:size-3.5 [&_svg]:shrink-0": {
     "category": "code",
     "reason": "Tailwind 类名或 CSS 值，不是界面文案"
+  },
+  "my.1password.com": {
+    "category": "url",
+    "reason": "输入框占位的示例地址"
   },
   "next": {
     "category": "dev-only",
