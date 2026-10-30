@@ -792,7 +792,8 @@ const buildCliArchive = Effect.fn("buildCliArchive")(function* (input: {
       assertX64Binary(path.join(contentDir, executableName), input.platform as "linux" | "win"),
     );
   const executablePath = path.join(contentDir, executableName);
-  if (input.platform === "linux") {
+  // fork 在 macOS 上交叉构建，没有 ldd、dpkg-query、patchelf；Linux 包照旧依赖系统 libatomic。
+  if (input.platform === "linux" && hostPlatform === "linux") {
     yield* bundleLinuxLibatomic({ repoRoot, contentDir, executablePath });
   }
   // TEMPORARY one-time Node fix. Remove when fixed: https://github.com/nodejs/node/issues/67048
