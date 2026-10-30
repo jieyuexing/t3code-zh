@@ -656,6 +656,7 @@ const stageOfficialTemplate = Effect.fn("stageOfficialTemplate")(function* (inpu
       input.stageRoot,
       `${stem}/node_modules`,
       `${stem}/resource-monitor`,
+      ...(input.platform === "linux" ? [`${stem}/lib`] : []),
     ]),
     "extract verified official native closure",
   );
@@ -666,7 +667,10 @@ const stageOfficialTemplate = Effect.fn("stageOfficialTemplate")(function* (inpu
     if (stat.isDirectory()) {
       for (const entry of NodeFS.readdirSync(absolute).sort()) walk(`${relative}/${entry}`);
     } else if (stat.isFile()) {
-      if (/\.(node|dll|exe|so)$/.test(relative) || relative.endsWith("/t3-resource-monitor")) {
+      if (
+        /\.(node|dll|exe|so|so\.1)$/.test(relative) ||
+        relative.endsWith("/t3-resource-monitor")
+      ) {
         // node-pty 的源包保留其他 Windows 架构的 vendor 工具，ffi-rs 同时带 ia32 sibling。
         // 这些不供 x64 loader 使用，但也按目录声明校验其真实 PE 架构，完整记录原字节。
         const vendor = relative.includes("/third_party/conpty/");
@@ -684,6 +688,7 @@ const stageOfficialTemplate = Effect.fn("stageOfficialTemplate")(function* (inpu
   yield* Effect.sync(() => {
     walk("node_modules");
     walk("resource-monitor");
+    if (input.platform === "linux") walk("lib");
   });
   return { ...provenance, reused };
 });
@@ -792,8 +797,13 @@ const buildCliArchive = Effect.fn("buildCliArchive")(function* (input: {
       assertX64Binary(path.join(contentDir, executableName), input.platform as "linux" | "win"),
     );
   const executablePath = path.join(contentDir, executableName);
-  // fork 在 macOS 上交叉构建，没有 ldd、dpkg-query、patchelf；Linux 包照旧依赖系统 libatomic。
-  if (input.platform === "linux" && hostPlatform === "linux") {
+  // 模板模式复用官方包里已校验的 lib/libatomic.so.1 与许可证；macOS 上没有 ldd、dpkg-query。
+  if (input.platform === "linux" && template) {
+    yield* runCommand(
+      ChildProcess.make("patchelf", ["--set-rpath", "$ORIGIN/lib", executablePath]),
+      "patchelf --set-rpath",
+    );
+  } else if (input.platform === "linux") {
     yield* bundleLinuxLibatomic({ repoRoot, contentDir, executablePath });
   }
   // TEMPORARY one-time Node fix. Remove when fixed: https://github.com/nodejs/node/issues/67048
