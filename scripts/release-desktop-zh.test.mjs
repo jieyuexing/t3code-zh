@@ -587,6 +587,13 @@ NodeTest.test(
   },
 );
 
+NodeTest.test("publisher on GitHub Actions requires the injected token and adds no proxy", () => {
+  NodeAssert.throws(() => ghEnvironment({ GITHUB_ACTIONS: "true" }), /requires GH_TOKEN/);
+  const env = ghEnvironment({ GITHUB_ACTIONS: "true", GH_TOKEN: "fixture-token" });
+  NodeAssert.equal(env.GH_TOKEN, "fixture-token");
+  NodeAssert.ok(!("HTTPS_PROXY" in env));
+});
+
 NodeTest.test(
   "Windows validation script is ASCII so PowerShell 5.1 parses it under any code page",
   () => {

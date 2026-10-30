@@ -242,7 +242,13 @@ export async function checkInstallerOriginal(prepared, sevenZip, scratch) {
   )
     throw new Error("Extracted material file count mismatch");
 }
+// GitHub Actions（jieyuexing/t3code-zh-build）由工作流注入只授本仓发布权限的 GH_TOKEN，直连 GitHub。
+export const onGitHubActions = (base) => base.GITHUB_ACTIONS === "true";
 export function ghEnvironment(base) {
+  if (onGitHubActions(base)) {
+    if (!base.GH_TOKEN) throw new Error("GitHub Actions publish requires GH_TOKEN");
+    return base;
+  }
   for (const name of [
     "GH_TOKEN",
     "GITHUB_TOKEN",
@@ -401,7 +407,8 @@ export async function main() {
     dryRun: values["dry-run"],
     remoteState,
     gh,
-    upload,
+    // runner 直连上传快，用默认的 gh release upload。
+    upload: onGitHubActions(process.env) ? undefined : upload,
     assertUnchanged,
     scratch,
     notes,
