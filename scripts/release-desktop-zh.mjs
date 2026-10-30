@@ -425,6 +425,7 @@ export function publishPrepared({
   scratch,
   notes,
   log = console.log,
+  wait = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms),
 }) {
   assertUnchanged();
   let state = remoteState();
@@ -459,7 +460,8 @@ export function publishPrepared({
       "--notes-file",
       notesFile,
     );
-    state = remoteState();
+    // 刚建的草稿可能要几秒才出现在 releases 列表里（10-30 runner 上实测）。
+    for (let attempt = 0; !(state = remoteState()).release && attempt < 5; attempt++) wait(3000);
     if (!state.release)
       throw new Error("Draft creation accepted but draft not visible; inspect before retry");
     checkRemoteState(state, prepared, tag);

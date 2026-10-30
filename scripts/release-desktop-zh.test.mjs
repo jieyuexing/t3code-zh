@@ -530,6 +530,63 @@ NodeTest.test(
       NodeAssert.equal(writes.at(-1)[1], "edit");
     }),
 );
+NodeTest.test("a new draft that lists late is awaited a bounded number of times", () =>
+  withFixture((f) => {
+    const prepared = preflightSuite(f.suiteFile, source),
+      tag = releaseTag(version);
+    const run = (visibleAfter) => {
+      let created,
+        listings = 0,
+        release;
+      const waits = [];
+      const gh = (...args) => {
+        if (args[1] === "create") {
+          created = {
+            draft: true,
+            tag_name: tag,
+            target_commitish: source.head,
+            assets: [],
+            body: `<!-- t3zh-source:${source.head}:${source.treeSha256} suite:${prepared.setSha256} -->`,
+          };
+          listings = 0;
+        }
+        if (args[1] === "upload") {
+          const asset = prepared.assets.find((a) => a.file === args[3]);
+          release.assets.push({
+            name: asset.name,
+            size: asset.bytes,
+            digest: `sha256:${asset.sha256}`,
+            state: "uploaded",
+          });
+        }
+        if (args[1] === "edit") release.draft = false;
+      };
+      const remoteState = () => {
+        if (created && ++listings > visibleAfter) release = created;
+        return {
+          originHead: source.head,
+          release,
+          tagCommit: release?.draft === false ? source.head : undefined,
+        };
+      };
+      publishPrepared({
+        log: () => {},
+        prepared,
+        tag,
+        dryRun: false,
+        remoteState,
+        gh,
+        assertUnchanged: () => {},
+        scratch: NodeFS.mkdtempSync(NodePath.join(f.root, "s-")),
+        notes: "Fixture notes",
+        wait: (ms) => waits.push(ms),
+      });
+      return waits;
+    };
+    NodeAssert.deepEqual(run(2), [3000, 3000]);
+    NodeAssert.throws(() => run(Infinity), /draft not visible/);
+  }),
+);
 NodeTest.test("upload with stored hash mismatch never reaches publication", () =>
   withFixture((f) => {
     const prepared = preflightSuite(f.suiteFile, source),

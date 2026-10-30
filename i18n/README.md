@@ -112,7 +112,7 @@ powershell -NoProfile -File C:\isolated\materials\validate-windows-zh.ps1 `
 
 ### 套装发布
 
-`release-desktop-zh.mjs` 是唯一 publisher。协调者整合、提交并推送到 `origin/zh-i18n` 后，以同一 clean 源码构建要发布的产物并完成各自目标验证。套装必须含 **Windows x64 archive**（141 的 `t3-141-update win` 只取它和 SHA256SUMS）；DMG arm64、NSIS x64、Linux x64 archive 可选，含 NSIS 时必须同时含它所嵌的 Linux 包。2026-10-26 起手动发布默认只发 Windows x64 archive（方案 A）。`suite.json` 留任务目录，四件齐全时结构为（只发 Windows 时 artifacts 只留最后一项）：
+`release-desktop-zh.mjs` 是唯一 publisher。协调者整合、提交并推送到 `origin/zh-i18n` 后，以同一 clean 源码构建要发布的产物并完成各自目标验证。套装必须含 **Windows x64 archive**（141 的 `t3-141-update win` 只取它和 SHA256SUMS）；DMG arm64、NSIS x64、Linux x64 archive 可选，含 NSIS 时必须同时含它所嵌的 Linux 包。2026-10-30 起由公开仓库 `jieyuexing/t3code-zh-build` 的 `build.yml` 在 GitHub runner 上构建 DMG arm64、Linux x64 与 Windows x64 archive，各自在目标系统验证后调用本 publisher 发布（不含 NSIS，见该仓 README）；本机手动发布只在 runner 不可用时做。`suite.json` 留任务目录，四件齐全时结构为（只发 Windows 时 artifacts 只留最后一项）：
 
 ```json
 {
@@ -155,6 +155,6 @@ node scripts/release-desktop-zh.mjs --suite /task/suite.json --tag zh-vV-r1 --dr
 
 dry-run 无 GitHub 写入。完整本地预检通过后才查远端：HEAD 必须精确等于当前 origin/zh-i18n，tag 必须不存在或精确指向它，不能以任意远端包含 HEAD 代替。默认 tag 是 `zh-vV`，显式修订只接受 `zh-vV-rN`；产品版本和资产名不加 zh/rN。已有已发布 Release 永远不变。
 
-获准正式发布时才去掉 `--dry-run`：先建立 draft、上传套装产物和自动生成的 SHA256SUMS/PROVENANCE.json，逐件核对 GitHub 存储 digest/size，完整才 publish。同源码、同套装 draft 可恢复；同名异 hash、额外资产、错误 tag 或另一套源码均拒绝，不删除或覆盖修复。GitHub 经既有 2080 代理，上传使用 gh 自己管理凭据，令牌不进入 argv/env/日志。公开 provenance 只含必要版本、仓库/commit、源码与产物 hash、目标与检查边界，不上传私有候选清单或回执。
+获准正式发布时才去掉 `--dry-run`：先建立 draft、上传套装产物和自动生成的 SHA256SUMS/PROVENANCE.json，逐件核对 GitHub 存储 digest/size，完整才 publish。同源码、同套装 draft 可恢复；同名异 hash、额外资产、错误 tag 或另一套源码均拒绝，不删除或覆盖修复。本机经既有 2080 代理，上传使用 gh 自己管理凭据，令牌不进入 argv/env/日志；GitHub Actions 上（`GITHUB_ACTIONS=true`）只接受工作流注入的 `GH_TOKEN`，直连并用 `gh release upload`。公开 provenance 只含必要版本、仓库/commit、源码与产物 hash、目标与检查边界，不上传私有候选清单或回执。
 
 定向验证：`vp test run scripts/build-desktop-zh.test.ts scripts/build-cli-archive.test.ts scripts/build-desktop-artifact.test.ts`、`node --test scripts/release-desktop-zh.test.mjs`。严格自包含测试需祖先无 node_modules 的合格隔离 TMP 根，不移动宿主目录来通过。归档来源检查仍可用 `--verify-template-only`；fixture 通过不能替代 Windows 运行。
