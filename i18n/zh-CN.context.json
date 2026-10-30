@@ -15,6 +15,10 @@
   "apps/web/src/components/auth/ConnectAgentSurface.tsx": {
     "on this machine.": "命令。"
   },
+  "apps/web/src/components/chat/ChangedFilesTree.tsx": {
+    "in the full diff": "可在完整差异中查看",
+    "more file": "个文件未显示"
+  },
   "apps/web/src/components/chat/ChatHeader.tsx": {
     "Started by an agent on": "由"
   },
@@ -33,6 +37,9 @@
   },
   "apps/web/src/components/chat/ThreadServersPanel.tsx": {
     "for your browser.": "以在你的浏览器中打开。"
+  },
+  "apps/web/src/components/chat/useForceStopThread.ts": {
+    "other": "若干"
   },
   "apps/web/src/components/clerk/T3ChatUserProfilePage.tsx": {
     ", then select Refresh.": " 上确认，然后选择“刷新”。",
@@ -81,6 +88,9 @@
   },
   "apps/web/src/components/settings/SecretProviderDialog.tsx": {
     "Provider variables on": "在"
+  },
+  "apps/web/src/components/settings/SecretSourceInput.tsx": {
+    "Value": "直接输入"
   },
   "apps/web/src/components/settings/SecretsSettings.tsx": {
     "Provider variables that read from": "从",

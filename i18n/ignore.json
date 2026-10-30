@@ -35,6 +35,10 @@
     "category": "code",
     "reason": "字体族列表/字体名"
   },
+  "#!/bin/sh\nexec {0} \"$@\"": {
+    "category": "code",
+    "reason": "AgentScope launcher shell script"
+  },
   "#27272a": {
     "category": "code",
     "reason": "颜色值"
@@ -3219,6 +3223,10 @@
     "category": "code",
     "reason": "internal atom/command identifier"
   },
+  "environment-data:orchestration:force-stop-thread": {
+    "category": "protocol",
+    "reason": "atom query identifier"
+  },
   "environment-data:orchestration:full-thread-diff": {
     "category": "code",
     "reason": "internal atom/command identifier"
@@ -3570,6 +3578,10 @@
   "environment-data:pull-requests:update-comment": {
     "category": "code",
     "reason": "internal atom/command identifier"
+  },
+  "environment-data:review:branch-commits": {
+    "category": "protocol",
+    "reason": "atom query identifier"
   },
   "environment-data:review:diff-file-contents": {
     "category": "code",
@@ -4987,6 +4999,10 @@
     "category": "dev-only",
     "reason": "log message"
   },
+  "relative after:pointer-events-none after:absolute after:inset-0 after:z-10 after:rounded-[inherit] after:ring-1 after:ring-inset after:ring-black/9 dark:after:ring-white/12": {
+    "category": "style",
+    "reason": "Tailwind class list"
+  },
   "relative first:rounded-t-xl last:rounded-b-xl px-3 py-3 sm:px-4": {
     "category": "code",
     "reason": "Tailwind class names"
@@ -5498,6 +5514,10 @@
   "v{0}": {
     "category": "code",
     "reason": "版本号格式 v{0}"
+  },
+  "w-64 gap-2 rounded-2xl bg-message px-3 py-2 text-sm text-message-foreground": {
+    "category": "style",
+    "reason": "Tailwind class list"
   },
   "w-full flex items-center text-base sm:text-sm justify-center h-(--cell-size) gap-1.5 *:[span]:font-medium": {
     "category": "code",
