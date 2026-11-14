@@ -329,3 +329,21 @@ it("denies every callHost to a plugin without the capability", async () => {
   expect(observed.seen).toContain("error:1:denied");
   expect(observed.seen).toContain("error:2:denied");
 });
+
+it("lets only a plugin that declared host.clipboard-write copy to the clipboard", async () => {
+  using _observed = setup(HOST_PAGE);
+  for (const [capabilities, allow] of [
+    [[], null],
+    [["host.vcs-read"], null],
+    [["host.clipboard-write"], "clipboard-write"],
+  ] as const) {
+    await using screen = await render(
+      <PluginViewFrame {...frameProps} capabilities={capabilities} />,
+      { router: false },
+    );
+    await vi.waitFor(() => expect(screen.container.querySelector("iframe")).not.toBeNull());
+    const iframe = screen.container.querySelector("iframe")!;
+    expect(iframe.getAttribute("allow")).toBe(allow);
+    expect(iframe.getAttribute("sandbox")).toBe("allow-scripts allow-forms");
+  }
+});

@@ -5,6 +5,10 @@ import type {
   ReviewDiffPreviewResult,
 } from "@t3tools/contracts";
 
+import { mediaFileReference } from "@t3tools/client-runtime/media-reference";
+import { joinPath } from "@t3tools/shared/fileLinks";
+import { isAbsolutePath } from "@t3tools/shared/path";
+
 import { BridgeCallError } from "./bridge";
 import { openableUrl } from "./openUrl";
 import { clipReply, type PendingThread } from "./pendingThreads";
@@ -15,6 +19,7 @@ const THREADS_READ_CAPABILITY = "host.threads-read";
 const THREADS_ORGANIZE_CAPABILITY = "host.threads-organize";
 const OPEN_URL_CAPABILITY = "host.open-url";
 const BROWSER_CAPABILITY = "host.browser";
+const OPEN_FILE_CAPABILITY = "host.open-file";
 
 export interface DiffTarget {
   readonly kind: "working-tree" | "commit";
@@ -51,6 +56,10 @@ export interface HostApiDeps {
   }) => Promise<void>;
   /** The browser profiles a tab can open in. */
   readonly browserProfiles: () => ReadonlyArray<BrowserProfileSummary>;
+  /** The thread's workspace root, which bounds `t3.openFile`; `null` without a thread. */
+  readonly workspaceRoot: string | null;
+  /** Opens a workspace file, by its `/` path relative to the root, as a tab of the thread's file panel. */
+  readonly openFile: (relativePath: string, line?: number) => void;
 }
 
 export interface BrowserProfileSummary {
@@ -219,6 +228,24 @@ const HANDLERS: Readonly<Record<string, Handler>> = {
     await deps.openBrowser({ url, ...(profileId === undefined ? {} : { profileId }), background });
     return null;
   },
+  // The file panel is the only reader: a path counts only if it stays inside the thread's workspace.
+  "t3.openFile": async (deps, input) => {
+    const path = readText(input, "path");
+    const line = input.line ?? undefined;
+    if (line !== undefined && (typeof line !== "number" || !Number.isInteger(line) || line < 1)) {
+      throw invalid('"line" must be a positive whole number.');
+    }
+    const root = deps.workspaceRoot;
+    if (root === null) {
+      throw new BridgeCallError({ code: "call-failed", message: "The thread has no workspace." });
+    }
+    const separator = root.includes("\\") || /^[A-Za-z]:/.test(root) ? "\\" : "/";
+    const absolute = isAbsolutePath(path) ? path : joinPath(root, path, separator);
+    const relativePath = mediaFileReference(absolute, root).relativePath;
+    if (relativePath === undefined) throw invalid("The file is outside the thread's workspace.");
+    deps.openFile(relativePath, line);
+    return null;
+  },
   "browser.profiles": async (deps) =>
     deps.browserProfiles().map(({ id, name, kind }) => ({ id, name, kind })),
 };
@@ -234,11 +261,12 @@ const CAPABILITY_OF: Readonly<Record<string, string>> = {
   "t3.openUrl": OPEN_URL_CAPABILITY,
   "browser.open": BROWSER_CAPABILITY,
   "browser.profiles": BROWSER_CAPABILITY,
+  "t3.openFile": OPEN_FILE_CAPABILITY,
 };
 
 /**
  * What a view's `callHost` reaches: a read-only slice of T3's Git, the diff panel, the thread
- * list and replies, snoozing, opening a web page in the system browser or the thread's T3 browser, and the caller's own settings
+ * list and replies, snoozing, opening a web page in the system browser or the thread's T3 browser, opening a workspace file in the thread's file panel, and the caller's own settings
  * page. A plugin that did not declare the capability a method needs is denied it, as is any
  * method not listed here.
  */
