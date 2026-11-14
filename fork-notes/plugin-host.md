@@ -109,4 +109,4 @@ t3code-cn 自建的通用插件系统，语义参照 Cordis：插件按清单声
 
 ## 未验证
 
-Electron 桌面端、Windows（141）上的子进程通信、官方手机版（看不到插件）、Agent 工具的 evals（没有 API key）、真实界面里的 “Modifies” 标记。
+`browser.open` 只在网页端加服务端浏览器（headless Chromium）下走查过，Electron 桌面端自带 webview 的路径没跑；Electron 桌面端、Windows（141）上的子进程通信、官方手机版（看不到插件）、Agent 工具的 evals（没有 API key）、真实界面里的 “Modifies” 标记。
