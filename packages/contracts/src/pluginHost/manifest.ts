@@ -14,7 +14,8 @@ export const PLUGIN_EXTENSION_NAMESPACE = "com.jieyuexing.t3code";
 /**
  * Capability names this host serves. `host.vcs-read` lets a view read Git through the host,
  * `host.threads-read` lets it read the thread list and replies, `host.threads-organize`
- * lets it snooze threads, and `host.open-url` lets it open a web page in the browser.
+ * lets it snooze threads, `host.open-url` lets it open a web page in the system browser, and
+ * `host.browser` lets it open one as a tab of the thread's T3 browser.
  */
 export const PLUGIN_HOST_CAPABILITIES = [
   "settings",
@@ -23,6 +24,7 @@ export const PLUGIN_HOST_CAPABILITIES = [
   "host.threads-read",
   "host.threads-organize",
   "host.open-url",
+  "host.browser",
 ] as const;
 
 /** The only top-level fields the specification permits in `plugin.json`. */
