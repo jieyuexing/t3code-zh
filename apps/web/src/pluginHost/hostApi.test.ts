@@ -4,8 +4,12 @@ import { createHostApi, type HostApiDeps } from "./hostApi";
 
 const CAPABILITY = "host.vcs-read";
 
-function setup(capabilities: ReadonlyArray<string> = [CAPABILITY]) {
+function setup(
+  capabilities: ReadonlyArray<string> = [CAPABILITY],
+  workspaceRoot: string | null = "/work/repo",
+) {
   const deps = {
+    workspaceRoot,
     status: vi.fn(async (input: { cwd: string }) => ({ isRepo: true, cwd: input.cwd })),
     preview: vi.fn(),
     fileContents: vi.fn(async () => ({ oldContents: "old", newContents: "new" })),
@@ -17,6 +21,12 @@ function setup(capabilities: ReadonlyArray<string> = [CAPABILITY]) {
     openThread: vi.fn(),
     snoozeThread: vi.fn(async () => undefined),
     openUrl: vi.fn(async () => undefined),
+    openBrowser: vi.fn(async () => undefined),
+    openFile: vi.fn(),
+    browserProfiles: vi.fn(() => [
+      { id: "default", name: "Default", kind: "persistent" as const },
+      { id: "incognito", name: "Incognito", kind: "incognito" as const },
+    ]),
   } satisfies Omit<HostApiDeps, "capabilities">;
   return { deps, call: createHostApi({ capabilities, ...deps }) };
 }
@@ -43,6 +53,8 @@ const DENIED = { code: "denied" };
 const THREADS_READ = "host.threads-read";
 const THREADS_ORGANIZE = "host.threads-organize";
 const OPEN_URL = "host.open-url";
+const BROWSER = "host.browser";
+const OPEN_FILE = "host.open-file";
 
 describe("host api", () => {
   it("keeps each thread method behind its own capability", async () => {
@@ -260,5 +272,105 @@ describe("host api", () => {
     await expect(call("t3.openDiff", { kind: "working-tree" })).rejects.toMatchObject(DENIED);
     expect(deps.status).not.toHaveBeenCalled();
     expect(deps.openDiff).not.toHaveBeenCalled();
+  });
+  it("opens a page in the T3 browser only with host.browser", async () => {
+    for (const capabilities of [["views"], [OPEN_URL], ["host.vcs-read"]]) {
+      const { deps, call } = setup(capabilities);
+      await expect(call("browser.open", { url: "https://example.com" })).rejects.toMatchObject(
+        DENIED,
+      );
+      await expect(call("browser.profiles", {})).rejects.toMatchObject(DENIED);
+      expect(deps.openBrowser).not.toHaveBeenCalled();
+    }
+    const { deps, call } = setup([BROWSER]);
+    await expect(call("browser.open", { url: "https://example.com/a?b=1" })).resolves.toBeNull();
+    expect(deps.openBrowser).toHaveBeenLastCalledWith({
+      url: "https://example.com/a?b=1",
+      background: false,
+    });
+    await expect(
+      call("browser.open", {
+        url: "http://127.0.0.1:3000/",
+        profileId: "default",
+        background: true,
+      }),
+    ).resolves.toBeNull();
+    expect(deps.openBrowser).toHaveBeenLastCalledWith({
+      url: "http://127.0.0.1:3000/",
+      profileId: "default",
+      background: true,
+    });
+    await expect(call("browser.profiles", {})).resolves.toEqual([
+      { id: "default", name: "Default", kind: "persistent" },
+      { id: "incognito", name: "Incognito", kind: "incognito" },
+    ]);
+  });
+
+  it("rejects non-web URLs, unknown profiles and a non-boolean background", async () => {
+    const { deps, call } = setup([BROWSER]);
+    for (const url of ["javascript:alert(1)", "file:///etc/passwd", "data:text/html,hi", "/x"]) {
+      await expect(call("browser.open", { url })).rejects.toMatchObject({ code: "invalid" });
+    }
+    await expect(
+      call("browser.open", { url: "https://example.com", profileId: "nope" }),
+    ).rejects.toMatchObject({ code: "invalid" });
+    await expect(
+      call("browser.open", { url: "https://example.com", background: "yes" }),
+    ).rejects.toMatchObject({ code: "invalid" });
+    expect(deps.openBrowser).not.toHaveBeenCalled();
+  });
+  it("opens a workspace file in the T3 file panel only with host.open-file", async () => {
+    for (const capabilities of [["views"], [OPEN_URL], [BROWSER], ["host.vcs-read"]]) {
+      const { deps, call } = setup(capabilities);
+      await expect(call("t3.openFile", { path: "src/a.ts" })).rejects.toMatchObject(DENIED);
+      expect(deps.openFile).not.toHaveBeenCalled();
+    }
+    const { deps, call } = setup([OPEN_FILE]);
+    await expect(call("t3.openFile", { path: "src/a.ts" })).resolves.toBeNull();
+    expect(deps.openFile).toHaveBeenLastCalledWith("src/a.ts", undefined);
+    await expect(
+      call("t3.openFile", { path: "/work/repo/docs/b.md", line: 12 }),
+    ).resolves.toBeNull();
+    expect(deps.openFile).toHaveBeenLastCalledWith("docs/b.md", 12);
+    await expect(call("t3.openFile", { path: "./src/../src/c.ts" })).resolves.toBeNull();
+    expect(deps.openFile).toHaveBeenLastCalledWith("src/c.ts", undefined);
+  });
+
+  it("refuses files outside the thread's workspace, and bad lines", async () => {
+    const { deps, call } = setup([OPEN_FILE]);
+    for (const path of [
+      "../secret.txt",
+      "src/../../secret.txt",
+      "/etc/passwd",
+      "/work/repo-other/a.txt",
+      "/work/repo",
+      "",
+    ]) {
+      await expect(call("t3.openFile", { path }), path).rejects.toMatchObject({ code: "invalid" });
+    }
+    for (const line of [0, -1, 1.5, "3"]) {
+      await expect(
+        call("t3.openFile", { path: "a.txt", line }),
+        String(line),
+      ).rejects.toMatchObject({
+        code: "invalid",
+      });
+    }
+    expect(deps.openFile).not.toHaveBeenCalled();
+    const noThread = setup([OPEN_FILE], null);
+    await expect(noThread.call("t3.openFile", { path: "a.txt" })).rejects.toMatchObject({
+      code: "call-failed",
+    });
+  });
+
+  it("keeps the workspace boundary on Windows paths", async () => {
+    const { deps, call } = setup([OPEN_FILE], "C:\\work\\repo");
+    await expect(call("t3.openFile", { path: "C:\\work\\repo\\src\\a.ts" })).resolves.toBeNull();
+    expect(deps.openFile).toHaveBeenLastCalledWith("src/a.ts", undefined);
+    await expect(call("t3.openFile", { path: "src\\b.ts" })).resolves.toBeNull();
+    expect(deps.openFile).toHaveBeenLastCalledWith("src/b.ts", undefined);
+    await expect(call("t3.openFile", { path: "D:\\other\\a.ts" })).rejects.toMatchObject({
+      code: "invalid",
+    });
   });
 });

@@ -7,13 +7,19 @@ import { useNavigate } from "@tanstack/react-router";
 import { ThreadId } from "@t3tools/contracts";
 import type { EnvironmentId, PluginId, ScopedThreadRef } from "@t3tools/contracts";
 
+import { canOpenLinksInApp } from "../browser/browserLinkTarget";
+import { getBrowserDefaults } from "../browser/browserDefaults";
+import { isBrowserSettingsReadError, openUrlInPreview } from "../browser/openFileInPreview";
+import { recordVisitForThread } from "../browserHistoryStore";
 import { readLocalApi } from "../localApi";
 import { appAtomRegistry } from "../rpc/atomRegistry";
 import { orchestrationEnvironment } from "../state/orchestration";
+import { previewEnvironment } from "../state/preview";
 import { environmentProjects } from "../state/projects";
 import { environmentThreadShells, threadEnvironment } from "../state/threads";
 import { useAtomCommand } from "../state/use-atom-command";
 import { useOrchestrationCommand } from "../state/use-orchestration-command";
+import { rightPanelHostRef, useRightPanelStore } from "../rightPanelStore";
 import { buildThreadRouteParams } from "../threadRoutes";
 import { BridgeCallError } from "./bridge";
 import { openThreadDiff } from "./diffNavigation";
@@ -38,8 +44,10 @@ export function useHostApi(options: {
   readonly pluginId: PluginId;
   readonly capabilities: ReadonlyArray<string>;
   readonly threadRef: ScopedThreadRef | null;
+  /** The thread's workspace root; `t3.openFile` stays inside it. */
+  readonly cwd: string | null;
 }) {
-  const { environmentId, pluginId, capabilities, threadRef } = options;
+  const { environmentId, pluginId, capabilities, threadRef, cwd } = options;
   const navigate = useNavigate();
   const quietly = { reportFailure: false };
   const status = useAtomCommand(pluginHostEnvironment.vcsStatus, quietly);
@@ -47,6 +55,7 @@ export function useHostApi(options: {
   const fileContents = useAtomCommand(pluginHostEnvironment.diffFileContents, quietly);
   const transcript = useAtomCommand(orchestrationEnvironment.threadTranscript, quietly);
   const snooze = useOrchestrationCommand(threadEnvironment.snooze, quietly);
+  const openPreview = useAtomCommand(previewEnvironment.open, quietly);
   const readItems = async (threadId: string) =>
     unwrap(
       await transcript({ environmentId, input: { threadId: ThreadId.make(threadId) } }),
@@ -117,6 +126,41 @@ export function useHostApi(options: {
         });
       }
       await api.shell.openExternal(url);
+    },
+    openBrowser: async ({ url, profileId, background }) => {
+      if (threadRef === null || !canOpenLinksInApp(threadRef)) {
+        throw new BridgeCallError({
+          code: "call-failed",
+          message: "The browser is unavailable in this thread.",
+        });
+      }
+      const result = await openUrlInPreview({
+        threadRef,
+        url,
+        openPreview,
+        background,
+        ...(profileId === undefined ? {} : { profileId }),
+      });
+      if (result._tag !== "Success") {
+        const error = squashAtomCommandFailure(result);
+        throw new BridgeCallError({
+          code: isAtomCommandInterrupted(result) ? "cancelled" : "call-failed",
+          message: isBrowserSettingsReadError(error)
+            ? "The saved browser settings could not be loaded."
+            : error instanceof Error
+              ? error.message
+              : "The browser could not open the page.",
+        });
+      }
+      recordVisitForThread(threadRef, url);
+    },
+    browserProfiles: () => getBrowserDefaults().profiles,
+    workspaceRoot: threadRef === null ? null : cwd,
+    openFile: (relativePath, line) => {
+      if (threadRef === null) {
+        throw new BridgeCallError({ code: "call-failed", message: "There is no thread." });
+      }
+      useRightPanelStore.getState().openFile(rightPanelHostRef(threadRef), relativePath, line);
     },
   });
 }

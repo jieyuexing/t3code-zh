@@ -74,7 +74,7 @@ export function PluginViewFrame(props: {
   } = props;
   const call = useStableCallback(usePluginHostCall(environmentId));
   const callHost = useStableCallback(
-    useHostApi({ environmentId, pluginId, capabilities, threadRef }),
+    useHostApi({ environmentId, pluginId, capabilities, threadRef, cwd }),
   );
   const context = usePluginViewContext(cwd, focus);
   const contextRef = useRef(context);
@@ -155,6 +155,8 @@ export function PluginViewFrame(props: {
         title={title}
         // Omitting allow-same-origin keeps the page apart from the session.
         sandbox="allow-scripts allow-forms"
+        // Writing the clipboard is delegated only to a page whose plugin declared it; reading never is.
+        allow={capabilities.includes("host.clipboard-write") ? "clipboard-write" : undefined}
         className="block size-full border-0"
       />
     );

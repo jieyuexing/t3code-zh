@@ -11,11 +11,7 @@ export const PLUGIN_MANIFEST_MAX_BYTES = 64 * 1024;
 const PLUGIN_SCHEMA_ID = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json";
 export const PLUGIN_EXTENSION_NAMESPACE = "com.jieyuexing.t3code";
 
-/**
- * Capability names this host serves. `host.vcs-read` lets a view read Git through the host,
- * `host.threads-read` lets it read the thread list and replies, `host.threads-organize`
- * lets it snooze threads, and `host.open-url` lets it open a web page in the browser.
- */
+/** Capability names this host serves; `fork-notes/plugin-host.md` lists what each one reaches. */
 export const PLUGIN_HOST_CAPABILITIES = [
   "settings",
   "views",
@@ -23,6 +19,9 @@ export const PLUGIN_HOST_CAPABILITIES = [
   "host.threads-read",
   "host.threads-organize",
   "host.open-url",
+  "host.browser",
+  "host.open-file",
+  "host.clipboard-write",
 ] as const;
 
 /** The only top-level fields the specification permits in `plugin.json`. */
